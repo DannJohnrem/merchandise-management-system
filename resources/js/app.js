@@ -9,20 +9,27 @@ if (!document.getElementById('toast-container')) {
 }
 
 window.toast = (message, type = 'success', duration = 4000) => {
+    const colors = {
+        success: '#48bb78', // green
+        error: '#f56565',   // red
+        warning: '#ed8936', // orange
+        info: '#4299e1',    // blue
+    };
+
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
     toast.textContent = message;
     toast.style.cssText = `
         position: relative;
-        background: ${type === 'error' ? '#f56565' : '#48bb78'};
+        background: ${colors[type] || colors.success};
         color: white;
         padding: 0.75rem 1rem;
         margin-top: 0.5rem;
         border-radius: 0.375rem;
         box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         opacity: 0;
-        transform: translateX(100%);
-        transition: all 0.3s ease;
+        transform: translateX(120%);
+        transition: all 0.35s ease;
         overflow: hidden;
         min-width: 220px;
     `;
@@ -35,23 +42,26 @@ window.toast = (message, type = 'success', duration = 4000) => {
         bottom: 0;
         left: 0;
         height: 4px;
-        background: rgba(255,255,255,0.7);
+        background: rgba(255,255,255,0.8);
         width: 100%;
         transition: width ${duration}ms linear;
     `;
     toast.appendChild(progress);
 
-    // Animate toast in
+    // ✅ Trick: Wait 2 animation frames before starting transition
+    // This ensures layout is fully applied before animating
     requestAnimationFrame(() => {
-        toast.style.opacity = '1';
-        toast.style.transform = 'translateX(0)';
-        progress.style.width = '0%';
+        requestAnimationFrame(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(0)';
+            progress.style.width = '0%';
+        });
     });
 
     // Remove toast after duration
     setTimeout(() => {
         toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        toast.addEventListener('transitionend', () => toast.remove());
+        toast.style.transform = 'translateX(120%)';
+        toast.addEventListener('transitionend', () => toast.remove(), { once: true });
     }, duration);
 };
