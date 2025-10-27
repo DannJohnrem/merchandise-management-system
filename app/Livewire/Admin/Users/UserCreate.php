@@ -31,11 +31,9 @@ class UserCreate extends Component
 
         $user->assignRole($this->role);
 
-        // 🔔 Trigger global toast
-        $this->dispatch('toast', [
-            'message' => 'User created successfully!',
-            'type' => 'success',
-        ]);
+        // 🔔 Livewire v3 way to trigger browser events
+        $this->dispatch('toast', message: 'User created successfully!', type: 'success');
+
 
         $this->reset(['name', 'email', 'password', 'role']);
     }

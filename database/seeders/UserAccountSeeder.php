@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class UserAccountSeeder extends Seeder
 {
@@ -15,7 +15,7 @@ class UserAccountSeeder extends Seeder
     public function run(): void
     {
         // Ensure the Super Admin role exists
-        $superAdminRole = \Spatie\Permission\Models\Role::firstOrCreate([
+        $superAdminRole = Role::firstOrCreate([
             'name' => 'Super Admin',
             'guard_name' => 'web',
         ]);

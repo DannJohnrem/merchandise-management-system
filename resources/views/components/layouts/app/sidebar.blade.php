@@ -125,14 +125,6 @@
 
         {{ $slot }}
 
-        <script>
-            document.addEventListener('livewire:init', () => {
-                Livewire.on('toast', (message, type = 'success') => {
-                    window.toast(message, type);
-                });
-            });
-        </script>
-
         @fluxScripts
     </body>
 </html>
