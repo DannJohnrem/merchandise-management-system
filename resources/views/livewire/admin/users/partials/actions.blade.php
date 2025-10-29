@@ -5,7 +5,7 @@
 
     <flux:menu>
         @can('edit users')
-            <flux:menu.item as="a" icon="pencil-square" wire:navigate href="{{ route('admin.users.edit', $user) }}">
+            <flux:menu.item as="a" variant="default" icon="pencil-square" wire:navigate href="{{ route('admin.users.edit', $user) }}">
                 Edit
             </flux:menu.item>
         @endcan
