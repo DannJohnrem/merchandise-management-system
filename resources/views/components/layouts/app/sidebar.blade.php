@@ -22,6 +22,11 @@
                         :current="request()->routeIs('admin.users.*')" wire:navigate>
                         {{ __('Users') }}
                     </flux:navlist.item>
+
+                    <flux:navlist.item icon="shield-check" :href="route('admin.roles.index')"
+                        :current="request()->routeIs('admin.roles.*')" wire:navigate>
+                        {{ __('Roles') }}
+                    </flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 
