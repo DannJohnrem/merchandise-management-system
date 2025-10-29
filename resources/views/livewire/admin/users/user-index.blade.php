@@ -22,3 +22,13 @@
         <livewire:admin.users.user-table />
     </div>
 </div>
+
+{{-- Delete Confirmation Listener --}}
+<script>
+    document.addEventListener('confirm-delete', (event) => {
+        const id = event.detail.id;
+        if (confirm('Are you sure you want to delete this user?')) {
+            Livewire.dispatch('confirmDelete', { id });
+        }
+    });
+</script>

@@ -12,6 +12,8 @@ class UserTable extends DataTableComponent
 {
     protected $model = User::class;
 
+    protected $listeners = ['confirmDelete' => 'deleteUser'];
+
     public array $bulkActions = [
         'deleteSelected' => '🗑️ Delete Selected',
     ];
@@ -74,21 +76,47 @@ class UserTable extends DataTableComponent
     }
 
     /**
-     * Bulk action handler
+     * 🔹 Individual Delete (Model Binding)
+     */
+    public function deleteUser(int $id): void
+    {
+        $user = User::find($id);
+
+        if (! $user) {
+            $this->dispatch('notify', type: 'error', message: 'User not found.');
+            return;
+        }
+
+        $user->delete();
+
+        $this->setPage(1);
+        $this->dispatch('$refresh');
+
+        $this->dispatch('notify', type: 'success', message: "User {$user->name} deleted successfully.");
+    }
+
+    /**
+     * 🔹 Bulk Delete
      */
     public function deleteSelected(): void
     {
-        $count = $this->getSelected()->count();
+        $selected = $this->getSelected();
+        $count = count($selected);
 
         if ($count === 0) {
             $this->dispatch('notify', type: 'warning', message: 'No users selected.');
             return;
         }
 
-        User::whereIn('id', $this->getSelected())->delete();
+        // Delete users
+        User::whereIn('id', $selected)->get()->each->delete();
 
+        // Clear selection and refresh the table
         $this->clearSelected();
+        $this->setPage(1);
+        $this->dispatch('$refresh'); // ✅ triggers Livewire re-render safely
 
+        // Notify success
         $this->dispatch('notify', type: 'success', message: "{$count} user(s) deleted successfully.");
     }
 
@@ -114,7 +142,7 @@ class UserTable extends DataTableComponent
                 ->label(fn($row) => $row->roles->isEmpty()
                     ? "<span class='px-2 py-1 text-xs text-gray-500'>No role yet</span>"
                     : $row->roles->pluck('name')
-                        ->map(fn($name) => "<span class='px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'>{$name}</span>")
+                        ->map(fn($name) => "<flux:badge color='sky'>{$name}</flux:badge>")
                         ->implode(' '))
                 ->html(),
 

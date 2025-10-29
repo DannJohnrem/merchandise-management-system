@@ -29,7 +29,7 @@ window.toast = (message, type = 'success', duration = 4000) => {
         box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         opacity: 0;
         transform: translateX(120%);
-        transition: all 0.35s ease;
+        transition: opacity 0.4s ease, transform 0.4s ease;
         overflow: hidden;
         min-width: 220px;
     `;
@@ -48,8 +48,7 @@ window.toast = (message, type = 'success', duration = 4000) => {
     `;
     toast.appendChild(progress);
 
-    // ✅ Trick: Wait 2 animation frames before starting transition
-    // This ensures layout is fully applied before animating
+    // Animate entrance and progress
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
             toast.style.opacity = '1';
@@ -58,10 +57,14 @@ window.toast = (message, type = 'success', duration = 4000) => {
         });
     });
 
-    // Remove toast after duration
+    // Start exit animation a bit before removal
     setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transform = 'translateX(120%)';
-        toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+    }, duration - 400); // fade out 0.4s before total duration
+
+    // Remove element after exit transition completes
+    setTimeout(() => {
+        toast.remove();
     }, duration);
 };
