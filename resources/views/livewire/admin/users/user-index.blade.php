@@ -25,10 +25,10 @@
 
 {{-- Delete Confirmation Listener --}}
 <script>
-    document.addEventListener('confirm-delete', (event) => {
+    document.addEventListener('confirm-delete-user', (event) => {
         const id = event.detail.id;
         if (confirm('Are you sure you want to delete this user?')) {
-            Livewire.dispatch('confirmDelete', { id });
+            Livewire.dispatch('confirmDeleteUser', { id });
         }
     });
 </script>

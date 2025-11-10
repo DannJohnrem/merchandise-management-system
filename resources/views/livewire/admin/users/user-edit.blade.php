@@ -66,10 +66,4 @@
     </div>
 </div>
 
-{{-- Toastify listener --}}
-<script>
-    window.addEventListener('toast', event => {
-        const { message, type = 'success' } = event.detail;
-        window.toast(message, type);
-    });
-</script>
+

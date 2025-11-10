@@ -14,7 +14,7 @@
 
         @can('delete users')
             <flux:menu.item as="button" variant="danger" icon="trash" class="cursor-pointer"
-                @click="$dispatch('confirm-delete', { id: {{ $user->id }} })">
+                @click="$dispatch('confirm-delete-user', { id: {{ $user->id }} })">
                 Delete
             </flux:menu.item>
         @endcan

@@ -2,64 +2,70 @@
 
 namespace App\Livewire\Admin\Roles;
 
+use Throwable;
+use App\Models\Role;
 use Livewire\Component;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
+use App\Models\Permission;
+use Illuminate\Database\QueryException;
+use Illuminate\Validation\ValidationException;
 
 class RoleCreate extends Component
 {
     public $name = '';
-    public $permissions = [];
     public $selectedPermissions = [];
-
-    public $roles;
-
-    protected $rules = [
-        'name' => 'required|string|max:255|unique:roles,name',
-    ];
-
-    public function mount()
-    {
-        $this->loadRoles();
-        $this->permissions = Permission::orderBy('name')->get();
-    }
-
-    public function loadRoles()
-    {
-        $this->roles = Role::with('permissions')->orderBy('name')->get();
-    }
 
     public function save()
     {
-        $this->validate();
+        try {
+            // Validate input
+            $validated = $this->validate([
+                'name' => 'required|string|max:255|unique:roles,name',
+                'selectedPermissions' => 'array',
+                'selectedPermissions.*' => 'exists:permissions,name',
+            ]);
 
-        $role = Role::create(['name' => $this->name]);
-        $role->syncPermissions($this->selectedPermissions);
+            // Create role
+            $role = Role::create(['name' => $validated['name']]);
 
-        $this->reset(['name', 'selectedPermissions']);
-        $this->loadRoles();
+            // Assign permissions if any
+            if (!empty($validated['selectedPermissions'])) {
+                $role->syncPermissions($validated['selectedPermissions']);
+            }
 
-        $this->dispatchBrowserEvent('toast', [
-            'type' => 'success',
-            'message' => 'Role created successfully!',
-        ]);
-    }
+            // Store toast in session so it shows after redirect
+            session()->flash('toast', [
+                'message' => 'Role updated successfully!',
+                'type' => 'success',
+            ]);
 
-    public function deleteRole($id)
-    {
-        $role = Role::findOrFail($id);
-        $role->delete();
+            // SPA redirect — Livewire v3 compatible
+            $this->redirect(route('admin.roles.index'), navigate: true);
 
-        $this->loadRoles();
+        } catch (ValidationException $e) {
+            $this->dispatch('toast', message: 'Please check the required fields.', type: 'error');
+            throw $e;
 
-        $this->dispatchBrowserEvent('toast', [
-            'type' => 'success',
-            'message' => 'Role deleted successfully!',
-        ]);
+        } catch (QueryException $e) {
+            $this->dispatch('toast', message: 'Database error occurred while saving role.', type: 'error');
+            logger()->error('Database error while creating role', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+        } catch (Throwable $e) {
+            $this->dispatch('toast', message: 'An unexpected error occurred. Please try again.', type: 'error');
+            logger()->error('Unexpected error in RoleCreate', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
     }
 
     public function render()
     {
-        return view('livewire.admin.roles.role-create');
+        return view('livewire.admin.roles.role-create', [
+            // 'permissions' => Permission::orderBy('name')->pluck('name')->toArray(),
+            'permissions' => Permission::orderBy('name')->get(),
+        ]);
     }
 }
