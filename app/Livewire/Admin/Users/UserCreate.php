@@ -38,19 +38,20 @@ class UserCreate extends Component
             // Assign role
             $user->assignRole($validated['role']);
 
-            // Success toast
-            $this->dispatch('toast', message: 'User created successfully!', type: 'success');
+            // Store toast in session so it shows after redirect
+            session()->flash('toast', [
+                'message' => 'User created successfully!',
+                'type' => 'success',
+            ]);
 
-            // Reset form fields
-            $this->reset(['name', 'email', 'password', 'role']);
+            // SPA redirect — Livewire v3 compatible
+            $this->redirect(route('admin.users.index'), navigate: true);
 
         } catch (ValidationException $e) {
-            // Validation errors — let Livewire show inline errors
             $this->dispatch('toast', message: 'Please check the required fields.', type: 'error');
             throw $e;
 
         } catch (QueryException $e) {
-            // Database-level errors (e.g., unique constraint, SQL issues)
             $this->dispatch('toast', message: 'Database error occurred while saving user.', type: 'error');
             logger()->error('Database error while creating user', [
                 'error' => $e->getMessage(),
@@ -58,7 +59,6 @@ class UserCreate extends Component
             ]);
 
         } catch (Throwable $e) {
-            // Catch-all for any unexpected errors
             $this->dispatch('toast', message: 'An unexpected error occurred. Please try again.', type: 'error');
             logger()->error('Unexpected error in UserCreate', [
                 'error' => $e->getMessage(),

@@ -1,13 +1,17 @@
 <div class="space-y-6">
+    {{-- Breadcrumbs --}}
     <flux:breadcrumbs>
         <flux:breadcrumbs.item href="{{ route('admin.users.index') }}" wire:navigate>Users</flux:breadcrumbs.item>
         <flux:breadcrumbs.item>Create</flux:breadcrumbs.item>
     </flux:breadcrumbs>
 
+    {{-- Page Title --}}
     <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">Add User</h1>
 
-    <div class="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 shadow rounded-lg p-6">
+    {{-- Create User Form --}}
+    <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow rounded-lg p-6">
         <form wire:submit.prevent="save" class="space-y-4">
+
             {{-- Name --}}
             <div>
                 <flux:label for="name">
@@ -65,11 +69,3 @@
         </form>
     </div>
 </div>
-
-{{-- Toastify listener --}}
-<script>
-    window.addEventListener('toast', event => {
-        const { message, type = 'success' } = event.detail;
-        window.toast(message, type);
-    });
-</script>

@@ -1,14 +1,17 @@
 <?php
 
-use App\Livewire\Admin\Users\UserCreate;
-use App\Livewire\Admin\Users\UserEdit;
+use App\Livewire\Admin\Roles\RoleCreate;
+use App\Livewire\Admin\Roles\RoleEdit;
 use Laravel\Fortify\Features;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\TwoFactor;
 use App\Livewire\Settings\Appearance;
 use Illuminate\Support\Facades\Route;
+use App\Livewire\Admin\Users\UserEdit;
+use App\Livewire\Admin\Roles\RoleIndex;
 use App\Livewire\Admin\Users\UserIndex;
+use App\Livewire\Admin\Users\UserCreate;
 
 Route::get('/', function () {
     return view('welcome');
@@ -42,5 +45,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/users', UserIndex::class)->name('users.index');
         Route::get('/users/create', UserCreate::class)->name('users.create');
         Route::get('/users/{user}/edit', UserEdit::class)->name('users.edit');
+
+        //Roles
+        Route::get('/roles', RoleIndex::class)->name('roles.index');
+        Route::get('/roles/create', RoleCreate::class)->name('roles.create');
+        Route::get('/roles/{role}/edit', RoleEdit::class)->name('roles.edit');
     });
 });

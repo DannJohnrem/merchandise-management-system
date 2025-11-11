@@ -4,17 +4,18 @@
     </flux:button>
 
     <flux:menu>
-        @can('edit users')
-            <flux:menu.item as="a" variant="default" icon="pencil-square" wire:navigate href="{{ route('admin.users.edit', $user) }}">
+        @can('edit roles')
+            <flux:menu.item as="a" variant="default" icon="pencil-square" wire:navigate
+                href="{{ route('admin.roles.edit', $role) }}">
                 Edit
             </flux:menu.item>
         @endcan
 
         <flux:menu.separator />
 
-        @can('delete users')
+        @can('delete roles')
             <flux:menu.item as="button" variant="danger" icon="trash" class="cursor-pointer"
-                @click="$dispatch('confirm-delete-user', { id: {{ $user->id }} })">
+                @click="$dispatch('confirm-delete-role', { id: {{ $role->id }} })">
                 Delete
             </flux:menu.item>
         @endcan

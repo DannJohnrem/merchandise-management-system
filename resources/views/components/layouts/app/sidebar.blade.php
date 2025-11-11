@@ -2,7 +2,9 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
         @include('partials.head')
+        @livewireStyles
     </head>
+
     <body class="min-h-screen bg-white dark:bg-zinc-800">
         <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
@@ -13,7 +15,9 @@
 
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Platform')" class="grid">
-                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
+                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
+                        {{ __('Dashboard') }}
+                    </flux:navlist.item>
                 </flux:navlist.group>
 
                 {{-- Administration --}}
@@ -21,6 +25,11 @@
                     <flux:navlist.item icon="users" :href="route('admin.users.index')"
                         :current="request()->routeIs('admin.users.*')" wire:navigate>
                         {{ __('Users') }}
+                    </flux:navlist.item>
+
+                    <flux:navlist.item icon="shield-check" :href="route('admin.roles.index')"
+                        :current="request()->routeIs('admin.roles.*')" wire:navigate>
+                        {{ __('Roles') }}
                     </flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
@@ -40,9 +49,7 @@
                         <div class="p-0 text-sm font-normal">
                             <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                                 <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
-                                    <span
-                                        class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white"
-                                    >
+                                    <span class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
                                         {{ auth()->user()->initials() }}
                                     </span>
                                 </span>
@@ -90,9 +97,7 @@
                         <div class="p-0 text-sm font-normal">
                             <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                                 <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
-                                    <span
-                                        class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white"
-                                    >
+                                    <span class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
                                         {{ auth()->user()->initials() }}
                                     </span>
                                 </span>
@@ -125,6 +130,32 @@
 
         {{ $slot }}
 
+        {{-- Scripts --}}
         @fluxScripts
+        @livewireScripts
+
+        <script>
+            if (!window.__toastListenerAdded) {
+                window.__toastListenerAdded = true;
+
+                // ✅ Listen for Livewire toast event
+                Livewire.on('toast', ({ message, type = 'success' }) => {
+                    if (message && typeof window.toast === 'function') {
+                        window.toast(message, type);
+                    }
+                });
+
+                // ✅ Keep toast container persistent after navigation
+                document.addEventListener('livewire:navigate', () => {
+                    const container = document.getElementById('toast-container');
+                    if (container) document.body.appendChild(container);
+                });
+
+                document.addEventListener('inertia:navigate', () => {
+                    const container = document.getElementById('toast-container');
+                    if (container) document.body.appendChild(container);
+                });
+            }
+        </script>
     </body>
 </html>

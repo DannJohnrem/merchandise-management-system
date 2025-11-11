@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Livewire\Admin\Users;
+namespace App\Livewire\Admin\Roles;
 
 use Livewire\Component;
 
-class UserIndex extends Component
+class RoleIndex extends Component
 {
-
     public function mount()
     {
         // Check for flashed toast from redirects (e.g., RoleEdit or RoleCreate)
@@ -18,6 +17,6 @@ class UserIndex extends Component
 
     public function render()
     {
-        return view('livewire.admin.users.user-index');
+        return view('livewire.admin.roles.role-index');
     }
 }
