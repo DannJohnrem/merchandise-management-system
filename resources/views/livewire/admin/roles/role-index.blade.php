@@ -29,10 +29,14 @@
 
 {{-- Delete Confirmation Listener --}}
 <script>
-    document.addEventListener('confirm-delete-role', (event) => {
+    document.removeEventListener('confirm-delete-role', window.__confirmDeleteRoleHandler);
+
+    window.__confirmDeleteRoleHandler = function(event) {
         const id = event.detail.id;
         if (confirm('Are you sure you want to delete this role?')) {
             Livewire.dispatch('confirmDeleteRole', { id });
         }
-    });
+    };
+
+    document.addEventListener('confirm-delete-role', window.__confirmDeleteRoleHandler);
 </script>
