@@ -1,17 +1,20 @@
 <?php
 
-use App\Livewire\Admin\Roles\RoleCreate;
-use App\Livewire\Admin\Roles\RoleEdit;
+use App\Livewire\Admin\Permissions\PermissionCreate;
+use App\Livewire\Admin\Permissions\PermissionEdit;
 use Laravel\Fortify\Features;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\TwoFactor;
 use App\Livewire\Settings\Appearance;
 use Illuminate\Support\Facades\Route;
+use App\Livewire\Admin\Roles\RoleEdit;
 use App\Livewire\Admin\Users\UserEdit;
 use App\Livewire\Admin\Roles\RoleIndex;
 use App\Livewire\Admin\Users\UserIndex;
+use App\Livewire\Admin\Roles\RoleCreate;
 use App\Livewire\Admin\Users\UserCreate;
+use App\Livewire\Admin\Permissions\PermissionIndex;
 
 Route::get('/', function () {
     return view('welcome');
@@ -50,5 +53,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/roles', RoleIndex::class)->name('roles.index');
         Route::get('/roles/create', RoleCreate::class)->name('roles.create');
         Route::get('/roles/{role}/edit', RoleEdit::class)->name('roles.edit');
+
+        //Permissions
+        Route::get('/permissions', PermissionIndex::class)->name('permissions.index');
+        Route::get('/permissions/create', PermissionCreate::class)->name('permissions.create');
+        Route::get('/permissions/{permission}/edit', PermissionEdit::class)->name('permissions.edit');
     });
 });
