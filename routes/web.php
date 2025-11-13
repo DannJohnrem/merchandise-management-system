@@ -42,6 +42,7 @@ Route::middleware(['auth'])->group(function () {
         )
         ->name('two-factor.show');
 
+    // IT Leasing Page
     Route::prefix('admin')->name('admin.')->group(function () {
 
         // Users
