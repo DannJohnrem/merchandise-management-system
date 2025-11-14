@@ -1,7 +1,5 @@
 <?php
 
-use App\Livewire\Admin\Permissions\PermissionCreate;
-use App\Livewire\Admin\Permissions\PermissionEdit;
 use Laravel\Fortify\Features;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\Password;
@@ -14,7 +12,12 @@ use App\Livewire\Admin\Roles\RoleIndex;
 use App\Livewire\Admin\Users\UserIndex;
 use App\Livewire\Admin\Roles\RoleCreate;
 use App\Livewire\Admin\Users\UserCreate;
+use App\Livewire\Pages\ItLeasing\ItLeasingEdit;
+use App\Livewire\Pages\ItLeasing\ItLeasingIndex;
+use App\Livewire\Pages\ItLeasing\ItLeasingCreate;
+use App\Livewire\Admin\Permissions\PermissionEdit;
 use App\Livewire\Admin\Permissions\PermissionIndex;
+use App\Livewire\Admin\Permissions\PermissionCreate;
 
 Route::get('/', function () {
     return view('welcome');
@@ -42,7 +45,13 @@ Route::middleware(['auth'])->group(function () {
         )
         ->name('two-factor.show');
 
-    // IT Leasing Page
+    Route::prefix('pages')->name('pages.')->group(function () {
+        // It Leasing
+        Route::get('/it-leasing', ItLeasingIndex::class)->name('it-leasing.index');
+        Route::get('/it-leasing/create', ItLeasingCreate::class)->name('it-leasing.create');
+        Route::get('/it-leasing/{item}/edit', ItLeasingEdit::class)->name('it-leasing.edit');
+    });
+
     Route::prefix('admin')->name('admin.')->group(function () {
 
         // Users

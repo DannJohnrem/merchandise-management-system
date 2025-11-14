@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('it_leasings', function (Blueprint $table) {
-   $table->id();
+            $table->id();
             $table->string('category'); // Laptop, Printer...
             $table->string('serial_number')->unique();
             $table->string('brand')->nullable();
