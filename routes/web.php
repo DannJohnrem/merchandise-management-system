@@ -12,6 +12,7 @@ use App\Livewire\Admin\Roles\RoleIndex;
 use App\Livewire\Admin\Users\UserIndex;
 use App\Livewire\Admin\Roles\RoleCreate;
 use App\Livewire\Admin\Users\UserCreate;
+use App\Http\Controllers\ItLeasingQrController;
 use App\Livewire\Pages\ItLeasing\ItLeasingEdit;
 use App\Livewire\Pages\ItLeasing\ItLeasingIndex;
 use App\Livewire\Pages\ItLeasing\ItLeasingCreate;
@@ -26,6 +27,9 @@ Route::get('/', function () {
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+Route::get('/it-leasing/{item}', [ItLeasingQrController::class, 'show'])
+    ->name('it-leasing.show');
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');

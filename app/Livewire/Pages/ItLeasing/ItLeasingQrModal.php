@@ -4,7 +4,9 @@ namespace App\Livewire\Pages\ItLeasing;
 
 use Livewire\Component;
 use App\Models\ItLeasing;
-use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\SvgWriter;
+use Endroid\QrCode\Encoding\Encoding;
 
 class ItLeasingQrModal extends Component
 {
@@ -12,22 +14,21 @@ class ItLeasingQrModal extends Component
     public $qrCodeSvg = null;
     public $isLoading = false;
 
-protected $listeners = ['show-qr-modal' => 'prepareModal'];
+    protected $listeners = ['show-qr-modal' => 'prepareModal'];
 
-public function prepareModal($itemId)
-{
-    if (!$itemId) return;
+    public function prepareModal($itemId)
+    {
+        if (!$itemId) return;
 
-    $this->item = null;
-    $this->qrCodeSvg = null;
-    $this->isLoading = true;
+        $this->item = null;
+        $this->qrCodeSvg = null;
+        $this->isLoading = true;
 
-    // open flux modal
-    $this->dispatchBrowserEvent('modal:open', ['name' => 'it-leasing-qr']);
+        // Open Flux modal (Livewire v3 dispatch)
+        $this->dispatch('flux:modal-open', name: 'it-leasing-qr');
 
-    $this->loadQrCode($itemId);
-}
-
+        $this->loadQrCode($itemId);
+    }
 
     private function loadQrCode($id)
     {
@@ -38,12 +39,20 @@ public function prepareModal($itemId)
             return;
         }
 
-        $this->qrCodeSvg = Builder::create()
-            ->data($this->item->serial_number)
-            ->size(200)
-            ->margin(10)
-            ->build()
-            ->getString();
+        // Public URL that QR will open
+        $url = route('it-leasing.show', $this->item->id);
+
+        $qrCode = new QrCode(
+            data: $url,
+            encoding: new Encoding('UTF-8'),
+            size: 200,
+            margin: 10
+        );
+
+        $writer = new SvgWriter();
+        $result = $writer->write($qrCode);
+
+        $this->qrCodeSvg = $result->getString();
 
         $this->isLoading = false;
     }
