@@ -28,10 +28,6 @@
                 <p><strong>Cost:</strong> ₱{{ number_format($item->cost, 2) }}</p>
             @endif
 
-            <p><strong>Assigned To:</strong> {{ $item->assigned_to ?? '-' }}</p>
-            <p><strong>Class:</strong> {{ $item->class ?? '-' }}</p>
-            <p><strong>Status:</strong> {{ $item->status ?? '-' }}</p>
-
             @if ($item->remarks)
                 <p><strong>Remarks:</strong> {{ $item->remarks }}</p>
             @endif

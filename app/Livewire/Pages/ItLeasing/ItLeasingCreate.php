@@ -20,7 +20,7 @@ class ItLeasingCreate extends Component
     public $cost;
     public $assigned_to;
     public $class;
-    public $status = 'in_use';
+    public $status = 'available';
     public $qr_code_path;
     public $remarks;
 
@@ -36,7 +36,7 @@ class ItLeasingCreate extends Component
                 'cost' => 'nullable|numeric',
                 'assigned_to' => 'nullable|string|max:255',
                 'class' => 'nullable|string|max:255',
-                'status' => 'required|in:in_use,returned,repair',
+                'status' => 'required|in:available,in_use,returned,repair,lost',
                 'qr_code_path' => 'nullable|file|mimes:jpg,png,pdf',
                 'remarks' => 'nullable|string',
             ]);
@@ -55,7 +55,7 @@ class ItLeasingCreate extends Component
                 'type' => 'success',
             ]);
 
-            $this->redirect(route('pages.it-leasing.index'), navigate: true);
+            $this->redirect(route('it-leasing.index'), navigate: true);
 
         } catch (ValidationException $e) {
             $this->dispatch('toast', message: 'Please check the required fields.', type: 'error');

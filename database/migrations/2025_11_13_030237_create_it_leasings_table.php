@@ -13,16 +13,16 @@ return new class extends Migration
     {
         Schema::create('it_leasings', function (Blueprint $table) {
             $table->id();
-            $table->string('category'); // Laptop, Printer...
+            $table->string('category');
             $table->string('serial_number')->unique();
-            $table->string('brand')->nullable();
-            $table->string('model')->nullable();
-            $table->decimal('cost', 12, 2)->nullable();
-            $table->string('assigned_to')->nullable(); // e.g., BTSMC
-            $table->string('class')->nullable(); // e.g., employee name
-            $table->string('status')->default('in_use'); // in_use, returned, repair
-            $table->string('qr_code_path')->nullable();
-            $table->text('remarks')->nullable();
+            $table->string('brand');
+            $table->string('model');
+            $table->decimal('cost', 12, 2);
+            $table->string('assigned_to');
+            $table->string('class');
+            $table->enum('status', ['available', 'in_use', 'repair', 'returned', 'lost'])
+                ->nullable(false);
+            $table->text('remarks');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -28,8 +28,10 @@ Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-Route::get('/it-leasing/{item}', [ItLeasingQrController::class, 'show'])
+// Public signed QR route (no auth)
+Route::get('/it-leasing/{item}/qr', [ItLeasingQrController::class, 'show'])
     ->name('it-leasing.show');
+
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
@@ -49,11 +51,10 @@ Route::middleware(['auth'])->group(function () {
         )
         ->name('two-factor.show');
 
-    Route::prefix('pages')->name('pages.')->group(function () {
-        // It Leasing
-        Route::get('/it-leasing', ItLeasingIndex::class)->name('it-leasing.index');
-        Route::get('/it-leasing/create', ItLeasingCreate::class)->name('it-leasing.create');
-        Route::get('/it-leasing/{item}/edit', ItLeasingEdit::class)->name('it-leasing.edit');
+    Route::prefix('it-leasing')->name('it-leasing.')->group(function () {
+        Route::get('/', ItLeasingIndex::class)->name('index');
+        Route::get('/create', ItLeasingCreate::class)->name('create');
+        Route::get('/{item}/edit', ItLeasingEdit::class)->name('edit');
     });
 
     Route::prefix('admin')->name('admin.')->group(function () {
@@ -74,3 +75,4 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/permissions/{permission}/edit', PermissionEdit::class)->name('permissions.edit');
     });
 });
+

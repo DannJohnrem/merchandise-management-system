@@ -24,8 +24,8 @@
 
             {{-- IT Leasing --}}
             <flux:navlist.group expandable :heading="__('IT Leasing')" class="grid">
-                <flux:navlist.item icon="computer-desktop" :href="route('pages.it-leasing.index')"
-                    :current="request()->routeIs('pages.it-leasing.*')" wire:navigate>
+                <flux:navlist.item icon="computer-desktop" :href="route('it-leasing.index')"
+                    :current="request()->routeIs('it-leasing.*')" wire:navigate>
                     {{ __('Leasing Management') }}
                 </flux:navlist.item>
             </flux:navlist.group>

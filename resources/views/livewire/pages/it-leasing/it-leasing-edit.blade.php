@@ -1,6 +1,6 @@
 <div class="space-y-6">
     <flux:breadcrumbs>
-        <flux:breadcrumbs.item href="{{ route('pages.it-leasing.index') }}" wire:navigate>
+        <flux:breadcrumbs.item href="{{ route('it-leasing.index') }}" wire:navigate>
             IT Leasing
         </flux:breadcrumbs.item>
         <flux:breadcrumbs.item>Edit</flux:breadcrumbs.item>
@@ -61,9 +61,11 @@
                 <div>
                     <flux:label for="status">Status *</flux:label>
                     <flux:select id="status" wire:model.defer="status">
+                        <option value="available">Available</option>
                         <option value="in_use">In Use</option>
                         <option value="returned">Returned</option>
                         <option value="repair">For Repair</option>
+                        <option value="lost">Lost</option>
                     </flux:select>
                 </div>
 
@@ -76,7 +78,7 @@
             </div>
 
             <div class="flex justify-end space-x-2">
-                <flux:button variant="ghost" wire:navigate href="{{ route('pages.it-leasing.index') }}">
+                <flux:button variant="ghost" wire:navigate href="{{ route('it-leasing.index') }}">
                     Cancel
                 </flux:button>
                 <flux:button variant="primary" type="submit">

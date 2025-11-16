@@ -1,6 +1,6 @@
 <div class="space-y-4 w-full">
     <flux:breadcrumbs>
-        <flux:breadcrumbs.item href="{{ route('pages.it-leasing.index') }}" wire:navigate>
+        <flux:breadcrumbs.item href="{{ route('it-leasing.index') }}" wire:navigate>
             IT Leasing
         </flux:breadcrumbs.item>
     </flux:breadcrumbs>
@@ -12,7 +12,7 @@
 
     <div class="flex justify-end">
         @can('create it-leasing')
-            <flux:button icon="plus" variant="primary" href="{{ route('pages.it-leasing.create') }}" wire:navigate>
+            <flux:button icon="plus" variant="primary" href="{{ route('it-leasing.create') }}" wire:navigate>
                 Create IT Leasing
             </flux:button>
         @endcan

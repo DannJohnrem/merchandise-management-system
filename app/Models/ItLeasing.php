@@ -19,7 +19,11 @@ class ItLeasing extends Model
         'assigned_to',
         'class',
         'status',
-        'qr_code_path',
         'remarks',
+    ];
+
+    protected $casts = [
+        'status' => 'string',
+        'cost' => 'decimal:2',
     ];
 }

@@ -39,6 +39,13 @@ class ItLeasingQrModal extends Component
             return;
         }
 
+        // TODO Generate signed URL valid for 24 hours
+        // $url = URL::temporarySignedRoute(
+        //     'it-leasing.show',
+        //     now()->addHours(24),
+        //     ['item' => $this->item->id]
+        // );
+
         // Public URL that QR will open
         $url = route('it-leasing.show', $this->item->id);
 

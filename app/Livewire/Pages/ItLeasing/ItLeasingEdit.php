@@ -39,7 +39,7 @@ class ItLeasingEdit extends Component
         $this->cost = $item->cost;
         $this->assigned_to = $item->assigned_to;
         $this->class = $item->class;
-        $this->status = $item->status;
+        $this->status = $item->status ?: 'available';
         $this->qrPreview = $item->qr_code_path ? asset('storage/' . $item->qr_code_path) : null;
         $this->remarks = $item->remarks;
     }
@@ -55,7 +55,7 @@ class ItLeasingEdit extends Component
                 'cost' => 'nullable|numeric',
                 'assigned_to' => 'nullable|string|max:255',
                 'class' => 'nullable|string|max:255',
-                'status' => 'required|in:in_use,returned,repair',
+                'status' => 'required|in:available,in_use,returned,repair,lost',
                 'qr_code_path' => 'nullable|file|mimes:jpg,png,pdf',
                 'remarks' => 'nullable|string',
             ]);
@@ -72,7 +72,7 @@ class ItLeasingEdit extends Component
                 'type' => 'success',
             ]);
 
-            $this->redirect(route('pages.it-leasing.index'), navigate: true);
+            $this->redirect(route('it-leasing.index'), navigate: true);
 
         } catch (ValidationException $e) {
             $this->dispatch('toast', message: 'Please check the required fields.', type: 'error');

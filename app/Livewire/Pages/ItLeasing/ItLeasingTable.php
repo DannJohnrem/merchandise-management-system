@@ -45,42 +45,22 @@ class ItLeasingTable extends DataTableComponent
                         ->prepend('All', '')
                         ->toArray()
                 )
-                ->filter(fn($query, $value) =>
+                ->filter(
+                    fn($query, $value) =>
                     $value ? $query->where('category', $value) : null
                 ),
 
             SelectFilter::make('Status')
                 ->options([
                     '' => 'All',
-                    'Available' => 'Available',
-                    'In-use' => 'In-use',
-                    'For Repair' => 'For Repair',
-                    'Lost' => 'Lost',
+                    'available' => 'Available',
+                    'in_use' => 'In Use',
+                    'returned' => 'Returned',
+                    'repair' => 'For Repair',
+                    'lost' => 'Lost',
                 ])
-                ->filter(fn($query, $value) =>
-                    $value ? $query->where('status', $value) : null
-                ),
+                ->filter(fn($query, $value) => $value ? $query->where('status', $value) : null),
         ];
-    }
-
-    /**
-     * Override query() to add pre-generated QR code
-     */
-    public function query()
-    {
-        $query = ItLeasing::query();
-
-        // Optional: pre-generate QR for table (not modal)
-        $query->get()->each(function ($item) {
-            $item->qr_code_svg = Builder::create()
-                ->data($item->serial_number)
-                ->size(200)
-                ->margin(10)
-                ->build()
-                ->getString();
-        });
-
-        return $query;
     }
 
     /**
@@ -104,11 +84,9 @@ class ItLeasingTable extends DataTableComponent
             $this->dispatch('$refresh');
 
             $this->dispatch('toast', message: "{$name} deleted successfully!", type: 'success');
-
         } catch (QueryException $e) {
             logger()->error('DB error deleting item', ['error' => $e->getMessage()]);
             $this->dispatch('toast', message: 'Database error occurred while deleting item.', type: 'error');
-
         } catch (Throwable $e) {
             logger()->error('Unexpected error deleting item', ['error' => $e->getMessage()]);
             $this->dispatch('toast', message: 'Unexpected error occurred while deleting item.', type: 'error');
@@ -142,11 +120,9 @@ class ItLeasingTable extends DataTableComponent
             $this->dispatch('$refresh');
 
             $this->dispatch('toast', message: "{$deletedCount} item(s) deleted successfully!", type: 'success');
-
         } catch (QueryException $e) {
             logger()->error('DB error bulk delete items', ['error' => $e->getMessage()]);
             $this->dispatch('toast', message: 'Database error occurred while deleting items.', type: 'error');
-
         } catch (Throwable $e) {
             logger()->error('Unexpected bulk delete error', ['error' => $e->getMessage()]);
             $this->dispatch('toast', message: 'Unexpected error occurred during bulk delete.', type: 'error');
@@ -158,7 +134,8 @@ class ItLeasingTable extends DataTableComponent
      */
     public function columns(): array
     {
-        return [
+
+        $columns = [
             Column::make('ID', 'id')
                 ->sortable()
                 ->searchable(),
@@ -186,12 +163,13 @@ class ItLeasingTable extends DataTableComponent
             Column::make('Assigned To', 'assigned_to')
                 ->sortable(),
 
-            Column::make('Status')
-                ->label(fn($row) =>
-                    view('livewire.pages.it-leasing.partials.status-badge', [
-                        'status' => $row->status,
-                    ])->render()
-                )
+
+            Column::make('Status', 'status')
+                ->sortable()
+                ->searchable()
+                ->label(fn($row) => view('livewire.pages.it-leasing.partials.status-badge', [
+                    'status' => $row->status
+                ])->render())
                 ->html(),
 
             Column::make('Created At', 'created_at')
@@ -199,12 +177,15 @@ class ItLeasingTable extends DataTableComponent
                 ->format(fn($value) => $value->format('M d, Y')),
 
             Column::make('Actions')
-                ->label(fn($row) =>
+                ->label(
+                    fn($row) =>
                     view('livewire.pages.it-leasing.partials.actions', [
                         'item' => $row
                     ])->render()
                 )
                 ->html(),
         ];
+
+        return $columns;
     }
 }
