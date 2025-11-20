@@ -30,7 +30,8 @@ class ItLeasingTable extends DataTableComponent
             ->setSearchDebounce(300)
             ->setBulkActionsEnabled()
             ->setEmptyMessage('No IT leasing items found.')
-            ->setTheme('tailwind');
+            ->setTheme('tailwind')
+            ->setAdditionalSelects(['it_leasings.status']);
     }
 
     /**

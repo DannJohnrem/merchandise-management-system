@@ -1,24 +1,16 @@
-<flux:modal name="it-leasing-qr" class="md:w-96">
+<flux:modal name="it-leasing-qr" class="md:w-96" :closable="false" :dismissible="false">
     <div class="space-y-6">
-        <div>
-            <flux:heading size="lg">
-                @if ($isLoading)
-                    Loading QR...
-                @elseif ($item)
-                    QR Code for {{ $item->serial_number }}
-                @endif
-            </flux:heading>
 
-            @if ($item)
-                <flux:text class="mt-2">
-                    {{ $item->category }} - {{ $item->brand ?? '-' }} {{ $item->model ?? '' }}
-                </flux:text>
-            @endif
+        {{-- Logo at the top --}}
+        <div class="flex justify-center">
+            <img src="{{ asset('apple-touch-icon.png') }}" alt="Logo" class="h-16 w-16 object-contain">
         </div>
 
+        {{-- QR Code --}}
         <div class="flex justify-center items-center min-h-[200px]">
             @if ($isLoading)
-                <svg class="animate-spin h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+                <svg class="animate-spin h-6 w-6 text-gray-500"
+                     xmlns="http://www.w3.org/2000/svg" fill="none"
                      viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10"
                             stroke="currentColor" stroke-width="4"></circle>
@@ -30,8 +22,25 @@
             @endif
         </div>
 
+        {{-- Item Info Below QR --}}
+        @if ($item)
+            <div class="space-y-1 text-first mt-2">
+                <flux:text>
+                    <strong>Category:</strong> {{ $item->category }}
+                </flux:text>
+                <flux:text>
+                    <strong>Brand:</strong> {{ $item->brand ?? '-' }}
+                </flux:text>
+                <flux:text>
+                    <strong>Model:</strong> {{ $item->model ?? '-' }}
+                </flux:text>
+            </div>
+        @endif
+
         <div class="flex justify-end mt-4">
-            <flux:modal.close variant="primary">Close</flux:modal.close>
+            <flux:modal.close>
+                <flux:button variant="ghost">Cancel</flux:button>
+            </flux:modal.close>
         </div>
     </div>
 </flux:modal>
