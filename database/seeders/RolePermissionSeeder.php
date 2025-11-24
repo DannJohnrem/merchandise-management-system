@@ -31,6 +31,14 @@ class RolePermissionSeeder extends Seeder
             'create inventory',
             'edit inventory',
             'delete inventory',
+            'delete permissions',
+            'view permissions',
+            'create permissions',
+            'edit permissions',
+            'view it-leasing',
+            'create it-leasing',
+            'edit it-leasing',
+            'delete it-leasing',
         ];
 
         foreach ($permissions as $permission) {

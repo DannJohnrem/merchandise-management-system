@@ -1,7 +1,5 @@
 <?php
 
-use App\Livewire\Admin\Permissions\PermissionCreate;
-use App\Livewire\Admin\Permissions\PermissionEdit;
 use Laravel\Fortify\Features;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\Password;
@@ -14,7 +12,13 @@ use App\Livewire\Admin\Roles\RoleIndex;
 use App\Livewire\Admin\Users\UserIndex;
 use App\Livewire\Admin\Roles\RoleCreate;
 use App\Livewire\Admin\Users\UserCreate;
+use App\Http\Controllers\ItLeasingQrController;
+use App\Livewire\Pages\ItLeasing\ItLeasingEdit;
+use App\Livewire\Pages\ItLeasing\ItLeasingIndex;
+use App\Livewire\Pages\ItLeasing\ItLeasingCreate;
+use App\Livewire\Admin\Permissions\PermissionEdit;
 use App\Livewire\Admin\Permissions\PermissionIndex;
+use App\Livewire\Admin\Permissions\PermissionCreate;
 
 Route::get('/', function () {
     return view('welcome');
@@ -23,6 +27,11 @@ Route::get('/', function () {
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+// Public signed QR route (no auth)
+Route::get('/it-leasing/{item}/qr', [ItLeasingQrController::class, 'show'])
+    ->name('it-leasing.show');
+
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
@@ -42,6 +51,12 @@ Route::middleware(['auth'])->group(function () {
         )
         ->name('two-factor.show');
 
+    Route::prefix('it-leasing')->name('it-leasing.')->group(function () {
+        Route::get('/', ItLeasingIndex::class)->name('index');
+        Route::get('/create', ItLeasingCreate::class)->name('create');
+        Route::get('/{item}/edit', ItLeasingEdit::class)->name('edit');
+    });
+
     Route::prefix('admin')->name('admin.')->group(function () {
 
         // Users
@@ -60,3 +75,4 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/permissions/{permission}/edit', PermissionEdit::class)->name('permissions.edit');
     });
 });
+

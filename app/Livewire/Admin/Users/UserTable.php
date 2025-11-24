@@ -5,7 +5,7 @@ namespace App\Livewire\Admin\Users;
 use App\Models\User;
 use Throwable;
 use Illuminate\Database\QueryException;
-use Spatie\Permission\Models\Role;
+use App\Models\Role;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
