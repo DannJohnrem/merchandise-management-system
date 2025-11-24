@@ -8,10 +8,13 @@ use App\Livewire\Settings\Appearance;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Admin\Roles\RoleEdit;
 use App\Livewire\Admin\Users\UserEdit;
+use App\Livewire\Admin\Class\ClassEdit;
 use App\Livewire\Admin\Roles\RoleIndex;
 use App\Livewire\Admin\Users\UserIndex;
+use App\Livewire\Admin\Class\ClassIndex;
 use App\Livewire\Admin\Roles\RoleCreate;
 use App\Livewire\Admin\Users\UserCreate;
+use App\Livewire\Admin\Class\ClassCreate;
 use App\Http\Controllers\ItLeasingQrController;
 use App\Livewire\Pages\ItLeasing\ItLeasingEdit;
 use App\Livewire\Pages\ItLeasing\ItLeasingIndex;
@@ -64,15 +67,20 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/users/create', UserCreate::class)->name('users.create');
         Route::get('/users/{user}/edit', UserEdit::class)->name('users.edit');
 
-        //Roles
+        // Roles
         Route::get('/roles', RoleIndex::class)->name('roles.index');
         Route::get('/roles/create', RoleCreate::class)->name('roles.create');
         Route::get('/roles/{role}/edit', RoleEdit::class)->name('roles.edit');
 
-        //Permissions
+        //vPermissions
         Route::get('/permissions', PermissionIndex::class)->name('permissions.index');
         Route::get('/permissions/create', PermissionCreate::class)->name('permissions.create');
         Route::get('/permissions/{permission}/edit', PermissionEdit::class)->name('permissions.edit');
+
+        // Classes
+        Route::get('/class', ClassIndex::class)->name('class.index');
+        Route::get('/class/create', ClassCreate::class)->name('class.create');
+        Route::get('/class/{class}/edit', ClassEdit::class)->name('class.edit');
     });
 });
 

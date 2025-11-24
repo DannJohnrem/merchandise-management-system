@@ -53,6 +53,11 @@
                         {{ __('Permissions') }}
                     </flux:navlist.item>
                 @endcan
+
+                    <flux:navlist.item icon="user-group" :href="route('admin.class.index')"
+                        :current="request()->routeIs('admin.class.*')" wire:navigate>
+                        {{ __('Class') }}
+                    </flux:navlist.item>
             </flux:navlist.group>
         </flux:navlist>
 
