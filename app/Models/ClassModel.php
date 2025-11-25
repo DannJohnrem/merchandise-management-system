@@ -6,5 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class ClassModel extends Model
 {
-    //
+    $fillable = [
+        'name',
+        'description',
+    ]
 }
