@@ -11,9 +11,11 @@
     </x-page-heading>
 
     <div class="flex justify-end">
-        <flux:button icon="plus" variant="primary" href="{{ route('admin.class.create') }}" wire:navigate>
-            Create Class
-        </flux:button>
+        @can('create classes')
+            <flux:button icon="plus" variant="primary" href="{{ route('admin.class.create') }}" wire:navigate>
+                Create Class
+            </flux:button>
+        @endcan
     </div>
 
     <div class="w-full border rounded-lg p-4 bg-white dark:bg-zinc-800 shadow-sm">
