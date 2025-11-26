@@ -30,6 +30,14 @@
                 </flux:navlist.item>
             </flux:navlist.group>
 
+            {{-- Fixed Asset --}}
+            <flux:navlist.group class="grid">
+                <flux:navlist.item icon="rectangle-stack" :href="route('fixed-asset.index')"
+                    :current="request()->routeIs('fixed-asset.*')" wire:navigate>
+                    {{ __('Fixed Asset') }}
+                </flux:navlist.item>
+            </flux:navlist.group>
+
             {{-- Administration --}}
             <flux:navlist.group expandable heading="Administration" class="grid">
 

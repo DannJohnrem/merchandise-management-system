@@ -22,6 +22,9 @@ use App\Livewire\Pages\ItLeasing\ItLeasingCreate;
 use App\Livewire\Admin\Permissions\PermissionEdit;
 use App\Livewire\Admin\Permissions\PermissionIndex;
 use App\Livewire\Admin\Permissions\PermissionCreate;
+use App\Livewire\Pages\FixedAsset\FixedAssetCreate;
+use App\Livewire\Pages\FixedAsset\FixedAssetEdit;
+use App\Livewire\Pages\FixedAsset\FixedAssetIndex;
 
 Route::get('/', function () {
     return view('welcome');
@@ -58,6 +61,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', ItLeasingIndex::class)->name('index');
         Route::get('/create', ItLeasingCreate::class)->name('create');
         Route::get('/{item}/edit', ItLeasingEdit::class)->name('edit');
+    });
+
+    Route::prefix('fixed-asset')->name('fixed-asset.')->group(function () {
+        Route::get('/', FixedAssetIndex::class)->name('index');
+        Route::get('/create', FixedAssetCreate::class)->name('create');
+        Route::get('/{item}/edit', FixedAssetEdit::class)->name('edit');
     });
 
     Route::prefix('admin')->name('admin.')->group(function () {
