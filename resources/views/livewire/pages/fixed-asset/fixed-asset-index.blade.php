@@ -17,7 +17,7 @@
     </div>
 
     <div class="w-full border rounded-lg p-4 bg-white dark:bg-zinc-800 shadow-sm">
-        <livewire:admin.fixed-asset.fixed-asset-table />
+        <livewire:pages.fixed-asset.fixed-asset-table />
     </div>
 </div>
 
