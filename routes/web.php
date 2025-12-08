@@ -15,12 +15,16 @@ use App\Livewire\Admin\Class\ClassIndex;
 use App\Livewire\Admin\Roles\RoleCreate;
 use App\Livewire\Admin\Users\UserCreate;
 use App\Livewire\Admin\Class\ClassCreate;
+use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\ItLeasingQrController;
 use App\Livewire\Pages\ItLeasing\ItLeasingEdit;
 use App\Livewire\Pages\ItLeasing\ItLeasingIndex;
+use App\Livewire\Pages\FixedAsset\FixedAssetEdit;
 use App\Livewire\Pages\ItLeasing\ItLeasingCreate;
 use App\Livewire\Admin\Permissions\PermissionEdit;
+use App\Livewire\Pages\FixedAsset\FixedAssetIndex;
 use App\Livewire\Admin\Permissions\PermissionIndex;
+use App\Livewire\Pages\FixedAsset\FixedAssetCreate;
 use App\Livewire\Admin\Permissions\PermissionCreate;
 
 Route::get('/', function () {
@@ -34,6 +38,9 @@ Route::view('dashboard', 'dashboard')
 // Public signed QR route (no auth)
 Route::get('/it-leasing/{item}/qr', [ItLeasingQrController::class, 'show'])
     ->name('it-leasing.show');
+
+Route::get('fixed-asset/{item}/qr', [FixedAssetController::class, 'show'])
+    ->name('fixed-asset.show');
 
 
 Route::middleware(['auth'])->group(function () {
@@ -60,6 +67,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{item}/edit', ItLeasingEdit::class)->name('edit');
     });
 
+    Route::prefix('fixed-asset')->name('fixed-asset.')->group(function () {
+        Route::get('/', FixedAssetIndex::class)->name('index');
+        Route::get('/create', FixedAssetCreate::class)->name('create');
+        Route::get('/{asset}/edit', FixedAssetEdit::class)->name('edit');
+    });
+
     Route::prefix('admin')->name('admin.')->group(function () {
 
         // Users
@@ -83,4 +96,3 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/class/{class}/edit', ClassEdit::class)->name('class.edit');
     });
 });
-

@@ -3,7 +3,8 @@
 
 <head>
     @include('partials.head')
-    @livewireStyles
+@livewireStyles
+@rappasoftTableStyles
 </head>
 
 <body class="min-h-screen bg-white dark:bg-zinc-800">
@@ -27,6 +28,14 @@
                 <flux:navlist.item icon="computer-desktop" :href="route('it-leasing.index')"
                     :current="request()->routeIs('it-leasing.*')" wire:navigate>
                     {{ __('Leasing Management') }}
+                </flux:navlist.item>
+            </flux:navlist.group>
+
+            {{-- Fixed Asset --}}
+            <flux:navlist.group class="grid">
+                <flux:navlist.item icon="rectangle-stack" :href="route('fixed-asset.index')"
+                    :current="request()->routeIs('fixed-asset.*')" wire:navigate>
+                    {{ __('Fixed Asset') }}
                 </flux:navlist.item>
             </flux:navlist.group>
 
@@ -158,6 +167,7 @@
     {{-- Scripts --}}
     @fluxScripts
     @livewireScripts
+    @rappasoftTableScripts
 
     <script>
         if (!window.__toastListenerAdded) {
