@@ -20,6 +20,9 @@ class ItLeasing extends Model
         'class',
         'status',
         'remarks',
+        // 'purchase_date',
+        // 'purchase_order_no',
+        // 'warranty_expiration',
     ];
 
     protected $casts = [
