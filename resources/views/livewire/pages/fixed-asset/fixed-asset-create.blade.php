@@ -19,7 +19,7 @@
 
                 {{-- Asset Tag --}}
                 <div>
-                    <flux:label for="asset_tag">Asset Tag <span class="text-red-400">*</span></flux:label>
+                    <flux:label for="asset_tag">Asset Tag</flux:label>
                     <flux:input id="asset_tag" wire:model.defer="asset_tag" placeholder="Asset tag code" />
                 </div>
 
@@ -39,10 +39,10 @@
                     </flux:select>
                 </div>
 
-                {{-- Item Name --}}
+                {{-- Asset Name --}}
                 <div>
-                    <flux:label for="item_name">Item Name <span class="text-red-400">*</span></flux:label>
-                    <flux:input id="item_name" wire:model.defer="item_name" placeholder="Item name / asset name" />
+                    <flux:label for="asset_name">Item Name <span class="text-red-400">*</span></flux:label>
+                    <flux:input id="asset_name" wire:model.defer="asset_name" placeholder="Item name / asset name" />
                 </div>
 
                 {{-- Serial Number --}}
@@ -63,11 +63,10 @@
                     <flux:input id="model" wire:model.defer="model" placeholder="Model name" />
                 </div>
 
-                {{-- Cost --}}
+                {{-- Purchase Cost --}}
                 <div>
-                    <flux:label for="purchase_cost">Purchase Cost</flux:label>
-                    <flux:input id="purchase_cost" type="number" step="0.01" wire:model.defer="purchase_cost"
-                        placeholder="Enter amount" />
+                    <flux:label for="cost">Purchase Cost</flux:label>
+                    <flux:input id="cost" type="number" step="0.01" wire:model.defer="cost" placeholder="Enter amount" />
                 </div>
 
                 {{-- Supplier --}}
@@ -103,7 +102,6 @@
                         <option value="in_use">In Use</option>
                         <option value="repair">For Repair</option>
                         <option value="lost">Lost</option>
-                        <option value="retired">Retired</option>
                     </flux:select>
                 </div>
 
@@ -140,8 +138,7 @@
                 {{-- Remarks --}}
                 <div class="md:col-span-2">
                     <flux:label for="remarks">Remarks</flux:label>
-                    <flux:textarea id="remarks" wire:model.defer="remarks" rows="4"
-                        placeholder="Additional notes..." />
+                    <flux:textarea id="remarks" wire:model.defer="remarks" rows="4" placeholder="Additional notes..." />
                 </div>
 
             </div>

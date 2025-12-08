@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\FixedAsset;
 use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
+use Carbon\Carbon;
 use Throwable;
 
 class FixedAssetEdit extends Component
@@ -13,40 +14,46 @@ class FixedAssetEdit extends Component
     public $assetId;
 
     public $asset_tag;
-    public $item_name;
+    public $asset_name;
     public $category;
-    public $description;
     public $serial_number;
     public $brand;
     public $model;
-    public $purchase_date;
-    public $purchase_cost;
+    public $cost;
     public $supplier;
-    public $warranty_expiration;
-    public $status;
-    public $location;
     public $assigned_to;
-    public $notes;
+    public $class;
+    public $location;
+    public $status;
+    public $condition;
+    public $purchase_date;
+    public $purchase_order_no;
+    public $warranty_expiration;
+    public $remarks;
 
     public function mount(FixedAsset $asset)
     {
         $this->assetId = $asset->id;
 
         $this->asset_tag = $asset->asset_tag;
-        $this->item_name = $asset->item_name;
+        $this->asset_name = $asset->asset_name;
         $this->category = $asset->category;
-        $this->description = $asset->description;
         $this->serial_number = $asset->serial_number;
         $this->brand = $asset->brand;
         $this->model = $asset->model;
-        $this->purchase_date = $asset->purchase_date;
-        $this->purchase_cost = $asset->purchase_cost;
+        $this->cost = $asset->cost;
         $this->supplier = $asset->supplier;
-        $this->warranty_expiration = $asset->warranty_expiration;
-        $this->status = $asset->status;
-        $this->location = $asset->location;
         $this->assigned_to = $asset->assigned_to;
-        $this->notes = $asset->notes;
+        $this->class = $asset->class;
+        $this->location = $asset->location;
+        $this->status = $asset->status;
+        $this->condition = $asset->condition;
+        // Format dates as YYYY-MM-DD for HTML date inputs
+        $this->purchase_date = $asset->purchase_date?->format('Y-m-d');
+        $this->warranty_expiration = $asset->warranty_expiration?->format('Y-m-d');
+
+        $this->purchase_order_no = $asset->purchase_order_no;
+        $this->remarks = $asset->remarks;
     }
 
     public function update()
@@ -54,25 +61,25 @@ class FixedAssetEdit extends Component
         try {
             $validated = $this->validate([
                 'asset_tag' => 'nullable|string|max:255',
-                'item_name' => 'required|string|max:255',
+                'asset_name' => 'required|string|max:255',
                 'category' => 'required|string|max:255',
-                'description' => 'nullable|string',
                 'serial_number' => 'nullable|string|max:255',
                 'brand' => 'nullable|string|max:255',
                 'model' => 'nullable|string|max:255',
-                'purchase_date' => 'nullable|date',
-                'purchase_cost' => 'nullable|numeric',
+                'cost' => 'nullable|numeric',
                 'supplier' => 'nullable|string|max:255',
-                'warranty_expiration' => 'nullable|date',
-                'status' => 'nullable|string|max:100',
-                'location' => 'nullable|string|max:255',
                 'assigned_to' => 'nullable|string|max:255',
-                'notes' => 'nullable|string',
+                'class' => 'nullable|string|max:255',
+                'location' => 'nullable|string|max:255',
+                'status' => 'nullable|string|max:100',
+                'condition' => 'nullable|string|max:100',
+                'purchase_date' => 'nullable|date',
+                'purchase_order_no' => 'nullable|string|max:255',
+                'warranty_expiration' => 'nullable|date',
+                'remarks' => 'nullable|string',
             ]);
 
-            $asset = FixedAsset::findOrFail($this->assetId);
-
-            $asset->update($validated);
+            FixedAsset::findOrFail($this->assetId)->update($validated);
 
             session()->flash('toast', [
                 'message' => 'Fixed asset updated successfully!',

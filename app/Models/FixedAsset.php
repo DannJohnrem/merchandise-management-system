@@ -32,7 +32,7 @@ class FixedAsset extends Model
 
     protected $casts = [
         'cost' => 'decimal:2',
-        'purchase_date' => 'date',
-        'warranty_expiration' => 'date',
+        'purchase_date' => 'date:Y-m-d',
+        'warranty_expiration' => 'date:Y-m-d',
     ];
 }

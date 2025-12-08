@@ -11,40 +11,44 @@ use Throwable;
 class FixedAssetCreate extends Component
 {
     public $asset_tag;
-    public $item_name;
+    public $asset_name;
     public $category;
-    public $description;
     public $serial_number;
     public $brand;
     public $model;
-    public $purchase_date;
-    public $purchase_cost;
+    public $cost;
     public $supplier;
-    public $warranty_expiration;
-    public $status;
-    public $location;
     public $assigned_to;
-    public $notes;
+    public $class;
+    public $location;
+    public $status;
+    public $condition;
+    public $purchase_date;
+    public $purchase_order_no;
+    public $warranty_expiration;
+    public $remarks;
 
     public function save()
     {
         try {
             $validated = $this->validate([
                 'asset_tag' => 'nullable|string|max:255',
-                'item_name' => 'required|string|max:255',
+                'asset_name' => 'required|string|max:255',
                 'category' => 'required|string|max:255',
-                'description' => 'nullable|string',
                 'serial_number' => 'nullable|string|max:255',
                 'brand' => 'nullable|string|max:255',
                 'model' => 'nullable|string|max:255',
-                'purchase_date' => 'nullable|date',
-                'purchase_cost' => 'nullable|numeric',
+                'cost' => 'nullable|numeric',
                 'supplier' => 'nullable|string|max:255',
-                'warranty_expiration' => 'nullable|date',
-                'status' => 'nullable|string|max:100',
-                'location' => 'nullable|string|max:255',
                 'assigned_to' => 'nullable|string|max:255',
-                'notes' => 'nullable|string',
+                'class' => 'nullable|string|max:255',
+                'location' => 'nullable|string|max:255',
+                'status' => 'nullable|string|max:100',
+                'condition' => 'nullable|string|max:100',
+                'purchase_date' => 'nullable|date',
+                'purchase_order_no' => 'nullable|string|max:255',
+                'warranty_expiration' => 'nullable|date',
+                'remarks' => 'nullable|string',
             ]);
 
             FixedAsset::create($validated);

@@ -13,7 +13,7 @@ class FixedAssetTable extends DataTableComponent
 {
     protected $model = FixedAsset::class;
 
-    protected $listeners = ['confirmDeleteItem' => 'deleteItem'];
+    protected $listeners = ['confirmDeleteFixedAsset' => 'deleteItem'];
 
     public array $bulkActions = [
         'deleteSelected' => '🗑️ Delete Selected',
@@ -148,7 +148,7 @@ class FixedAssetTable extends DataTableComponent
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Item Name', 'item_name')
+            Column::make('Asset Name', 'asset_name')
                 ->sortable()
                 ->searchable(),
 
@@ -164,7 +164,7 @@ class FixedAssetTable extends DataTableComponent
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Cost', 'purchase_cost')
+            Column::make('Cost', 'cost')
                 ->sortable()
                 ->format(fn($value) => "₱ " . number_format($value, 2)),
 

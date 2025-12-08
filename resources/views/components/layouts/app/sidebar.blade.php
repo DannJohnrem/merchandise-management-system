@@ -3,7 +3,8 @@
 
 <head>
     @include('partials.head')
-    @livewireStyles
+@livewireStyles
+@rappasoftTableStyles
 </head>
 
 <body class="min-h-screen bg-white dark:bg-zinc-800">
@@ -166,6 +167,7 @@
     {{-- Scripts --}}
     @fluxScripts
     @livewireScripts
+    @rappasoftTableScripts
 
     <script>
         if (!window.__toastListenerAdded) {
