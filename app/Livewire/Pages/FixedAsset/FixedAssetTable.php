@@ -45,19 +45,16 @@ class FixedAssetTable extends DataTableComponent
                         ->prepend('All', '')
                         ->toArray()
                 )
-                ->filter(
-                    fn($query, $value) =>
-                    $value ? $query->where('category', $value) : null
-                ),
+                ->filter(fn($query, $value) => $value ? $query->where('category', $value) : null),
 
             SelectFilter::make('Status')
                 ->options([
                     '' => 'All',
-                    'active' => 'Active',
-                    'in_use' => 'In Use',
-                    'repair' => 'For Repair',
+                    'available' => 'Available',
+                    'issued' => 'Issued',
+                    'repair' => 'Repair',
+                    'disposed' => 'Disposed',
                     'lost' => 'Lost',
-                    'retired' => 'Retired',
                 ])
                 ->filter(fn($query, $value) => $value ? $query->where('status', $value) : null),
         ];
@@ -76,8 +73,7 @@ class FixedAssetTable extends DataTableComponent
                 return;
             }
 
-            $name = $item->item_name ?? 'Asset';
-
+            $name = $item->asset_name ?? 'Asset';
             $item->delete();
 
             $this->setPage(1);
@@ -100,32 +96,29 @@ class FixedAssetTable extends DataTableComponent
     {
         try {
             $selected = $this->getSelected();
-            $count = count($selected);
 
-            if ($count === 0) {
+            if (empty($selected)) {
                 $this->dispatch('toast', message: 'No items selected.', type: 'warning');
                 return;
             }
 
-            $items = FixedAsset::whereIn('id', $selected)->get();
-            $deletedCount = 0;
-
-            foreach ($items as $item) {
-                $item->delete();
-                $deletedCount++;
-            }
+            FixedAsset::whereIn('id', $selected)->delete();
 
             $this->clearSelected();
             $this->setPage(1);
             $this->dispatch('$refresh');
 
-            $this->dispatch('toast', message: "{$deletedCount} asset(s) deleted successfully!", type: 'success');
+            $this->dispatch(
+                'toast',
+                message: count($selected) . ' asset(s) deleted successfully!',
+                type: 'success'
+            );
         } catch (QueryException $e) {
-            logger()->error('DB error bulk delete assets', ['error' => $e->getMessage()]);
-            $this->dispatch('toast', message: 'Database error occurred during deletion.', type: 'error');
+            logger()->error('DB bulk delete error', ['error' => $e->getMessage()]);
+            $this->dispatch('toast', message: 'Database error occurred.', type: 'error');
         } catch (Throwable $e) {
             logger()->error('Unexpected bulk delete error', ['error' => $e->getMessage()]);
-            $this->dispatch('toast', message: 'Unexpected error occurred during bulk delete.', type: 'error');
+            $this->dispatch('toast', message: 'Unexpected error occurred.', type: 'error');
         }
     }
 
@@ -135,69 +128,21 @@ class FixedAssetTable extends DataTableComponent
     public function columns(): array
     {
         return [
-
-            Column::make('ID', 'id')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Asset Tag', 'asset_tag')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Category', 'category')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Asset Name', 'asset_name')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Serial Number', 'serial_number')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Brand', 'brand')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Model', 'model')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Cost', 'cost')
-                ->sortable()
-                ->format(fn($value) => "₱ " . number_format($value, 2)),
-
-            Column::make('Supplier', 'supplier')
-                ->sortable(),
-
-            Column::make('Assigned To', 'assigned_to')
-                ->sortable(),
-
-            Column::make('Location', 'location')
-                ->sortable(),
-
-            Column::make('Status', 'status')
-                ->sortable()
-                ->searchable()
-                ->label(fn($row) =>
-                    view('livewire.pages.fixed-asset.partials.status-badge', [
-                        'status' => $row->status
-                    ])->render()
-                )
-                ->html(),
-
-            Column::make('Created At', 'created_at')
-                ->sortable()
-                ->format(fn($value) => $value->format('M d, Y')),
-
-            Column::make('Actions')
-                ->label(fn($row) =>
-                    view('livewire.pages.fixed-asset.partials.actions', [
-                        'item' => $row
-                    ])->render()
-                )
-                ->html(),
+            Column::make('ID', 'id')->sortable()->searchable(),
+            Column::make('Asset Tag', 'asset_tag')->sortable()->searchable(),
+            Column::make('Category', 'category')->sortable()->searchable(),
+            Column::make('Asset Name', 'asset_name')->sortable()->searchable(),
+            Column::make('Serial Number', 'serial_number')->sortable()->searchable(),
+            Column::make('Brand', 'brand')->sortable()->searchable(),
+            Column::make('Model', 'model')->sortable()->searchable(),
+            Column::make('Cost', 'purchase_cost')->sortable()->format(fn($value) => "₱ " . number_format($value, 2)),
+            Column::make('Supplier', 'supplier')->sortable(),
+            Column::make('Assigned To', 'assigned_employee')->sortable()->searchable(),
+            Column::make('Location', 'location')->sortable()->searchable(),
+            Column::make('Status', 'status')->sortable()->searchable()
+                ->label(fn($row) => view('livewire.pages.fixed-asset.partials.status-badge', ['status' => $row->status])->render())->html(),
+            Column::make('Created At', 'created_at')->sortable()->format(fn($value) => $value->format('M d, Y')),
+            Column::make('Actions')->label(fn($row) => view('livewire.pages.fixed-asset.partials.actions', ['item' => $row])->render())->html(),
         ];
     }
 }

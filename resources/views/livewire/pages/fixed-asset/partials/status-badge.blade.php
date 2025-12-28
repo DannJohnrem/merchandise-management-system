@@ -1,18 +1,19 @@
 @php
     $key = strtolower(trim($status)); // status comes from DB
+
     $colors = [
         'available' => ['green', 'dark:bg-green-500 dark:text-white'],
-        'in_use'    => ['blue', 'dark:bg-blue-500 dark:text-white'],
+        'issued'    => ['blue', 'dark:bg-blue-500 dark:text-white'],
         'repair'    => ['yellow', 'dark:bg-yellow-500 dark:text-black'],
-        'returned'  => ['purple', 'dark:bg-purple-500 dark:text-white'],
+        'disposed'  => ['purple', 'dark:bg-purple-500 dark:text-white'],
         'lost'      => ['red', 'dark:bg-red-500 dark:text-white'],
     ];
 
     $labels = [
         'available' => 'Available',
-        'in_use'    => 'In Use',
+        'issued'    => 'Issued',
         'repair'    => 'For Repair',
-        'returned'  => 'Returned',
+        'disposed'  => 'Disposed',
         'lost'      => 'Lost',
     ];
 

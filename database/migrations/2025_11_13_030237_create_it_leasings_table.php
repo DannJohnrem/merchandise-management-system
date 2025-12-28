@@ -14,15 +14,21 @@ return new class extends Migration
         Schema::create('it_leasings', function (Blueprint $table) {
             $table->id();
             $table->string('category');
+            $table->string('item_name');
             $table->string('serial_number')->unique();
             $table->string('brand');
             $table->string('model');
-            $table->decimal('cost', 12, 2);
-            $table->string('assigned_to');
-            $table->string('class');
-            $table->enum('status', ['available', 'in_use', 'repair', 'returned', 'lost'])
-                ->nullable(false);
-            $table->text('remarks');
+            $table->decimal('purchase_cost', 12, 2);
+            $table->string('supplier')->nullable();
+            $table->string('purchase_order_no')->nullable();
+            $table->date('purchase_date')->nullable();
+            $table->date('warranty_expiration')->nullable();
+            $table->string('assigned_company');              // Company (BTSMC, etc.)
+            $table->string('assigned_employee')->nullable(); // Optional end-user
+            $table->string('location')->nullable();
+            $table->enum('status', ['available', 'deployed', 'in_repair', 'returned', 'lost'])->default('available');
+            $table->enum('condition', ['new', 'good', 'fair', 'poor'])->nullable();
+            $table->text('remarks')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

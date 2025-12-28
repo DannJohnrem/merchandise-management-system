@@ -2,9 +2,9 @@
 
 namespace App\Livewire\Pages\FixedAsset;
 
-use App\Models\ClassModel;
 use Livewire\Component;
 use App\Models\FixedAsset;
+use App\Models\ClassModel;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\QueryException;
 use Throwable;
@@ -18,7 +18,7 @@ class FixedAssetCreate extends Component
     {
         $this->items[] = $this->blankItem();
 
-        // lOAD CLASSES
+        // Load classes for dropdowns
         $this->classes = ClassModel::orderBy('name')->get();
     }
 
@@ -31,13 +31,13 @@ class FixedAssetCreate extends Component
             'serial_number' => null,
             'brand' => null,
             'model' => null,
-            'cost' => null,
+            'purchase_cost' => null,          // corrected
             'supplier' => null,
-            'assigned_to' => null,
-            'class' => null,
+            'assigned_employee' => null,      // corrected
+            'asset_class' => null,            // corrected
             'location' => null,
-            'status' => null,
-            'condition' => null,
+            'status' => 'available',
+            'condition' => 'new',
             'purchase_date' => null,
             'purchase_order_no' => null,
             'warranty_expiration' => null,
@@ -53,7 +53,7 @@ class FixedAssetCreate extends Component
     public function removeItem($index)
     {
         unset($this->items[$index]);
-        $this->items = array_values($this->items); // reindex
+        $this->items = array_values($this->items); // reindex array
     }
 
     public function save()
@@ -61,21 +61,19 @@ class FixedAssetCreate extends Component
         try {
             $this->validate([
                 'items' => 'required|array|min:1',
-
                 'items.*.asset_name' => 'required|string|max:255',
                 'items.*.category' => 'required|string|max:255',
-
                 'items.*.asset_tag' => 'nullable|string|max:255',
-                'items.*.serial_number' => 'nullable|string|max:255',
+                'items.*.serial_number' => 'nullable|string|max:255|unique:fixed_assets,serial_number',
                 'items.*.brand' => 'nullable|string|max:255',
                 'items.*.model' => 'nullable|string|max:255',
-                'items.*.cost' => 'nullable|numeric',
+                'items.*.purchase_cost' => 'nullable|numeric',
                 'items.*.supplier' => 'nullable|string|max:255',
-                'items.*.assigned_to' => 'nullable|string|max:255',
-                'items.*.class' => 'nullable|string|max:255',
+                'items.*.assigned_employee' => 'nullable|string|max:255',
+                'items.*.asset_class' => 'nullable|string|max:255',
                 'items.*.location' => 'nullable|string|max:255',
-                'items.*.status' => 'nullable|string|max:100',
-                'items.*.condition' => 'nullable|string|max:100',
+                'items.*.status' => 'nullable|in:available,issued,repair,disposed,lost',
+                'items.*.condition' => 'nullable|in:new,good,fair,poor',
                 'items.*.purchase_date' => 'nullable|date',
                 'items.*.purchase_order_no' => 'nullable|string|max:255',
                 'items.*.warranty_expiration' => 'nullable|date',
