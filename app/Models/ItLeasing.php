@@ -12,21 +12,26 @@ class ItLeasing extends Model
 
     protected $fillable = [
         'category',
+        'item_name',
         'serial_number',
         'brand',
         'model',
-        'cost',
-        'assigned_to',
-        'class',
+        'purchase_cost',
+        'supplier',
+        'purchase_order_no',
+        'purchase_date',
+        'warranty_expiration',
+        'assigned_company',
+        'assigned_employee',
+        'location',
         'status',
+        'condition',
         'remarks',
-        // 'purchase_date',
-        // 'purchase_order_no',
-        // 'warranty_expiration',
     ];
 
     protected $casts = [
-        'status' => 'string',
-        'cost' => 'decimal:2',
+        'purchase_cost' => 'decimal:2',
+        'purchase_date' => 'date:Y-m-d',
+        'warranty_expiration' => 'date:Y-m-d',
     ];
 }

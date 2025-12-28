@@ -4,6 +4,7 @@ use Laravel\Fortify\Features;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\TwoFactor;
+use Illuminate\Support\Facades\Auth;
 use App\Livewire\Settings\Appearance;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Admin\Roles\RoleEdit;
@@ -25,10 +26,13 @@ use App\Livewire\Admin\Permissions\PermissionEdit;
 use App\Livewire\Pages\FixedAsset\FixedAssetIndex;
 use App\Livewire\Admin\Permissions\PermissionIndex;
 use App\Livewire\Pages\FixedAsset\FixedAssetCreate;
+use App\Livewire\Admin\ActivityLog\ActivityLogIndex;
 use App\Livewire\Admin\Permissions\PermissionCreate;
 
 Route::get('/', function () {
-    return view('welcome');
+    return Auth::check()
+        ? redirect()->route('dashboard')
+        : redirect()->route('login');
 })->name('home');
 
 Route::view('dashboard', 'dashboard')
@@ -94,5 +98,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/class', ClassIndex::class)->name('class.index');
         Route::get('/class/create', ClassCreate::class)->name('class.create');
         Route::get('/class/{class}/edit', ClassEdit::class)->name('class.edit');
+
+        Route::get('/activity-log', ActivityLogIndex::class)->name('activity-log.index');
     });
 });

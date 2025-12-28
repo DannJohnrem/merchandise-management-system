@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\ItLeasing;
+use App\Models\FixedAsset;
+use App\Observers\ItLeasingObserver;
+use App\Observers\FixedAssetObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        ItLeasing::observe(ItLeasingObserver::class);
+        FixedAsset::observe(FixedAssetObserver::class);
     }
 }

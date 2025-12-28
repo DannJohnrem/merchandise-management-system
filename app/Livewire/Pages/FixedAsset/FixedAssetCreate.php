@@ -4,73 +4,104 @@ namespace App\Livewire\Pages\FixedAsset;
 
 use Livewire\Component;
 use App\Models\FixedAsset;
-use Illuminate\Database\QueryException;
+use App\Models\ClassModel;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Database\QueryException;
 use Throwable;
 
 class FixedAssetCreate extends Component
 {
-    public $asset_tag;
-    public $asset_name;
-    public $category;
-    public $serial_number;
-    public $brand;
-    public $model;
-    public $cost;
-    public $supplier;
-    public $assigned_to;
-    public $class;
-    public $location;
-    public $status;
-    public $condition;
-    public $purchase_date;
-    public $purchase_order_no;
-    public $warranty_expiration;
-    public $remarks;
+    public array $items = [];
+    public $classes = [];
+
+    public function mount()
+    {
+        $this->items[] = $this->blankItem();
+
+        // Load classes for dropdowns
+        $this->classes = ClassModel::orderBy('name')->get();
+    }
+
+    protected function blankItem(): array
+    {
+        return [
+            'asset_tag' => null,
+            'category' => null,
+            'asset_name' => null,
+            'serial_number' => null,
+            'brand' => null,
+            'model' => null,
+            'purchase_cost' => null,          // corrected
+            'supplier' => null,
+            'assigned_employee' => null,      // corrected
+            'asset_class' => null,            // corrected
+            'location' => null,
+            'status' => 'available',
+            'condition' => 'new',
+            'purchase_date' => null,
+            'purchase_order_no' => null,
+            'warranty_expiration' => null,
+            'remarks' => null,
+        ];
+    }
+
+    public function addItem()
+    {
+        $this->items[] = $this->blankItem();
+    }
+
+    public function removeItem($index)
+    {
+        unset($this->items[$index]);
+        $this->items = array_values($this->items); // reindex array
+    }
 
     public function save()
     {
         try {
-            $validated = $this->validate([
-                'asset_tag' => 'nullable|string|max:255',
-                'asset_name' => 'required|string|max:255',
-                'category' => 'required|string|max:255',
-                'serial_number' => 'nullable|string|max:255',
-                'brand' => 'nullable|string|max:255',
-                'model' => 'nullable|string|max:255',
-                'cost' => 'nullable|numeric',
-                'supplier' => 'nullable|string|max:255',
-                'assigned_to' => 'nullable|string|max:255',
-                'class' => 'nullable|string|max:255',
-                'location' => 'nullable|string|max:255',
-                'status' => 'nullable|string|max:100',
-                'condition' => 'nullable|string|max:100',
-                'purchase_date' => 'nullable|date',
-                'purchase_order_no' => 'nullable|string|max:255',
-                'warranty_expiration' => 'nullable|date',
-                'remarks' => 'nullable|string',
+            $this->validate([
+                'items' => 'required|array|min:1',
+                'items.*.asset_name' => 'required|string|max:255',
+                'items.*.category' => 'required|string|max:255',
+                'items.*.asset_tag' => 'nullable|string|max:255',
+                'items.*.serial_number' => 'nullable|string|max:255|unique:fixed_assets,serial_number',
+                'items.*.brand' => 'nullable|string|max:255',
+                'items.*.model' => 'nullable|string|max:255',
+                'items.*.purchase_cost' => 'nullable|numeric',
+                'items.*.supplier' => 'nullable|string|max:255',
+                'items.*.assigned_employee' => 'nullable|string|max:255',
+                'items.*.asset_class' => 'nullable|string|max:255',
+                'items.*.location' => 'nullable|string|max:255',
+                'items.*.status' => 'nullable|in:available,issued,repair,disposed,lost',
+                'items.*.condition' => 'nullable|in:new,good,fair,poor',
+                'items.*.purchase_date' => 'nullable|date',
+                'items.*.purchase_order_no' => 'nullable|string|max:255',
+                'items.*.warranty_expiration' => 'nullable|date',
+                'items.*.remarks' => 'nullable|string',
             ]);
 
-            FixedAsset::create($validated);
+            foreach ($this->items as $item) {
+                FixedAsset::create($item);
+            }
 
             session()->flash('toast', [
-                'message' => 'Fixed asset created successfully!',
+                'message' => 'Fixed assets created successfully!',
                 'type' => 'success',
             ]);
 
             return $this->redirect(route('fixed-asset.index'), navigate: true);
 
         } catch (ValidationException $e) {
-            $this->dispatch('toast', message: 'Please check required fields.', type: 'error');
+            $this->dispatch('toast', message: 'Please fix validation errors.', type: 'error');
             throw $e;
 
         } catch (QueryException $e) {
+            logger()->error('DB Error', ['error' => $e->getMessage()]);
             $this->dispatch('toast', message: 'Database error occurred.', type: 'error');
-            logger()->error('DB Error in FixedAssetCreate', ['error' => $e->getMessage()]);
 
         } catch (Throwable $e) {
+            logger()->error('Unexpected Error', ['error' => $e->getMessage()]);
             $this->dispatch('toast', message: 'Unexpected error occurred.', type: 'error');
-            logger()->error('Error in FixedAssetCreate', ['error' => $e->getMessage()]);
         }
     }
 

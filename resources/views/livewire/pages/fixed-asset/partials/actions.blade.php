@@ -1,7 +1,7 @@
 {{-- Edit --}}
 @can('edit fixed-asset')
     <a href="{{ route('fixed-asset.edit', $item->id) }}" wire:navigate>
-        <flux:button variant="outline" size="sm" icon="pencil-square">
+        <flux:button variant="primary" color="amber" size="sm" icon="pencil-square">
             Edit
         </flux:button>
     </a>
@@ -9,7 +9,7 @@
 
 {{-- View QR (Flux Modal Trigger + Livewire Event) --}}
 <flux:modal.trigger name="fixed-asset-qr">
-    <flux:button variant="outline" size="sm" icon="qr-code"
+    <flux:button variant="primary" color="emerald" size="sm" icon="qr-code"
         wire:click="$dispatch('show-fixed-asset-qr', { id: {{ $item->id }} })">
         View QR
     </flux:button>

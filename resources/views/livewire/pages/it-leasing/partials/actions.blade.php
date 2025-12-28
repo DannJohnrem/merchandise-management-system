@@ -8,7 +8,7 @@
 @endcan
 
 {{-- View QR (Flux Modal Trigger + Livewire Event) --}}
-<flux:modal.trigger name="it-leasing-qr">
+{{-- <flux:modal.trigger name="it-leasing-qr">
     <flux:button
         variant="outline"
         size="sm"
@@ -17,7 +17,7 @@
     >
         View QR
     </flux:button>
-</flux:modal.trigger>
+</flux:modal.trigger> --}}
 
 {{-- Delete --}}
 @can('delete it-leasing')

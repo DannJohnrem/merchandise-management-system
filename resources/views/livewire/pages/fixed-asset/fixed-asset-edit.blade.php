@@ -17,99 +17,92 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                {{-- Asset Tag --}}
                 <div>
-                    <flux:label for="asset_tag">Asset Tag <span class="text-red-400">*</span></flux:label>
-                    <flux:input id="asset_tag" wire:model.defer="asset_tag" />
+                    <flux:label>Asset Tag</flux:label>
+                    <flux:input wire:model.defer="asset_tag" />
                 </div>
 
-                {{-- Category --}}
                 <div>
-                    <flux:label for="category">Category <span class="text-red-400">*</span></flux:label>
-                    <flux:select id="category" wire:model.defer="category">
+                    <flux:label>Category *</flux:label>
+                    <flux:select wire:model.defer="category">
                         <option value="">Select Category</option>
-                        <option value="Laptop">Laptop</option>
-                        <option value="Desktop">Desktop</option>
-                        <option value="Monitor">Monitor</option>
-                        <option value="Printer">Printer</option>
-                        <option value="Scanner">Scanner</option>
-                        <option value="Furniture">Furniture</option>
-                        <option value="Equipment">Equipment</option>
-                        <option value="Others">Others</option>
+                        <option>Laptop</option>
+                        <option>Desktop</option>
+                        <option>Monitor</option>
+                        <option>Printer</option>
+                        <option>Scanner</option>
+                        <option>Furniture</option>
+                        <option>Equipment</option>
+                        <option>Others</option>
                     </flux:select>
                 </div>
 
-                {{-- Asset Name --}}
                 <div>
-                    <flux:label for="asset_name">Item Name <span class="text-red-400">*</span></flux:label>
-                    <flux:input id="asset_name" wire:model.defer="asset_name" />
+                    <flux:label>Item Name *</flux:label>
+                    <flux:input wire:model.defer="asset_name" />
                 </div>
 
-                {{-- Serial Number --}}
                 <div>
-                    <flux:label for="serial_number">Serial Number</flux:label>
-                    <flux:input id="serial_number" wire:model.defer="serial_number" />
+                    <flux:label>Serial Number</flux:label>
+                    <flux:input wire:model.defer="serial_number" />
                 </div>
 
-                {{-- Brand --}}
                 <div>
-                    <flux:label for="brand">Brand</flux:label>
-                    <flux:input id="brand" wire:model.defer="brand" />
+                    <flux:label>Brand</flux:label>
+                    <flux:input wire:model.defer="brand" />
                 </div>
 
-                {{-- Model --}}
                 <div>
-                    <flux:label for="model">Model</flux:label>
-                    <flux:input id="model" wire:model.defer="model" />
+                    <flux:label>Model</flux:label>
+                    <flux:input wire:model.defer="model" />
                 </div>
 
-                {{-- Purchase Cost --}}
                 <div>
-                    <flux:label for="cost">Purchase Cost</flux:label>
-                    <flux:input id="cost" type="number" step="0.01" wire:model.defer="cost" />
+                    <flux:label>Purchase Cost</flux:label>
+                    <flux:input type="number" step="0.01" wire:model.defer="purchase_cost" />
                 </div>
 
-                {{-- Supplier --}}
                 <div>
-                    <flux:label for="supplier">Supplier</flux:label>
-                    <flux:input id="supplier" wire:model.defer="supplier" />
+                    <flux:label>Supplier</flux:label>
+                    <flux:input wire:model.defer="supplier" />
                 </div>
 
-                {{-- Assigned To --}}
                 <div>
-                    <flux:label for="assigned_to">Assigned To</flux:label>
-                    <flux:input id="assigned_to" wire:model.defer="assigned_to" />
+                    <flux:label>Assigned Employee</flux:label>
+                    <flux:input wire:model.defer="assigned_employee" />
                 </div>
 
-                {{-- Class --}}
                 <div>
-                    <flux:label for="class">Class (Employee)</flux:label>
-                    <flux:input id="class" wire:model.defer="class" />
+                    <flux:label>Class</flux:label>
+                    <flux:select wire:model.defer="asset_class">
+                        <option value="">Select Class</option>
+                        @foreach ($classes as $class)
+                            <option value="{{ $class->name }}">
+                                {{ $class->name }} @if ($class->type) ({{ ucfirst($class->type) }}) @endif
+                            </option>
+                        @endforeach
+                    </flux:select>
                 </div>
 
-                {{-- Location --}}
                 <div>
-                    <flux:label for="location">Location</flux:label>
-                    <flux:input id="location" wire:model.defer="location" />
+                    <flux:label>Location</flux:label>
+                    <flux:input wire:model.defer="location" />
                 </div>
 
-                {{-- Status --}}
                 <div>
-                    <flux:label for="status">Status</flux:label>
-                    <flux:select id="status" wire:model.defer="status">
-                        <option value="">Select Status</option>
-                        <option value="active">Active</option>
-                        <option value="in_use">In Use</option>
-                        <option value="repair">For Repair</option>
+                    <flux:label>Status</flux:label>
+                    <flux:select wire:model.defer="status">
+                        <option value="available">Available</option>
+                        <option value="issued">Issued</option>
+                        <option value="repair">Repair</option>
+                        <option value="disposed">Disposed</option>
                         <option value="lost">Lost</option>
                     </flux:select>
                 </div>
 
-                {{-- Condition --}}
                 <div>
-                    <flux:label for="condition">Condition</flux:label>
-                    <flux:select id="condition" wire:model.defer="condition">
-                        <option value="">Select Condition</option>
+                    <flux:label>Condition</flux:label>
+                    <flux:select wire:model.defer="condition">
                         <option value="new">New</option>
                         <option value="good">Good</option>
                         <option value="fair">Fair</option>
@@ -117,37 +110,32 @@
                     </flux:select>
                 </div>
 
-                {{-- Purchase Date --}}
                 <div>
-                    <flux:label for="purchase_date">Purchase Date</flux:label>
-                    <flux:input id="purchase_date" type="date" wire:model.defer="purchase_date" />
+                    <flux:label>Purchase Date</flux:label>
+                    <flux:input type="date" wire:model.defer="purchase_date" />
                 </div>
 
-                {{-- PO Number --}}
                 <div>
-                    <flux:label for="purchase_order_no">Purchase Order No.</flux:label>
-                    <flux:input id="purchase_order_no" wire:model.defer="purchase_order_no" />
+                    <flux:label>Purchase Order No.</flux:label>
+                    <flux:input wire:model.defer="purchase_order_no" />
                 </div>
 
-                {{-- Warranty --}}
                 <div>
-                    <flux:label for="warranty_expiration">Warranty Expiration</flux:label>
-                    <flux:input id="warranty_expiration" type="date" wire:model.defer="warranty_expiration" />
+                    <flux:label>Warranty Expiration</flux:label>
+                    <flux:input type="date" wire:model.defer="warranty_expiration" />
                 </div>
 
-                {{-- Remarks --}}
                 <div class="md:col-span-2">
-                    <flux:label for="remarks">Remarks</flux:label>
-                    <flux:textarea id="remarks" wire:model.defer="remarks" rows="4" />
+                    <flux:label>Remarks</flux:label>
+                    <flux:textarea rows="4" wire:model.defer="remarks" />
                 </div>
+
             </div>
 
-            {{-- Actions --}}
             <div class="flex justify-end space-x-2">
                 <flux:button variant="ghost" wire:navigate href="{{ route('fixed-asset.index') }}">
                     Cancel
                 </flux:button>
-
                 <flux:button variant="primary" type="submit">
                     Update
                 </flux:button>
@@ -155,5 +143,4 @@
 
         </form>
     </div>
-
 </div>
