@@ -15,6 +15,7 @@ class FixedAsset extends Model
         'category',
         'asset_name',
         'serial_number',
+        'charger_serial_number',
         'brand',
         'model',
         'purchase_cost',

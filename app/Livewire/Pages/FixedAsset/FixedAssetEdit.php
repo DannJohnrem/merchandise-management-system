@@ -18,6 +18,7 @@ class FixedAssetEdit extends Component
     public $category;
     public $asset_name;
     public $serial_number;
+    public $charger_serial_number;
     public $brand;
     public $model;
     public $purchase_cost;
@@ -31,6 +32,7 @@ class FixedAssetEdit extends Component
     public $purchase_order_no;
     public $warranty_expiration;
     public $remarks;
+    public $inclusions = [];
 
     public $classes = [];
 
@@ -43,6 +45,7 @@ class FixedAssetEdit extends Component
         $this->category = $asset->category;
         $this->asset_name = $asset->asset_name;
         $this->serial_number = $asset->serial_number;
+        $this->charger_serial_number = $asset->charger_serial_number;
         $this->brand = $asset->brand;
         $this->model = $asset->model;
         $this->purchase_cost = $asset->purchase_cost;
@@ -56,9 +59,21 @@ class FixedAssetEdit extends Component
         $this->purchase_order_no = $asset->purchase_order_no;
         $this->warranty_expiration = $asset->warranty_expiration?->format('Y-m-d');
         $this->remarks = $asset->remarks;
+        $this->inclusions = $asset->inclusions ?? [];
 
         // Load available classes
         $this->classes = ClassModel::orderBy('name')->get();
+    }
+
+    public function addInclusion()
+    {
+        $this->inclusions[] = '';
+    }
+
+    public function removeInclusion($index)
+    {
+        unset($this->inclusions[$index]);
+        $this->inclusions = array_values($this->inclusions);
     }
 
     public function update()
@@ -69,6 +84,7 @@ class FixedAssetEdit extends Component
                 'category' => 'required|string|max:255',
                 'asset_name' => 'required|string|max:255',
                 'serial_number' => "nullable|string|unique:fixed_assets,serial_number,{$this->asset->id}",
+                'charger_serial_number' => "nullable|string|unique:fixed_assets,charger_serial_number,{$this->asset->id}",
                 'brand' => 'nullable|string|max:255',
                 'model' => 'nullable|string|max:255',
                 'purchase_cost' => 'nullable|numeric',
@@ -82,33 +98,15 @@ class FixedAssetEdit extends Component
                 'purchase_order_no' => 'nullable|string|max:255',
                 'warranty_expiration' => 'nullable|date',
                 'remarks' => 'nullable|string',
+                'inclusions' => 'nullable|array',
+                'inclusions.*' => 'nullable|string|max:255',
             ]);
 
-            // Update the model using the public properties
-            $this->asset->update([
-                'asset_tag' => $this->asset_tag,
-                'category' => $this->category,
-                'asset_name' => $this->asset_name,
-                'serial_number' => $this->serial_number,
-                'brand' => $this->brand,
-                'model' => $this->model,
-                'purchase_cost' => $this->purchase_cost,
-                'supplier' => $this->supplier,
-                'assigned_employee' => $this->assigned_employee,
-                'asset_class' => $this->asset_class,
-                'location' => $this->location,
-                'status' => $this->status,
-                'condition' => $this->condition,
-                'purchase_date' => $this->purchase_date,
-                'purchase_order_no' => $this->purchase_order_no,
-                'warranty_expiration' => $this->warranty_expiration,
-                'remarks' => $this->remarks,
-            ]);
+            $this->asset->update(array_merge($validated, [
+                'inclusions' => $this->inclusions,
+            ]));
 
-            session()->flash('toast', [
-                'message' => 'Fixed asset updated successfully!',
-                'type' => 'success',
-            ]);
+            session()->flash('toast', ['message' => 'Fixed asset updated successfully!', 'type' => 'success']);
 
             return redirect()->route('fixed-asset.index');
 
@@ -121,7 +119,7 @@ class FixedAssetEdit extends Component
             $this->dispatch('toast', message: 'Database error occurred.', type: 'error');
 
         } catch (Throwable $e) {
-            logger()->error('Unexpected error in FixedAssetEdit', ['error' => $e->getMessage()]);
+            logger()->error('Error updating FixedAsset', ['error' => $e->getMessage()]);
             $this->dispatch('toast', message: 'Unexpected error occurred.', type: 'error');
         }
     }

@@ -22,7 +22,8 @@
                     <div class="flex justify-between items-center">
                         <h3 class="text-lg font-semibold">Item {{ $index + 1 }}</h3>
                         @if (count($items) > 1)
-                            <flux:button type="button" variant="danger" size="sm" wire:click="removeItem({{ $index }})">
+                            <flux:button type="button" variant="danger" size="sm"
+                                wire:click="removeItem({{ $index }})">
                                 Remove
                             </flux:button>
                         @endif
@@ -33,7 +34,8 @@
 
                         <div>
                             <flux:label>Asset Tag</flux:label>
-                            <flux:input wire:model.defer="items.{{ $index }}.asset_tag" placeholder="Asset tag code" />
+                            <flux:input wire:model.defer="items.{{ $index }}.asset_tag"
+                                placeholder="Asset tag code" />
                         </div>
 
                         <div>
@@ -53,12 +55,18 @@
 
                         <div>
                             <flux:label>Item Name <span class="text-red-400">*</span></flux:label>
-                            <flux:input wire:model.defer="items.{{ $index }}.asset_name" placeholder="Item name / asset name" />
+                            <flux:input wire:model.defer="items.{{ $index }}.asset_name"
+                                placeholder="Item name / asset name" />
                         </div>
 
                         <div>
                             <flux:label>Serial Number</flux:label>
                             <flux:input wire:model.defer="items.{{ $index }}.serial_number" />
+                        </div>
+
+                        <div>
+                            <flux:label>Charger Serial Number</flux:label>
+                            <flux:input wire:model.defer="items.{{ $index }}.charger_serial_number" />
                         </div>
 
                         <div>
@@ -73,7 +81,8 @@
 
                         <div>
                             <flux:label>Purchase Cost</flux:label>
-                            <flux:input type="number" step="0.01" wire:model.defer="items.{{ $index }}.purchase_cost" />
+                            <flux:input type="number" step="0.01"
+                                wire:model.defer="items.{{ $index }}.purchase_cost" />
                         </div>
 
                         <div>
@@ -92,7 +101,9 @@
                                 <option value="">Select Class</option>
                                 @foreach ($classes as $class)
                                     <option value="{{ $class->name }}">
-                                        {{ $class->name }} @if ($class->type) ({{ ucfirst($class->type) }}) @endif
+                                        {{ $class->name }} @if ($class->type)
+                                            ({{ ucfirst($class->type) }})
+                                        @endif
                                     </option>
                                 @endforeach
                             </flux:select>
@@ -136,7 +147,26 @@
 
                         <div>
                             <flux:label>Warranty Expiration</flux:label>
-                            <flux:input type="date" wire:model.defer="items.{{ $index }}.warranty_expiration" />
+                            <flux:input type="date"
+                                wire:model.defer="items.{{ $index }}.warranty_expiration" />
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <flux:label>Inclusions</flux:label>
+                            <div class="space-y-2">
+                                @foreach ($item['inclusions'] ?? $inclusions as $incIndex => $value)
+                                    <div class="flex space-x-2 mb-2">
+                                        <flux:input type="text"
+                                            wire:model.defer="items.{{ $index }}.inclusions.{{ $incIndex }}"
+                                            placeholder="Inclusion item" />
+                                        <flux:button type="button" variant="danger"
+                                            wire:click.prevent="removeInclusion({{ $index }}, {{ $incIndex }})">
+                                            Remove</flux:button>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <flux:button type="button" variant="primary"
+                                wire:click.prevent="addInclusion({{ $index }})">+ Add Inclusion</flux:button>
                         </div>
 
                         <div class="md:col-span-2">
@@ -152,8 +182,10 @@
             <div class="flex justify-between items-center">
                 <flux:button type="button" variant="outline" wire:click="addItem">+ Add Another Item</flux:button>
                 <div class="flex space-x-2">
-                    <flux:button variant="ghost" wire:navigate href="{{ route('fixed-asset.index') }}">Cancel</flux:button>
-                    <flux:button variant="primary" type="submit">{{ count($items) > 1 ? 'Save All' : 'Save' }}</flux:button>
+                    <flux:button variant="ghost" wire:navigate href="{{ route('fixed-asset.index') }}">Cancel
+                    </flux:button>
+                    <flux:button variant="primary" type="submit">{{ count($items) > 1 ? 'Save All' : 'Save' }}
+                    </flux:button>
                 </div>
             </div>
 

@@ -1,13 +1,13 @@
-<flux:modal name="it-leasing-qr" class="md:w-96" :closable="false" :dismissible="false">
-    <div class="space-y-6">
+{{-- <flux:modal name="it-leasing-qr" class="md:w-96" :closable="false" :dismissible="false">
+    <div class="space-y-6"> --}}
 
         {{-- Logo at the top --}}
-        <div class="flex justify-center">
+        {{-- <div class="flex justify-center">
             <img src="{{ asset('apple-touch-icon.png') }}" alt="Logo" class="h-16 w-16 object-contain">
-        </div>
+        </div> --}}
 
         {{-- QR Code --}}
-        <div class="flex justify-center items-center min-h-[200px]">
+        {{-- <div class="flex justify-center items-center min-h-[200px]">
             @if ($isLoading)
                 <svg class="animate-spin h-6 w-6 text-gray-500"
                      xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -20,10 +20,10 @@
             @elseif ($qrCodeSvg)
                 {!! $qrCodeSvg !!}
             @endif
-        </div>
+        </div> --}}
 
         {{-- Item Info Below QR --}}
-        @if ($item)
+        {{-- @if ($item)
             <div class="space-y-1 text-first mt-2">
                 <flux:text>
                     <strong>Category:</strong> {{ $item->category }}
@@ -43,4 +43,4 @@
             </flux:modal.close>
         </div>
     </div>
-</flux:modal>
+</flux:modal> --}}

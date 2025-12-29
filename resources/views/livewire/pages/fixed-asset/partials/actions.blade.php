@@ -1,4 +1,12 @@
 {{-- Edit --}}
+@can('view fixed-asset')
+    <a href="{{ route('fixed-asset.show', $item->id) }}" wire:navigate>
+        <flux:button variant="primary" color="sky" size="sm" icon="eye">
+            View
+        </flux:button>
+    </a>
+@endcan
+
 @can('edit fixed-asset')
     <a href="{{ route('fixed-asset.edit', $item->id) }}" wire:navigate>
         <flux:button variant="primary" color="amber" size="sm" icon="pencil-square">

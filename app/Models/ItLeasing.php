@@ -14,6 +14,7 @@ class ItLeasing extends Model
         'category',
         'item_name',
         'serial_number',
+        'charger_serial_number',
         'brand',
         'model',
         'purchase_cost',
@@ -27,11 +28,13 @@ class ItLeasing extends Model
         'status',
         'condition',
         'remarks',
+        'inclusions',
     ];
 
     protected $casts = [
         'purchase_cost' => 'decimal:2',
         'purchase_date' => 'date:Y-m-d',
         'warranty_expiration' => 'date:Y-m-d',
+        'inclusions' => 'array',
     ];
 }

@@ -18,7 +18,7 @@ class FixedAssetObserver
             'created',
             null,
             $asset->toArray(),
-            'Fixed asset created'
+            'Fixed asset item created'
         );
     }
 
@@ -36,7 +36,7 @@ class FixedAssetObserver
             'updated',
             $old,
             $dirty,
-            'Fixed asset updated'
+            'Fixed asset item updated'
         );
     }
 
@@ -51,7 +51,7 @@ class FixedAssetObserver
             'deleted',
             $asset->toArray(),
             null,
-            'Fixed asset deleted'
+            'Fixed asset item deleted'
         );
     }
 }

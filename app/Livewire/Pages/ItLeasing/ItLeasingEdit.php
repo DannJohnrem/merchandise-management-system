@@ -15,6 +15,7 @@ class ItLeasingEdit extends Component
     public $category;
     public $item_name;
     public $serial_number;
+    public $charger_serial_number;
     public $brand;
     public $model;
     public $purchase_cost;
@@ -28,6 +29,7 @@ class ItLeasingEdit extends Component
     public $status;
     public $condition;
     public $remarks;
+    public $inclusions = [];
 
     public function mount(ItLeasing $item)
     {
@@ -36,6 +38,7 @@ class ItLeasingEdit extends Component
         $this->category = $item->category;
         $this->item_name = $item->item_name;
         $this->serial_number = $item->serial_number;
+        $this->charger_serial_number = $item->charger_serial_number;
         $this->brand = $item->brand;
         $this->model = $item->model;
         $this->purchase_cost = $item->purchase_cost;
@@ -49,6 +52,18 @@ class ItLeasingEdit extends Component
         $this->status = $item->status ?: 'available';
         $this->condition = $item->condition ?: 'new';
         $this->remarks = $item->remarks;
+        $this->inclusions = $item->inclusions ?? [];
+    }
+
+    public function addInclusion()
+    {
+        $this->inclusions[] = '';
+    }
+
+    public function removeInclusion($index)
+    {
+        unset($this->inclusions[$index]);
+        $this->inclusions = array_values($this->inclusions);
     }
 
     public function update()
@@ -58,6 +73,7 @@ class ItLeasingEdit extends Component
                 'category' => 'required|string|max:255',
                 'item_name' => 'required|string|max:255',
                 'serial_number' => "required|string|unique:it_leasings,serial_number,{$this->item->id}",
+                'charger_serial_number' => "nullable|string|unique:it_leasings,charger_serial_number,{$this->item->id}",
                 'brand' => 'nullable|string|max:255',
                 'model' => 'nullable|string|max:255',
                 'purchase_cost' => 'nullable|numeric',
@@ -71,7 +87,11 @@ class ItLeasingEdit extends Component
                 'status' => 'required|in:available,deployed,in_repair,returned,lost',
                 'condition' => 'nullable|in:new,good,fair,poor',
                 'remarks' => 'nullable|string',
+                'inclusions' => 'nullable|array',
+                'inclusions.*' => 'nullable|string|max:255',
             ]);
+
+            $validated['inclusions'] = $this->inclusions;
 
             $this->item->update($validated);
 

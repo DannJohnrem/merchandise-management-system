@@ -23,7 +23,7 @@
     </div>
 
     {{-- QR Code Modal --}}
-    <livewire:pages.it-leasing.it-leasing-qr-modal />
+    {{-- <livewire:pages.it-leasing.it-leasing-qr-modal /> --}}
 </div>
 
 {{-- Delete Confirmation Listener --}}

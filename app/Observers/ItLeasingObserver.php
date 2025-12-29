@@ -30,28 +30,13 @@ class ItLeasingObserver
         $old = $leasing->getOriginal();
         $dirty = $leasing->getDirty();
 
-        // default action
-        $action = 'updated';
-        $description = 'IT Leasing updated';
-
-        // kapag status ang binago
-        if (isset($dirty['status'])) {
-            match ($dirty['status']) {
-                'returned'  => $action = 'returned',
-                'in_repair' => $action = 'damaged',
-                default     => $action = 'status_updated',
-            };
-
-            $description = 'IT Leasing status changed';
-        }
-
         ActivityLogger::log(
             'ItLeasing',
             $leasing->id,
-            $action,
+            'updated',
             $old,
             $dirty,
-            $description
+            'IT Leasing item updated'
         );
     }
 

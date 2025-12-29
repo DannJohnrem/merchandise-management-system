@@ -23,6 +23,7 @@ class ItLeasingCreate extends Component
             'category' => null,
             'item_name' => null,
             'serial_number' => null,
+            'charger_serial_number' => null,
             'brand' => null,
             'model' => null,
             'purchase_cost' => null,
@@ -36,6 +37,7 @@ class ItLeasingCreate extends Component
             'status' => 'available',
             'condition' => 'new',
             'remarks' => null,
+            'inclusions' => [],
         ];
     }
 
@@ -50,6 +52,17 @@ class ItLeasingCreate extends Component
         $this->items = array_values($this->items);
     }
 
+    public function addInclusion($itemIndex)
+    {
+        $this->items[$itemIndex]['inclusions'][] = '';
+    }
+
+    public function removeInclusion($itemIndex, $inclusionIndex)
+    {
+        unset($this->items[$itemIndex]['inclusions'][$inclusionIndex]);
+        $this->items[$itemIndex]['inclusions'] = array_values($this->items[$itemIndex]['inclusions']);
+    }
+
     public function save()
     {
         try {
@@ -58,6 +71,7 @@ class ItLeasingCreate extends Component
                 'items.*.category' => 'required|string|max:255',
                 'items.*.item_name' => 'required|string|max:255',
                 'items.*.serial_number' => 'required|string|unique:it_leasings,serial_number',
+                'items.*.charger_serial_number' => 'nullable|string|max:255|unique:it_leasings,charger_serial_number',
                 'items.*.brand' => 'nullable|string|max:255',
                 'items.*.model' => 'nullable|string|max:255',
                 'items.*.purchase_cost' => 'nullable|numeric',
@@ -71,6 +85,8 @@ class ItLeasingCreate extends Component
                 'items.*.status' => 'required|in:available,deployed,in_repair,returned,lost',
                 'items.*.condition' => 'nullable|in:new,good,fair,poor',
                 'items.*.remarks' => 'nullable|string',
+                'items.*.inclusions' => 'nullable|array',
+                'items.*.inclusions.*' => 'nullable|string|max:255',
             ]);
 
             foreach ($this->items as $item) {

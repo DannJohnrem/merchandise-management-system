@@ -1,7 +1,16 @@
+{{-- View --}}
+@can('view it-leasing')
+    <a href="{{ route('it-leasing.show', $item->id) }}" wire:navigate>
+        <flux:button variant="primary" color="sky" size="sm" icon="eye">
+            View
+        </flux:button>
+    </a>
+@endcan
+
 {{-- Edit --}}
 @can('edit it-leasing')
     <a href="{{ route('it-leasing.edit', $item->id) }}" wire:navigate>
-        <flux:button variant="outline" size="sm" icon="pencil-square">
+        <flux:button variant="primary" color="amber" size="sm" icon="pencil-square">
             Edit
         </flux:button>
     </a>

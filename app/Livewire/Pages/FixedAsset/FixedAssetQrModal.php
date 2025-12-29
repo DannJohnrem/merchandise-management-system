@@ -40,7 +40,7 @@ class FixedAssetQrModal extends Component
         }
 
         // Public URL that QR will open (you can adjust to signed route if needed)
-        $url = route('fixed-asset.show', $this->item->id);
+        $url = route('fixed-asset.show.qr', $this->item->id);
 
         $qrCode = new QrCode(
             data: $url,

@@ -29,12 +29,13 @@ class FixedAssetCreate extends Component
             'category' => null,
             'asset_name' => null,
             'serial_number' => null,
+            'charger_serial_number' => null,
             'brand' => null,
             'model' => null,
-            'purchase_cost' => null,          // corrected
+            'purchase_cost' => null,
             'supplier' => null,
-            'assigned_employee' => null,      // corrected
-            'asset_class' => null,            // corrected
+            'assigned_employee' => null,
+            'asset_class' => null,
             'location' => null,
             'status' => 'available',
             'condition' => 'new',
@@ -42,6 +43,7 @@ class FixedAssetCreate extends Component
             'purchase_order_no' => null,
             'warranty_expiration' => null,
             'remarks' => null,
+            'inclusions' => [],
         ];
     }
 
@@ -53,7 +55,18 @@ class FixedAssetCreate extends Component
     public function removeItem($index)
     {
         unset($this->items[$index]);
-        $this->items = array_values($this->items); // reindex array
+        $this->items = array_values($this->items);
+    }
+
+    public function addInclusion($itemIndex)
+    {
+        $this->items[$itemIndex]['inclusions'][] = '';
+    }
+
+    public function removeInclusion($itemIndex, $inclusionIndex)
+    {
+        unset($this->items[$itemIndex]['inclusions'][$inclusionIndex]);
+        $this->items[$itemIndex]['inclusions'] = array_values($this->items[$itemIndex]['inclusions']);
     }
 
     public function save()
@@ -65,6 +78,7 @@ class FixedAssetCreate extends Component
                 'items.*.category' => 'required|string|max:255',
                 'items.*.asset_tag' => 'nullable|string|max:255',
                 'items.*.serial_number' => 'nullable|string|max:255|unique:fixed_assets,serial_number',
+                'items.*.charger_serial_number' => 'nullable|string|max:255|unique:fixed_assets,charger_serial_number',
                 'items.*.brand' => 'nullable|string|max:255',
                 'items.*.model' => 'nullable|string|max:255',
                 'items.*.purchase_cost' => 'nullable|numeric',
@@ -78,6 +92,8 @@ class FixedAssetCreate extends Component
                 'items.*.purchase_order_no' => 'nullable|string|max:255',
                 'items.*.warranty_expiration' => 'nullable|date',
                 'items.*.remarks' => 'nullable|string',
+                'items.*.inclusions' => 'nullable|array',
+                'items.*.inclusions.*' => 'nullable|string|max:255',
             ]);
 
             foreach ($this->items as $item) {

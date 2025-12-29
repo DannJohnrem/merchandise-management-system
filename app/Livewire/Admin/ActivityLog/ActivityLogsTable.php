@@ -13,7 +13,7 @@ class ActivityLogsTable extends DataTableComponent
     public function configure(): void
     {
         $this->setPrimaryKey('id')
-             ->setDefaultSort('created_at', 'desc');
+            ->setDefaultSort('created_at', 'desc');
     }
 
     public function columns(): array
@@ -29,37 +29,63 @@ class ActivityLogsTable extends DataTableComponent
 
             // Decode old_values JSON and display nicely
             Column::make('Old Values', 'old_values')
-                ->format(function($value) {
+                ->format(function ($value) {
                     if (!$value) return '-';
+
                     $data = is_array($value) ? $value : json_decode($value, true);
                     if (!$data) return '-';
 
+                    $ignoreKeys = ['created_at', 'updated_at', 'deleted_at'];
+
                     $html = '<ul class="text-xs space-y-1">';
                     foreach ($data as $key => $val) {
-                        $html .= '<li><strong>' . $key . ':</strong> ' . (is_array($val) ? json_encode($val) : $val) . '</li>';
-                    }
-                    $html .= '</ul>';
-                    return $html;
-                })
+
+                        if (in_array($key, $ignoreKeys)) {
+                            continue;
+                        }
+
+                        $html .= '<li>
+                        <strong>' . $key . ':</strong> ' .
+                                (is_array($val) ? json_encode($val) : $val) .
+                                '</li>';
+                        }
+                        $html .= '</ul>';
+
+                        return $html ?: '-';
+                    })
                 ->html()
                 ->collapseOnTablet(),
+
 
             // Decode new_values JSON and display nicely
             Column::make('New Values', 'new_values')
-                ->format(function($value) {
+                ->format(function ($value) {
                     if (!$value) return '-';
+
                     $data = is_array($value) ? $value : json_decode($value, true);
                     if (!$data) return '-';
 
+                    $ignoreKeys = ['created_at', 'updated_at', 'deleted_at'];
+
                     $html = '<ul class="text-xs space-y-1">';
                     foreach ($data as $key => $val) {
-                        $html .= '<li><strong>' . $key . ':</strong> ' . (is_array($val) ? json_encode($val) : $val) . '</li>';
-                    }
-                    $html .= '</ul>';
-                    return $html;
-                })
+
+                        if (in_array($key, $ignoreKeys)) {
+                            continue;
+                        }
+
+                        $html .= '<li>
+                        <strong>' . $key . ':</strong> ' .
+                                    (is_array($val) ? json_encode($val) : $val) .
+                                    '</li>';
+                        }
+                        $html .= '</ul>';
+
+                        return $html ?: '-';
+                    })
                 ->html()
                 ->collapseOnTablet(),
+
 
             Column::make('User', 'user.name')
                 ->format(fn($value) => $value ?? 'System')

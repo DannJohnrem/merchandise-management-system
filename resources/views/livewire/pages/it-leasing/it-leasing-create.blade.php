@@ -24,8 +24,9 @@
                             Item {{ $index + 1 }}
                         </h3>
 
-                        @if(count($items) > 1)
-                            <flux:button type="button" variant="danger" size="sm" wire:click="removeItem({{ $index }})">
+                        @if (count($items) > 1)
+                            <flux:button type="button" variant="danger" size="sm"
+                                wire:click="removeItem({{ $index }})">
                                 Remove
                             </flux:button>
                         @endif
@@ -33,9 +34,9 @@
 
                     {{-- Fields --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
+                        {{-- Category --}}
                         <div>
-                            <flux:label>Category <span class="text-red-400">*</span></flux:label>
+                            <flux:label>Category *</flux:label>
                             <flux:select wire:model.defer="items.{{ $index }}.category">
                                 <option value="">Select Category</option>
                                 <option value="Laptop">Laptop</option>
@@ -47,93 +48,77 @@
                             </flux:select>
                         </div>
 
+                        {{-- Item Name --}}
                         <div>
-                            <flux:label>Item Name <span class="text-red-400">*</span></flux:label>
-                            <flux:input wire:model.defer="items.{{ $index }}.item_name" placeholder="Item name" />
+                            <flux:label>Item Name *</flux:label>
+                            <flux:input wire:model.defer="items.{{ $index }}.item_name"/>
                         </div>
 
+                        {{-- Serial Number --}}
                         <div>
                             <flux:label>Serial Number</flux:label>
-                            <flux:input wire:model.defer="items.{{ $index }}.serial_number" />
+                            <flux:input wire:model.defer="items.{{ $index }}.serial_number"/>
                         </div>
 
+                        {{-- Charger Serial Number --}}
+                        <div>
+                            <flux:label>Charger Serial Number</flux:label>
+                            <flux:input wire:model.defer="items.{{ $index }}.charger_serial_number"/>
+                        </div>
+
+                        {{-- Brand --}}
                         <div>
                             <flux:label>Brand</flux:label>
-                            <flux:input wire:model.defer="items.{{ $index }}.brand" />
+                            <flux:input wire:model.defer="items.{{ $index }}.brand"/>
                         </div>
 
+                        {{-- Model --}}
                         <div>
                             <flux:label>Model</flux:label>
-                            <flux:input wire:model.defer="items.{{ $index }}.model" />
+                            <flux:input wire:model.defer="items.{{ $index }}.model"/>
                         </div>
 
+                        {{-- Purchase Cost --}}
                         <div>
                             <flux:label>Cost</flux:label>
-                            <flux:input type="number" step="0.01" wire:model.defer="items.{{ $index }}.purchase_cost" />
+                            <flux:input type="number" step="0.01" wire:model.defer="items.{{ $index }}.purchase_cost"/>
                         </div>
 
+                        {{-- Assigned Company --}}
                         <div>
-                            <flux:label>Supplier</flux:label>
-                            <flux:input wire:model.defer="items.{{ $index }}.supplier" />
+                            <flux:label>Assigned Company *</flux:label>
+                            <flux:input wire:model.defer="items.{{ $index }}.assigned_company"/>
                         </div>
 
-                        <div>
-                            <flux:label>Purchase Order No.</flux:label>
-                            <flux:input wire:model.defer="items.{{ $index }}.purchase_order_no" />
-                        </div>
-
-                        <div>
-                            <flux:label>Purchase Date</flux:label>
-                            <flux:input type="date" wire:model.defer="items.{{ $index }}.purchase_date" />
-                        </div>
-
-                        <div>
-                            <flux:label>Warranty Expiration</flux:label>
-                            <flux:input type="date" wire:model.defer="items.{{ $index }}.warranty_expiration" />
-                        </div>
-
-                        <div>
-                            <flux:label>Assigned Company <span class="text-red-400">*</span></flux:label>
-                            <flux:input wire:model.defer="items.{{ $index }}.assigned_company" placeholder="Company / department" />
-                        </div>
-
+                        {{-- Assigned Employee --}}
                         <div>
                             <flux:label>Assigned Employee</flux:label>
-                            <flux:input wire:model.defer="items.{{ $index }}.assigned_employee" />
+                            <flux:input wire:model.defer="items.{{ $index }}.assigned_employee"/>
                         </div>
 
-                        <div>
-                            <flux:label>Location</flux:label>
-                            <flux:input wire:model.defer="items.{{ $index }}.location" />
+                        {{-- Inclusions --}}
+                        <div class="md:col-span-2">
+                            <flux:label>Inclusions</flux:label>
+                            <div class="space-y-2">
+                                @foreach ($item['inclusions'] as $incIndex => $value)
+                                    <div class="flex space-x-2 mb-2">
+                                        <flux:input type="text"
+                                            wire:model.defer="items.{{ $index }}.inclusions.{{ $incIndex }}"
+                                            placeholder="Inclusion item"/>
+                                        <flux:button type="button" variant="danger"
+                                            wire:click.prevent="removeInclusion({{ $index }}, {{ $incIndex }})">Remove</flux:button>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <flux:button type="button" variant="primary"
+                                wire:click.prevent="addInclusion({{ $index }})">+ Add Inclusion</flux:button>
                         </div>
 
-                        <div>
-                            <flux:label>Status</flux:label>
-                            <flux:select wire:model.defer="items.{{ $index }}.status">
-                                <option value="available">Available</option>
-                                <option value="deployed">Deployed</option>
-                                <option value="in_repair">In Repair</option>
-                                <option value="returned">Returned</option>
-                                <option value="lost">Lost</option>
-                            </flux:select>
-                        </div>
-
-                        <div>
-                            <flux:label>Condition</flux:label>
-                            <flux:select wire:model.defer="items.{{ $index }}.condition">
-                                <option value="">Select Condition</option>
-                                <option value="new">New</option>
-                                <option value="good">Good</option>
-                                <option value="fair">Fair</option>
-                                <option value="poor">Poor</option>
-                            </flux:select>
-                        </div>
-
+                        {{-- Remarks --}}
                         <div class="md:col-span-2">
                             <flux:label>Remarks</flux:label>
-                            <flux:textarea rows="4" wire:model.defer="items.{{ $index }}.remarks" />
+                            <flux:textarea rows="4" wire:model.defer="items.{{ $index }}.remarks"/>
                         </div>
-
                     </div>
 
                 </div>
@@ -158,5 +143,4 @@
 
         </form>
     </div>
-
 </div>
