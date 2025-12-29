@@ -1,14 +1,23 @@
+{{-- View --}}
+@can('view it-leasing')
+    <a href="{{ route('it-leasing.show', $item->id) }}" wire:navigate>
+        <flux:button variant="primary" color="sky" size="sm" icon="eye">
+            View
+        </flux:button>
+    </a>
+@endcan
+
 {{-- Edit --}}
 @can('edit it-leasing')
     <a href="{{ route('it-leasing.edit', $item->id) }}" wire:navigate>
-        <flux:button variant="outline" size="sm" icon="pencil-square">
+        <flux:button variant="primary" color="amber" size="sm" icon="pencil-square">
             Edit
         </flux:button>
     </a>
 @endcan
 
 {{-- View QR (Flux Modal Trigger + Livewire Event) --}}
-<flux:modal.trigger name="it-leasing-qr">
+{{-- <flux:modal.trigger name="it-leasing-qr">
     <flux:button
         variant="outline"
         size="sm"
@@ -17,7 +26,7 @@
     >
         View QR
     </flux:button>
-</flux:modal.trigger>
+</flux:modal.trigger> --}}
 
 {{-- Delete --}}
 @can('delete it-leasing')

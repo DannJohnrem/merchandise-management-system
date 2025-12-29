@@ -23,7 +23,7 @@
         </div>
 
         {{-- Asset Info Below QR --}}
-        @if ($item)
+        {{-- @if ($item)
             <div class="space-y-1 text-first mt-2">
                 <flux:text>
                     <strong>Asset Tag:</strong> {{ $item->asset_tag ?? '-' }}
@@ -74,7 +74,7 @@
                     <strong>Remarks:</strong> {{ $item->remarks ?? '-' }}
                 </flux:text>
             </div>
-        @endif
+        @endif --}}
 
         {{-- Cancel Button --}}
         <div class="flex justify-end mt-4">

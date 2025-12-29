@@ -7,67 +7,110 @@ use App\Models\ItLeasing;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\QueryException;
 use Throwable;
-use Livewire\WithFileUploads;
 
 class ItLeasingCreate extends Component
 {
-    use WithFileUploads;
+    public array $items = [];
 
-    public $category = '';
-    public $serial_number;
-    public $brand;
-    public $model;
-    public $cost;
-    public $assigned_to;
-    public $class;
-    public $status = 'available';
-    public $qr_code_path;
-    public $remarks;
+    public function mount()
+    {
+        $this->items[] = $this->blankItem();
+    }
+
+    protected function blankItem(): array
+    {
+        return [
+            'category' => null,
+            'item_name' => null,
+            'serial_number' => null,
+            'charger_serial_number' => null,
+            'brand' => null,
+            'model' => null,
+            'purchase_cost' => null,
+            'supplier' => null,
+            'purchase_order_no' => null,
+            'purchase_date' => null,
+            'warranty_expiration' => null,
+            'assigned_company' => null,
+            'assigned_employee' => null,
+            'location' => null,
+            'status' => 'available',
+            'condition' => 'new',
+            'remarks' => null,
+            'inclusions' => [],
+        ];
+    }
+
+    public function addItem()
+    {
+        $this->items[] = $this->blankItem();
+    }
+
+    public function removeItem($index)
+    {
+        unset($this->items[$index]);
+        $this->items = array_values($this->items);
+    }
+
+    public function addInclusion($itemIndex)
+    {
+        $this->items[$itemIndex]['inclusions'][] = '';
+    }
+
+    public function removeInclusion($itemIndex, $inclusionIndex)
+    {
+        unset($this->items[$itemIndex]['inclusions'][$inclusionIndex]);
+        $this->items[$itemIndex]['inclusions'] = array_values($this->items[$itemIndex]['inclusions']);
+    }
 
     public function save()
     {
         try {
-            // Validate input
-            $validated = $this->validate([
-                'category' => 'required|string|max:255',
-                'serial_number' => 'required|string|unique:it_leasings,serial_number',
-                'brand' => 'nullable|string|max:255',
-                'model' => 'nullable|string|max:255',
-                'cost' => 'nullable|numeric',
-                'assigned_to' => 'nullable|string|max:255',
-                'class' => 'nullable|string|max:255',
-                'status' => 'required|in:available,in_use,returned,repair,lost',
-                'qr_code_path' => 'nullable|file|mimes:jpg,png,pdf',
-                'remarks' => 'nullable|string',
+            $this->validate([
+                'items' => 'required|array|min:1',
+                'items.*.category' => 'required|string|max:255',
+                'items.*.item_name' => 'required|string|max:255',
+                'items.*.serial_number' => 'required|string|unique:it_leasings,serial_number',
+                'items.*.charger_serial_number' => 'nullable|string|max:255|unique:it_leasings,charger_serial_number',
+                'items.*.brand' => 'nullable|string|max:255',
+                'items.*.model' => 'nullable|string|max:255',
+                'items.*.purchase_cost' => 'nullable|numeric',
+                'items.*.supplier' => 'nullable|string|max:255',
+                'items.*.purchase_order_no' => 'nullable|string|max:255',
+                'items.*.purchase_date' => 'nullable|date',
+                'items.*.warranty_expiration' => 'nullable|date',
+                'items.*.assigned_company' => 'required|string|max:255',
+                'items.*.assigned_employee' => 'nullable|string|max:255',
+                'items.*.location' => 'nullable|string|max:255',
+                'items.*.status' => 'required|in:available,deployed,in_repair,returned,lost',
+                'items.*.condition' => 'nullable|in:new,good,fair,poor',
+                'items.*.remarks' => 'nullable|string',
+                'items.*.inclusions' => 'nullable|array',
+                'items.*.inclusions.*' => 'nullable|string|max:255',
             ]);
 
-            // Handle QR code file
-            if ($this->qr_code_path) {
-                $validated['qr_code_path'] = $this->qr_code_path->store('it_leasing_qrcodes');
+            foreach ($this->items as $item) {
+                ItLeasing::create($item);
             }
 
-            // Create record
-            ItLeasing::create($validated);
-
-            // Show toast and redirect
             session()->flash('toast', [
-                'message' => 'IT Leasing item created successfully!',
+                'message' => 'IT Leasing items created successfully!',
                 'type' => 'success',
             ]);
 
             $this->redirect(route('it-leasing.index'), navigate: true);
 
         } catch (ValidationException $e) {
-            $this->dispatch('toast', message: 'Please check the required fields.', type: 'error');
+            $this->dispatch('toast', message: 'Please check required fields.', type: 'error');
             throw $e;
 
         } catch (QueryException $e) {
-            $this->dispatch('toast', message: 'Database error occurred while saving item.', type: 'error');
             logger()->error('Database error creating IT Leasing', ['error' => $e->getMessage()]);
+            $this->dispatch('toast', message: 'Database error occurred.', type: 'error');
 
         } catch (Throwable $e) {
-            $this->dispatch('toast', message: 'Unexpected error. Please try again.', type: 'error');
             logger()->error('Unexpected error in ItLeasingCreate', ['error' => $e->getMessage()]);
+            $this->dispatch('toast', message: 'Unexpected error occurred.', type: 'error');
         }
     }
 

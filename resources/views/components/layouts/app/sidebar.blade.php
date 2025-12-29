@@ -3,8 +3,8 @@
 
 <head>
     @include('partials.head')
-@livewireStyles
-@rappasoftTableStyles
+    @livewireStyles
+    @rappasoftTableStyles
 </head>
 
 <body class="min-h-screen bg-white dark:bg-zinc-800">
@@ -27,7 +27,7 @@
             <flux:navlist.group class="grid">
                 <flux:navlist.item icon="computer-desktop" :href="route('it-leasing.index')"
                     :current="request()->routeIs('it-leasing.*')" wire:navigate>
-                    {{ __('Leasing Management') }}
+                    {{ __('IT Leasing') }}
                 </flux:navlist.item>
             </flux:navlist.group>
 
@@ -63,10 +63,15 @@
                     </flux:navlist.item>
                 @endcan
 
-                    <flux:navlist.item icon="user-group" :href="route('admin.class.index')"
-                        :current="request()->routeIs('admin.class.*')" wire:navigate>
-                        {{ __('Class') }}
-                    </flux:navlist.item>
+                <flux:navlist.item icon="user-group" :href="route('admin.class.index')"
+                    :current="request()->routeIs('admin.class.*')" wire:navigate>
+                    {{ __('Class') }}
+                </flux:navlist.item>
+
+                <flux:navlist.item icon="clipboard-document-list" :href="route('admin.activity-log.index')"
+                    :current="request()->routeIs('admin.activity-log.*')" wire:navigate>
+                    {{ __('Activity Logs') }}
+                </flux:navlist.item>
             </flux:navlist.group>
         </flux:navlist>
 

@@ -7,41 +7,63 @@ use App\Models\ItLeasing;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\QueryException;
 use Throwable;
-use Livewire\WithFileUploads;
 
 class ItLeasingEdit extends Component
 {
-    use WithFileUploads;
-
-    public $item; // Model binding
+    public ItLeasing $item;
 
     public $category;
+    public $item_name;
     public $serial_number;
+    public $charger_serial_number;
     public $brand;
     public $model;
-    public $cost;
-    public $assigned_to;
-    public $class;
+    public $purchase_cost;
+    public $supplier;
+    public $purchase_order_no;
+    public $purchase_date;
+    public $warranty_expiration;
+    public $assigned_company;
+    public $assigned_employee;
+    public $location;
     public $status;
-    public $qr_code_path;
-    public $qrPreview;
+    public $condition;
     public $remarks;
+    public $inclusions = [];
 
     public function mount(ItLeasing $item)
     {
         $this->item = $item;
 
-        // Fill form fields
         $this->category = $item->category;
+        $this->item_name = $item->item_name;
         $this->serial_number = $item->serial_number;
+        $this->charger_serial_number = $item->charger_serial_number;
         $this->brand = $item->brand;
         $this->model = $item->model;
-        $this->cost = $item->cost;
-        $this->assigned_to = $item->assigned_to;
-        $this->class = $item->class;
+        $this->purchase_cost = $item->purchase_cost;
+        $this->supplier = $item->supplier;
+        $this->purchase_order_no = $item->purchase_order_no;
+        $this->purchase_date = $item->purchase_date?->format('Y-m-d');
+        $this->warranty_expiration = $item->warranty_expiration?->format('Y-m-d');
+        $this->assigned_company = $item->assigned_company;
+        $this->assigned_employee = $item->assigned_employee;
+        $this->location = $item->location;
         $this->status = $item->status ?: 'available';
-        $this->qrPreview = $item->qr_code_path ? asset('storage/' . $item->qr_code_path) : null;
+        $this->condition = $item->condition ?: 'new';
         $this->remarks = $item->remarks;
+        $this->inclusions = $item->inclusions ?? [];
+    }
+
+    public function addInclusion()
+    {
+        $this->inclusions[] = '';
+    }
+
+    public function removeInclusion($index)
+    {
+        unset($this->inclusions[$index]);
+        $this->inclusions = array_values($this->inclusions);
     }
 
     public function update()
@@ -49,21 +71,27 @@ class ItLeasingEdit extends Component
         try {
             $validated = $this->validate([
                 'category' => 'required|string|max:255',
+                'item_name' => 'required|string|max:255',
                 'serial_number' => "required|string|unique:it_leasings,serial_number,{$this->item->id}",
+                'charger_serial_number' => "nullable|string|unique:it_leasings,charger_serial_number,{$this->item->id}",
                 'brand' => 'nullable|string|max:255',
                 'model' => 'nullable|string|max:255',
-                'cost' => 'nullable|numeric',
-                'assigned_to' => 'nullable|string|max:255',
-                'class' => 'nullable|string|max:255',
-                'status' => 'required|in:available,in_use,returned,repair,lost',
-                'qr_code_path' => 'nullable|file|mimes:jpg,png,pdf',
+                'purchase_cost' => 'nullable|numeric',
+                'supplier' => 'nullable|string|max:255',
+                'purchase_order_no' => 'nullable|string|max:255',
+                'purchase_date' => 'nullable|date',
+                'warranty_expiration' => 'nullable|date',
+                'assigned_company' => 'required|string|max:255',
+                'assigned_employee' => 'nullable|string|max:255',
+                'location' => 'nullable|string|max:255',
+                'status' => 'required|in:available,deployed,in_repair,returned,lost',
+                'condition' => 'nullable|in:new,good,fair,poor',
                 'remarks' => 'nullable|string',
+                'inclusions' => 'nullable|array',
+                'inclusions.*' => 'nullable|string|max:255',
             ]);
 
-            // Handle QR code file
-            if ($this->qr_code_path) {
-                $validated['qr_code_path'] = $this->qr_code_path->store('it_leasing_qrcodes');
-            }
+            $validated['inclusions'] = $this->inclusions;
 
             $this->item->update($validated);
 
@@ -75,16 +103,16 @@ class ItLeasingEdit extends Component
             $this->redirect(route('it-leasing.index'), navigate: true);
 
         } catch (ValidationException $e) {
-            $this->dispatch('toast', message: 'Please check the required fields.', type: 'error');
+            $this->dispatch('toast', message: 'Please check required fields.', type: 'error');
             throw $e;
 
         } catch (QueryException $e) {
-            $this->dispatch('toast', message: 'Database error occurred while updating item.', type: 'error');
             logger()->error('Database error updating IT Leasing', ['error' => $e->getMessage()]);
+            $this->dispatch('toast', message: 'Database error occurred.', type: 'error');
 
         } catch (Throwable $e) {
-            $this->dispatch('toast', message: 'Unexpected error. Please try again.', type: 'error');
             logger()->error('Unexpected error in ItLeasingEdit', ['error' => $e->getMessage()]);
+            $this->dispatch('toast', message: 'Unexpected error occurred.', type: 'error');
         }
     }
 

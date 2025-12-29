@@ -4,6 +4,7 @@ use Laravel\Fortify\Features;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\TwoFactor;
+use Illuminate\Support\Facades\Auth;
 use App\Livewire\Settings\Appearance;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Admin\Roles\RoleEdit;
@@ -18,6 +19,7 @@ use App\Livewire\Admin\Class\ClassCreate;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\ItLeasingQrController;
 use App\Livewire\Pages\ItLeasing\ItLeasingEdit;
+use App\Livewire\Pages\ItLeasing\ItLeasingShow;
 use App\Livewire\Pages\ItLeasing\ItLeasingIndex;
 use App\Livewire\Pages\FixedAsset\FixedAssetEdit;
 use App\Livewire\Pages\ItLeasing\ItLeasingCreate;
@@ -25,10 +27,14 @@ use App\Livewire\Admin\Permissions\PermissionEdit;
 use App\Livewire\Pages\FixedAsset\FixedAssetIndex;
 use App\Livewire\Admin\Permissions\PermissionIndex;
 use App\Livewire\Pages\FixedAsset\FixedAssetCreate;
+use App\Livewire\Admin\ActivityLog\ActivityLogIndex;
 use App\Livewire\Admin\Permissions\PermissionCreate;
+use App\Livewire\Pages\FixedAsset\FixedAssetShow;
 
 Route::get('/', function () {
-    return view('welcome');
+    return Auth::check()
+        ? redirect()->route('dashboard')
+        : redirect()->route('login');
 })->name('home');
 
 Route::view('dashboard', 'dashboard')
@@ -37,10 +43,10 @@ Route::view('dashboard', 'dashboard')
 
 // Public signed QR route (no auth)
 Route::get('/it-leasing/{item}/qr', [ItLeasingQrController::class, 'show'])
-    ->name('it-leasing.show');
+    ->name('it-leasing.show.qr');
 
 Route::get('fixed-asset/{item}/qr', [FixedAssetController::class, 'show'])
-    ->name('fixed-asset.show');
+    ->name('fixed-asset.show.qr');
 
 
 Route::middleware(['auth'])->group(function () {
@@ -64,12 +70,14 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('it-leasing')->name('it-leasing.')->group(function () {
         Route::get('/', ItLeasingIndex::class)->name('index');
         Route::get('/create', ItLeasingCreate::class)->name('create');
+        Route::get('/{itLeasing}', ItLeasingShow::class)->name('show');
         Route::get('/{item}/edit', ItLeasingEdit::class)->name('edit');
     });
 
     Route::prefix('fixed-asset')->name('fixed-asset.')->group(function () {
         Route::get('/', FixedAssetIndex::class)->name('index');
         Route::get('/create', FixedAssetCreate::class)->name('create');
+        Route::get('/{asset}', FixedAssetShow::class)->name('show');
         Route::get('/{asset}/edit', FixedAssetEdit::class)->name('edit');
     });
 
@@ -94,5 +102,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/class', ClassIndex::class)->name('class.index');
         Route::get('/class/create', ClassCreate::class)->name('class.create');
         Route::get('/class/{class}/edit', ClassEdit::class)->name('class.edit');
+
+        Route::get('/activity-log', ActivityLogIndex::class)->name('activity-log.index');
     });
 });
