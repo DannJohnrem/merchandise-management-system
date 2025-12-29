@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserAccountSeeder::class,
             RolePermissionSeeder::class,
+            FiftyLaptopWithChargerSeeder::class,
         ]);
     }
 }
