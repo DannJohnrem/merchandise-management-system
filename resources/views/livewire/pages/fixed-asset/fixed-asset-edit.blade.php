@@ -48,7 +48,7 @@
                 </div>
 
                 <div>
-                    <flux:label></flux:label>Charger Serial Number</flux:label>
+                    <flux:label>Charger Serial Number</flux:label>
                     <flux:input wire:model.defer="charger_serial_number" />
                 </div>
 
@@ -133,19 +133,19 @@
                 <div class="md:col-span-2">
                     <flux:label>Inclusions</flux:label>
                     <div class="space-y-2">
-                        @foreach ($item['inclusions'] ?? $inclusions as $incIndex => $value)
+                        @foreach ($inclusions as $incIndex => $value)
                             <div class="flex space-x-2 mb-2">
                                 <flux:input type="text"
-                                    wire:model.defer="items.{{ $index }}.inclusions.{{ $incIndex }}"
+                                    wire:model.defer="inclusions.{{ $incIndex }}"
                                     placeholder="Inclusion item" />
                                 <flux:button type="button" variant="danger"
-                                    wire:click.prevent="removeInclusion({{ $index }}, {{ $incIndex }})">
-                                    Remove</flux:button>
+                                    wire:click.prevent="removeInclusion({{ $incIndex }})">
+                                    Remove
+                                </flux:button>
                             </div>
                         @endforeach
                     </div>
-                    <flux:button type="button" variant="primary"
-                        wire:click.prevent="addInclusion({{ $index }})">+ Add Inclusion</flux:button>
+                    <flux:button type="button" variant="primary" wire:click.prevent="addInclusion">+ Add Inclusion</flux:button>
                 </div>
 
                 <div class="md:col-span-2">

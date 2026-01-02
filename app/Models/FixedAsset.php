@@ -30,6 +30,7 @@ class FixedAsset extends Model
         'purchase_date',
         'purchase_order_no',
         'remarks',
+        'inclusions',
     ];
 
     protected $casts = [
