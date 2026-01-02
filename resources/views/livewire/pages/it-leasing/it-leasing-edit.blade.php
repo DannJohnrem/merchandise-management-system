@@ -52,7 +52,7 @@
                 {{-- Brand --}}
                 <div>
                     <flux:label>Brand</flux:label>
-                    <flux:input wire:model.defer="brand"/>
+                    <flux:input wire:model.live="brand"/>
                 </div>
 
                 {{-- Model --}}
@@ -65,6 +65,12 @@
                 <div>
                     <flux:label>Cost</flux:label>
                     <flux:input type="number" step="0.01" wire:model.defer="purchase_cost"/>
+                </div>
+
+                {{-- Rental Rate Per Month --}}
+                <div>
+                    <flux:label>Rental Rate Per Month</flux:label>
+                    <flux:input type="number" step="0.01" wire:model.defer="rental_rate_per_month"/>
                 </div>
 
                 {{-- Supplier --}}

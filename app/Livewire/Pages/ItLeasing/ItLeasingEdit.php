@@ -19,6 +19,7 @@ class ItLeasingEdit extends Component
     public $brand;
     public $model;
     public $purchase_cost;
+    public $rental_rate_per_month;
     public $supplier;
     public $purchase_order_no;
     public $purchase_date;
@@ -35,65 +36,52 @@ class ItLeasingEdit extends Component
     {
         $this->item = $item;
 
-        $this->category = $item->category;
-        $this->item_name = $item->item_name;
-        $this->serial_number = $item->serial_number;
-        $this->charger_serial_number = $item->charger_serial_number;
-        $this->brand = $item->brand;
-        $this->model = $item->model;
-        $this->purchase_cost = $item->purchase_cost;
-        $this->supplier = $item->supplier;
-        $this->purchase_order_no = $item->purchase_order_no;
-        $this->purchase_date = $item->purchase_date?->format('Y-m-d');
-        $this->warranty_expiration = $item->warranty_expiration?->format('Y-m-d');
-        $this->assigned_company = $item->assigned_company;
-        $this->assigned_employee = $item->assigned_employee;
-        $this->location = $item->location;
-        $this->status = $item->status ?: 'available';
-        $this->condition = $item->condition ?: 'new';
-        $this->remarks = $item->remarks;
-        $this->inclusions = $item->inclusions ?? [];
+        foreach ($item->toArray() as $key => $value) {
+            $this->$key = $value;
+        }
     }
 
-    public function addInclusion()
+    /**
+     * 🔥 AUTO-FILL RENTAL RATE WHEN BRAND CHANGES
+     */
+    public function updatedBrand($value)
     {
-        $this->inclusions[] = '';
-    }
+        // Do not override manual input
+        if (!empty($this->rental_rate_per_month)) {
+            return;
+        }
 
-    public function removeInclusion($index)
-    {
-        unset($this->inclusions[$index]);
-        $this->inclusions = array_values($this->inclusions);
+        match (strtoupper(trim($value))) {
+            'HP' => $this->rental_rate_per_month = 3000.00,
+            'LENOVO' => $this->rental_rate_per_month = 3500.00,
+            default => null,
+        };
     }
 
     public function update()
     {
         try {
-            $validated = $this->validate([
-                'category' => 'required|string|max:255',
-                'item_name' => 'required|string|max:255',
-                'serial_number' => "required|string|unique:it_leasings,serial_number,{$this->item->id}",
-                'charger_serial_number' => "nullable|string|unique:it_leasings,charger_serial_number,{$this->item->id}",
-                'brand' => 'nullable|string|max:255',
-                'model' => 'nullable|string|max:255',
-                'purchase_cost' => 'nullable|numeric',
-                'supplier' => 'nullable|string|max:255',
-                'purchase_order_no' => 'nullable|string|max:255',
-                'purchase_date' => 'nullable|date',
-                'warranty_expiration' => 'nullable|date',
-                'assigned_company' => 'required|string|max:255',
-                'assigned_employee' => 'nullable|string|max:255',
-                'location' => 'nullable|string|max:255',
-                'status' => 'required|in:available,deployed,in_repair,returned,lost',
-                'condition' => 'nullable|in:new,good,fair,poor',
-                'remarks' => 'nullable|string',
-                'inclusions' => 'nullable|array',
-                'inclusions.*' => 'nullable|string|max:255',
+            $this->item->update([
+                'category' => $this->category,
+                'item_name' => $this->item_name,
+                'serial_number' => $this->serial_number,
+                'charger_serial_number' => $this->charger_serial_number,
+                'brand' => $this->brand,
+                'model' => $this->model,
+                'purchase_cost' => $this->purchase_cost,
+                'rental_rate_per_month' => $this->rental_rate_per_month,
+                'supplier' => $this->supplier,
+                'purchase_order_no' => $this->purchase_order_no,
+                'purchase_date' => $this->purchase_date,
+                'warranty_expiration' => $this->warranty_expiration,
+                'assigned_company' => $this->assigned_company,
+                'assigned_employee' => $this->assigned_employee,
+                'location' => $this->location,
+                'status' => $this->status,
+                'condition' => $this->condition,
+                'remarks' => $this->remarks,
+                'inclusions' => $this->inclusions,
             ]);
-
-            $validated['inclusions'] = $this->inclusions;
-
-            $this->item->update($validated);
 
             session()->flash('toast', [
                 'message' => 'IT Leasing item updated successfully!',
