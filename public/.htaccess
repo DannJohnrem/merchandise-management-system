@@ -23,3 +23,16 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# ===== FIX ERR_CONTENT_DECODING_FAILED =====
+<IfModule mod_headers.c>
+    Header unset Content-Encoding
+</IfModule>
+
+<IfModule mod_deflate.c>
+    SetEnvIfNoCase Request_URI "\.(js|css)$" no-gzip
+</IfModule>
+
+<IfModule mod_brotli.c>
+    BrotliCompression off
+</IfModule>
