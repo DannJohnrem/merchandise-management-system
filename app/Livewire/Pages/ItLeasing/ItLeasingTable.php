@@ -52,6 +52,17 @@ class ItLeasingTable extends DataTableComponent
                     $value ? $query->where('category', $value) : null
                 ),
 
+            SelectFilter::make('Serial Number')
+                ->options(
+                    ItLeasing::pluck('serial_number', 'serial_number')
+                        ->prepend('All', '')
+                        ->toArray()
+                )
+                ->filter(
+                    fn($query, $value) =>
+                    $value ? $query->where('serial_number', $value) : null
+                ),
+
             SelectFilter::make('Status')
                 ->options([
                     '' => 'All',
