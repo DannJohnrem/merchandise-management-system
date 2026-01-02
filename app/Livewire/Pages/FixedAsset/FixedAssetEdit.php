@@ -114,7 +114,7 @@ class FixedAssetEdit extends Component
                 'type' => 'success',
             ]);
 
-            return redirect()->route('fixed-asset.index');
+            return $this->redirect(route('fixed-asset.index'), navigate: true);
 
         } catch (ValidationException $e) {
             $this->dispatch('toast', message: 'Please check required fields.', type: 'error');

@@ -37,5 +37,6 @@ class FixedAsset extends Model
         'purchase_cost' => 'decimal:2',
         'purchase_date' => 'date:Y-m-d',
         'warranty_expiration' => 'date:Y-m-d',
+        'inclusions' => 'array',
     ];
 }
