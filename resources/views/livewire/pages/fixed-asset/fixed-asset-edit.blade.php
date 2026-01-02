@@ -83,9 +83,7 @@
                         <option value="">Select Class</option>
                         @foreach ($classes as $class)
                             <option value="{{ $class->name }}">
-                                {{ $class->name }} @if ($class->type)
-                                    ({{ ucfirst($class->type) }})
-                                @endif
+                                {{ $class->name }} @if($class->type)({{ ucfirst($class->type) }})@endif
                             </option>
                         @endforeach
                     </flux:select>
