@@ -40,7 +40,7 @@ class FixedAssetEdit extends Component
     {
         $this->asset = $asset;
 
-        // Populate public properties with existing data
+        // Populate properties with existing data
         $this->asset_tag = $asset->asset_tag;
         $this->category = $asset->category;
         $this->asset_name = $asset->asset_name;
@@ -59,7 +59,9 @@ class FixedAssetEdit extends Component
         $this->purchase_order_no = $asset->purchase_order_no;
         $this->warranty_expiration = $asset->warranty_expiration?->format('Y-m-d');
         $this->remarks = $asset->remarks;
-        $this->inclusions = $asset->inclusions ?? [];
+
+        // Decode inclusions from JSON, fallback to empty array
+        $this->inclusions = $asset->inclusions ? json_decode($asset->inclusions, true) : [];
 
         // Load available classes
         $this->classes = ClassModel::orderBy('name')->get();
@@ -102,11 +104,15 @@ class FixedAssetEdit extends Component
                 'inclusions.*' => 'nullable|string|max:255',
             ]);
 
-            $this->asset->update(array_merge($validated, [
-                'inclusions' => $this->inclusions,
-            ]));
+            // Store inclusions as JSON
+            $validated['inclusions'] = json_encode($this->inclusions);
 
-            session()->flash('toast', ['message' => 'Fixed asset updated successfully!', 'type' => 'success']);
+            $this->asset->update($validated);
+
+            session()->flash('toast', [
+                'message' => 'Fixed asset updated successfully!',
+                'type' => 'success',
+            ]);
 
             return redirect()->route('fixed-asset.index');
 
@@ -119,7 +125,7 @@ class FixedAssetEdit extends Component
             $this->dispatch('toast', message: 'Database error occurred.', type: 'error');
 
         } catch (Throwable $e) {
-            logger()->error('Error updating FixedAsset', ['error' => $e->getMessage()]);
+            logger()->error('Unexpected error updating Fixed Asset', ['error' => $e->getMessage()]);
             $this->dispatch('toast', message: 'Unexpected error occurred.', type: 'error');
         }
     }

@@ -108,6 +108,7 @@
                 <div>
                     <flux:label>Condition</flux:label>
                     <flux:select wire:model.defer="condition">
+                        <option value="">Select Condition</option>
                         <option value="new">New</option>
                         <option value="good">Good</option>
                         <option value="fair">Fair</option>
@@ -130,38 +131,31 @@
                     <flux:input type="date" wire:model.defer="warranty_expiration" />
                 </div>
 
+                {{-- Inclusions --}}
                 <div class="md:col-span-2">
                     <flux:label>Inclusions</flux:label>
                     <div class="space-y-2">
-                        @foreach ($inclusions as $incIndex => $value)
+                        @foreach ($inclusions as $index => $value)
                             <div class="flex space-x-2 mb-2">
-                                <flux:input type="text"
-                                    wire:model.defer="inclusions.{{ $incIndex }}"
-                                    placeholder="Inclusion item" />
-                                <flux:button type="button" variant="danger"
-                                    wire:click.prevent="removeInclusion({{ $incIndex }})">
-                                    Remove
-                                </flux:button>
+                                <flux:input type="text" wire:model.defer="inclusions.{{ $index }}" placeholder="Inclusion item" />
+                                <flux:button type="button" variant="danger" wire:click.prevent="removeInclusion({{ $index }})">Remove</flux:button>
                             </div>
                         @endforeach
                     </div>
-                    <flux:button type="button" variant="primary" wire:click.prevent="addInclusion">+ Add Inclusion</flux:button>
+                    <flux:button type="button" variant="primary" wire:click.prevent="addInclusion()">+ Add Inclusion</flux:button>
                 </div>
 
+                {{-- Remarks --}}
                 <div class="md:col-span-2">
                     <flux:label>Remarks</flux:label>
-                    <flux:textarea rows="4" wire:model.defer="remarks" />
+                    <flux:textarea rows="4" wire:model.defer="remarks"/>
                 </div>
 
             </div>
 
             <div class="flex justify-end space-x-2">
-                <flux:button variant="ghost" wire:navigate href="{{ route('fixed-asset.index') }}">
-                    Cancel
-                </flux:button>
-                <flux:button variant="primary" type="submit">
-                    Update
-                </flux:button>
+                <flux:button variant="ghost" wire:navigate href="{{ route('fixed-asset.index') }}">Cancel</flux:button>
+                <flux:button variant="primary" type="submit">Update</flux:button>
             </div>
 
         </form>

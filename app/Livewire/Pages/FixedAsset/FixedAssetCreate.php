@@ -97,6 +97,9 @@ class FixedAssetCreate extends Component
             ]);
 
             foreach ($this->items as $item) {
+                // Encode inclusions array to JSON to prevent DB error
+                $item['inclusions'] = json_encode($item['inclusions'] ?? []);
+
                 FixedAsset::create($item);
             }
 
