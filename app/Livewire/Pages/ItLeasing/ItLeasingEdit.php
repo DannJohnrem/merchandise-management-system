@@ -73,7 +73,6 @@ class ItLeasingEdit extends Component
         };
     }
 
-
     /**
      * Update the IT Leasing item.
      *
