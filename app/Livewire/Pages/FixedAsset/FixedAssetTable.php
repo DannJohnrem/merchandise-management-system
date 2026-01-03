@@ -11,14 +11,32 @@ use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
 class FixedAssetTable extends DataTableComponent
 {
+    /**
+     * The model associated with the table.
+     *
+     * @var class-string<\App\Models\FixedAsset>
+     */
     protected $model = FixedAsset::class;
 
+    /**
+     * Event listeners for the component.
+     *
+     * @var array<string, string>
+     */
     protected $listeners = ['confirmDeleteFixedAsset' => 'deleteItem'];
 
+    /**
+     * Bulk actions available in the table.
+     *
+     * @var array<string, string>
+     */
     public array $bulkActions = [
         'deleteSelected' => '🗑️ Delete Selected',
     ];
 
+    /**
+     * Configure table settings.
+     */
     public function configure(): void
     {
         $this->setPrimaryKey('id')
@@ -34,7 +52,9 @@ class FixedAssetTable extends DataTableComponent
     }
 
     /**
-     * FILTERS
+     * Define filters for the table.
+     *
+     * @return array<string, \Rappasoft\LaravelLivewireTables\Views\Filters\Filter>
      */
     public function filters(): array
     {
@@ -60,8 +80,12 @@ class FixedAssetTable extends DataTableComponent
         ];
     }
 
+
     /**
-     * DELETE INDIVIDUAL
+     * Delete a FixedAsset item by ID.
+     *
+     * @param int $id
+     * @return void
      */
     public function deleteItem(int $id): void
     {
@@ -89,8 +113,11 @@ class FixedAssetTable extends DataTableComponent
         }
     }
 
+
     /**
-     * BULK DELETE
+     * Delete selected FixedAsset items in bulk.
+     *
+     * @return void
      */
     public function deleteSelected(): void
     {
@@ -122,8 +149,11 @@ class FixedAssetTable extends DataTableComponent
         }
     }
 
+
     /**
-     * COLUMNS
+     * Define columns for the table.
+     *
+     * @return array<\Rappasoft\LaravelLivewireTables\Views\Column>
      */
     public function columns(): array
     {

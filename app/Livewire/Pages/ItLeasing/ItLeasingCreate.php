@@ -12,11 +12,17 @@ class ItLeasingCreate extends Component
 {
     public array $items = [];
 
+    /**
+     * Initialize with one blank item
+     */
     public function mount()
     {
         $this->items[] = $this->blankItem();
     }
 
+    /**
+     * Returns a blank item structure
+     */
     protected function blankItem(): array
     {
         return [
@@ -42,22 +48,34 @@ class ItLeasingCreate extends Component
         ];
     }
 
+    /**
+     * Add or remove items dynamically
+     */
     public function addItem()
     {
         $this->items[] = $this->blankItem();
     }
 
+    /**
+     * Remove item at given index
+     */
     public function removeItem($index)
     {
         unset($this->items[$index]);
         $this->items = array_values($this->items);
     }
 
+    /**
+     * Add or remove inclusions for a specific item
+     */
     public function addInclusion($itemIndex)
     {
         $this->items[$itemIndex]['inclusions'][] = '';
     }
 
+    /**
+     * Remove inclusion at given index for a specific item
+     */
     public function removeInclusion($itemIndex, $inclusionIndex)
     {
         unset($this->items[$itemIndex]['inclusions'][$inclusionIndex]);
@@ -77,8 +95,8 @@ class ItLeasingCreate extends Component
         $index = explode('.', $name)[1];
         $brand = strtoupper(trim($this->items[$index]['brand'] ?? ''));
 
-        // Do NOT override manual input
-        if (!empty($this->items[$index]['rental_rate_per_month'])) {
+        if ($brand === '') {
+            $this->items[$index]['rental_rate_per_month'] = null;
             return;
         }
 
@@ -89,6 +107,9 @@ class ItLeasingCreate extends Component
         };
     }
 
+    /**
+     * Save the IT Leasing items
+     */
     public function save()
     {
         try {
@@ -141,6 +162,9 @@ class ItLeasingCreate extends Component
         }
     }
 
+    /**
+     * Render the component view
+     */
     public function render()
     {
         return view('livewire.pages.it-leasing.it-leasing-create');

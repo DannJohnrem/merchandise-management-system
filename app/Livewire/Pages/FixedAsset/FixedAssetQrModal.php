@@ -16,6 +16,12 @@ class FixedAssetQrModal extends Component
 
     protected $listeners = ['show-fixed-asset-qr' => 'prepareModal'];
 
+    /**
+     * Prepare and open the QR code modal for the given FixedAsset ID.
+     *
+     * @param int|null $id
+     * @return void
+     */
     public function prepareModal($id)
     {
         if (!$id) return;
@@ -30,6 +36,12 @@ class FixedAssetQrModal extends Component
         $this->loadQrCode($id);
     }
 
+    /**
+     * Load and generate the QR code SVG for the given FixedAsset ID.
+     *
+     * @param int $id
+     * @return void
+     */
     private function loadQrCode($id)
     {
         $this->item = FixedAsset::find($id);
@@ -56,6 +68,11 @@ class FixedAssetQrModal extends Component
         $this->isLoading = false;
     }
 
+    /**
+     * Render the component view.
+     *
+     * @return \Illuminate\View\View
+     */
     public function render()
     {
         return view('livewire.pages.fixed-asset.fixed-asset-qr-modal');

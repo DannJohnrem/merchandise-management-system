@@ -11,9 +11,33 @@ use Throwable;
 
 class FixedAssetCreate extends Component
 {
+    /**
+     * Items being created in the form.
+     *
+     * Each item is an associative array representing a fixed asset payload
+     * that will be validated and stored.
+     *
+     * @var array<int, array<string, mixed>>
+     */
     public array $items = [];
+
+    /**
+     * Cached list of classes for dropdowns.
+     *
+     * Loaded in `mount()` to populate the class select control.
+     *
+     * @var \Illuminate\Database\Eloquent\Collection|\App\Models\ClassModel[]
+     */
     public $classes = [];
 
+    /**
+     * Initialize component state.
+     *
+     * Adds one blank item to the form and loads the available classes
+     * used by select controls.
+     *
+     * @return void
+     */
     public function mount()
     {
         $this->items[] = $this->blankItem();
@@ -47,28 +71,61 @@ class FixedAssetCreate extends Component
         ];
     }
 
+    /**
+     * Add a new blank item to the items array.
+     *
+     * @return void
+     */
     public function addItem()
     {
         $this->items[] = $this->blankItem();
     }
 
+    /**
+     * Remove the item at the given index from the items array.
+     *
+     * @param int $index
+     * @return void
+     */
     public function removeItem($index)
     {
         unset($this->items[$index]);
         $this->items = array_values($this->items);
     }
 
+    /**
+     * Add an empty inclusion entry for a specific item.
+     *
+     * @param int $itemIndex Index of the item in the `items` array
+     * @return void
+     */
     public function addInclusion($itemIndex)
     {
         $this->items[$itemIndex]['inclusions'][] = '';
     }
 
+    /**
+     * Remove an inclusion at the given index for a specific item.
+     *
+     * @param int $itemIndex Index of the item in the `items` array
+     * @param int $inclusionIndex Index of the inclusion to remove
+     * @return void
+     */
     public function removeInclusion($itemIndex, $inclusionIndex)
     {
         unset($this->items[$itemIndex]['inclusions'][$inclusionIndex]);
         $this->items[$itemIndex]['inclusions'] = array_values($this->items[$itemIndex]['inclusions']);
     }
 
+    /**
+     * Validate and persist the fixed asset items to the database.
+     *
+     * Validates the `items` array and creates a `FixedAsset` record
+     * for each item. Provides user feedback via session toasts and
+     * handles database and unexpected errors gracefully.
+     *
+     * @return \Illuminate\Http\RedirectResponse|void
+     */
     public function save()
     {
         try {
@@ -124,6 +181,11 @@ class FixedAssetCreate extends Component
         }
     }
 
+    /**
+     * Render the component view.
+     *
+     * @return \Illuminate\View\View
+     */
     public function render()
     {
         return view('livewire.pages.fixed-asset.fixed-asset-create');

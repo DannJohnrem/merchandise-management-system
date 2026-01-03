@@ -36,6 +36,15 @@ class FixedAssetEdit extends Component
 
     public $classes = [];
 
+    /**
+     * Initialize component with the given FixedAsset model.
+     *
+     * Populates form-bound public properties from the model and loads
+     * supporting data such as available classes.
+     *
+     * @param \App\Models\FixedAsset $asset
+     * @return void
+     */
     public function mount(FixedAsset $asset)
     {
         $this->asset = $asset;
@@ -67,17 +76,37 @@ class FixedAssetEdit extends Component
         $this->classes = ClassModel::orderBy('name')->get();
     }
 
+    /**
+     * Add an empty inclusion line to the inclusions array.
+     *
+     * @return void
+     */
     public function addInclusion()
     {
         $this->inclusions[] = '';
     }
 
+    /**
+     * Remove an inclusion at the specified index.
+     *
+     * @param int $index
+     * @return void
+     */
     public function removeInclusion($index)
     {
         unset($this->inclusions[$index]);
         $this->inclusions = array_values($this->inclusions);
     }
 
+    /**
+     * Validate input and update the FixedAsset model.
+     *
+     * Handles validation, updates the model, and provides user feedback
+     * through session toasts. Catches and logs database and unexpected
+     * errors.
+     *
+     * @return \Illuminate\Http\RedirectResponse|void
+     */
     public function update()
     {
         try {
@@ -130,6 +159,11 @@ class FixedAssetEdit extends Component
         }
     }
 
+    /**
+     * Render the component view.
+     *
+     * @return \Illuminate\View\View
+     */
     public function render()
     {
         return view('livewire.pages.fixed-asset.fixed-asset-edit');

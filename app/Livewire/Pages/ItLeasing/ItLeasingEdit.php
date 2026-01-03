@@ -32,6 +32,14 @@ class ItLeasingEdit extends Component
     public $remarks;
     public $inclusions = [];
 
+    /**
+     * Initialize component with the given ItLeasing model.
+     *
+     * Populates form-bound public properties from the model.
+     *
+     * @param \App\Models\ItLeasing $item
+     * @return void
+     */
     public function mount(ItLeasing $item)
     {
         $this->item = $item;
@@ -41,23 +49,36 @@ class ItLeasingEdit extends Component
         }
     }
 
+
     /**
-     * 🔥 AUTO-FILL RENTAL RATE WHEN BRAND CHANGES
+     * Automatically set rental rate based on brand selection.
+     *
+     * @param string $value
+     * @return void
      */
     public function updatedBrand($value)
     {
-        // Do not override manual input
-        if (!empty($this->rental_rate_per_month)) {
+        $brand = strtoupper(trim($value));
+
+        // 🔥 Clear rental rate if brand is empty
+        if ($brand === '') {
+            $this->rental_rate_per_month = null;
             return;
         }
 
-        match (strtoupper(trim($value))) {
+        match ($brand) {
             'HP' => $this->rental_rate_per_month = 3000.00,
             'LENOVO' => $this->rental_rate_per_month = 3500.00,
-            default => null,
+            default => $this->rental_rate_per_month = null,
         };
     }
 
+
+    /**
+     * Update the IT Leasing item.
+     *
+     * @return void
+     */
     public function update()
     {
         try {
@@ -104,6 +125,11 @@ class ItLeasingEdit extends Component
         }
     }
 
+    /**
+     * Render the component view.
+     *
+     * @return \Illuminate\View\View
+     */
     public function render()
     {
         return view('livewire.pages.it-leasing.it-leasing-edit');

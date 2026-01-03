@@ -11,16 +11,34 @@ use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
 class ItLeasingTable extends DataTableComponent
 {
+    /**
+     * The model associated with the table.
+     *
+     * @var class-string<\App\Models\ItLeasing>
+     */
     protected $model = ItLeasing::class;
 
+    /**
+     * Event listeners for the component.
+     *
+     * @var array<string, string>
+     */
     protected $listeners = [
         'confirmDeleteItem' => 'deleteItem',
     ];
 
+    /**
+     * Bulk actions available in the table.
+     *
+     * @var array<string, string>
+     */
     public array $bulkActions = [
         'deleteSelected' => '🗑️ Delete Selected',
     ];
 
+    /**
+     * Configure table settings.
+     */
     public function configure(): void
     {
         $this->setPrimaryKey('id')
@@ -36,7 +54,9 @@ class ItLeasingTable extends DataTableComponent
     }
 
     /**
-     * Filters
+     * Define filters for the table.
+     *
+     * @return array<string, \Rappasoft\LaravelLivewireTables\Views\Filters\Filter>
      */
     public function filters(): array
     {
@@ -77,7 +97,10 @@ class ItLeasingTable extends DataTableComponent
     }
 
     /**
-     * Individual Delete
+     * Delete a ItLeasing item by ID.
+     *
+     * @param int $id
+     * @return void
      */
     public function deleteItem(int $id): void
     {
@@ -107,7 +130,9 @@ class ItLeasingTable extends DataTableComponent
     }
 
     /**
-     * Bulk Delete
+     * Delete selected ItLeasing items in bulk.
+     *
+     * @return void
      */
     public function deleteSelected(): void
     {
@@ -140,7 +165,9 @@ class ItLeasingTable extends DataTableComponent
     }
 
     /**
-     * Columns (placed at bottom for maintainability)
+     * Define columns for the table.
+     *
+     * @return array<\Rappasoft\LaravelLivewireTables\Views\Column>
      */
     public function columns(): array
     {
