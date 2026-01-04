@@ -20,6 +20,19 @@
 
     <div class="w-full border rounded-lg p-4 bg-white dark:bg-zinc-800 shadow-sm">
         <livewire:pages.it-leasing.it-leasing-table />
+
+        <div class="mt-4 flex justify-end space-x-12 text-gray-700 dark:text-gray-200">
+            <div>
+                <span class="font-semibold">Page Total:</span>
+                ₱ {{ number_format($pageTotal, 2) }}
+            </div>
+
+            <div>
+                <span class="font-semibold">Grand Total:</span>
+                ₱ {{ number_format($grandTotal, 2) }}
+            </div>
+        </div>
+
     </div>
 
     {{-- QR Code Modal --}}
@@ -30,10 +43,12 @@
 <script>
     document.removeEventListener('confirm-delete-it-leasing', window.__confirmDeleteItLeasingHandler);
 
-    window.__confirmDeleteItLeasingHandler = function (event) {
+    window.__confirmDeleteItLeasingHandler = function(event) {
         const id = event.detail.id;
         if (confirm('Are you sure you want to delete this IT Leasing record?')) {
-            Livewire.dispatch('confirmDeleteItLeasing', { id });
+            Livewire.dispatch('confirmDeleteItLeasing', {
+                id
+            });
         }
     };
 
