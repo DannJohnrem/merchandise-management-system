@@ -36,43 +36,83 @@ class ItLeasingTable extends DataTableComponent
     }
 
     /**
-     * Filters
+     * Recalculate totals when the current pagination page changes.
+     *
+     * Triggered by Livewire when the `page` property updates.
+     *
+     * @return void
+     */
+    public function updatedPage(): void
+    {
+        $this->emitTotals();
+    }
+
+    /**
+     * Recalculate totals when table filters change.
+     *
+     * Called when Livewire updates the `filters` property.
+     *
+     * @return void
+     */
+    public function updatedFilters(): void
+    {
+        $this->emitTotals();
+    }
+
+    /**
+     * Recalculate totals when the search term changes.
+     *
+     * @param string|array|null $value The new search value
+     * @return void
+     */
+    public function updatedSearch(array|string|null $value): void
+    {
+        $this->emitTotals();
+    }
+
+    /**
+     * Recalculate totals when the items-per-page setting changes.
+     *
+     * @param int|string $value The new per-page value
+     * @return void
+     */
+    public function updatedPerPage(string|int $value): void
+    {
+        $this->emitTotals();
+    }
+
+    /**
+     * Define available filters for the data table.
+     *
+     * Each returned Filter (eg. `SelectFilter`) is used by the
+     * Livewire table to render filter UI and apply constraints to
+     * the query. Filters should reference valid database columns
+     * and return closures that modify the query when a value is
+     * selected.
+     *
+     * @return array<string, \Rappasoft\LaravelLivewireTables\Views\Filters\Filter>
      */
     public function filters(): array
     {
         return [
             SelectFilter::make('Category')
-                ->options(
-                    ItLeasing::pluck('category', 'category')
-                        ->prepend('All', '')
-                        ->toArray()
-                )
-                ->filter(
-                    fn($query, $value) =>
-                    $value ? $query->where('category', $value) : null
-                ),
+                ->options(ItLeasing::pluck('category', 'category')->prepend('All', '')->toArray())
+                ->filter(fn ($query, $value) => $value ? $query->where('category', $value) : null),
 
             SelectFilter::make('Serial Number')
-                ->options(
-                    ItLeasing::pluck('serial_number', 'serial_number')
-                        ->prepend('All', '')
-                        ->toArray()
-                )
-                ->filter(
-                    fn($query, $value) =>
-                    $value ? $query->where('serial_number', $value) : null
-                ),
+                ->options(ItLeasing::pluck('serial_number', 'serial_number')->prepend('All', '')->toArray())
+                ->filter(fn ($query, $value) => $value ? $query->where('serial_number', $value) : null),
 
             SelectFilter::make('Status')
                 ->options([
                     '' => 'All',
-                    'available'  => 'Available',
-                    'deployed'   => 'Deployed',
-                    'in_repair'  => 'In Repair',
-                    'returned'   => 'Returned',
-                    'lost'       => 'Lost',
+                    'available' => 'Available',
+                    'deployed'  => 'Deployed',
+                    'in_repair' => 'In Repair',
+                    'returned'  => 'Returned',
+                    'lost'      => 'Lost',
                 ])
-                ->filter(fn($query, $value) => $value ? $query->where('status', $value) : null),
+                ->filter(fn ($query, $value) => $value ? $query->where('status', $value) : null),
         ];
     }
 
@@ -90,19 +130,17 @@ class ItLeasingTable extends DataTableComponent
             }
 
             $name = $item->serial_number ?? 'Item';
-
             $item->delete();
 
             $this->setPage(1);
             $this->dispatch('$refresh');
 
             $this->dispatch('toast', message: "{$name} deleted successfully!", type: 'success');
-        } catch (QueryException $e) {
-            logger()->error('DB error deleting item', ['error' => $e->getMessage()]);
-            $this->dispatch('toast', message: 'Database error occurred while deleting item.', type: 'error');
-        } catch (Throwable $e) {
-            logger()->error('Unexpected error deleting item', ['error' => $e->getMessage()]);
-            $this->dispatch('toast', message: 'Unexpected error occurred while deleting item.', type: 'error');
+
+            $this->emitTotals();
+        } catch (QueryException|Throwable $e) {
+            logger()->error('Error deleting item', ['error' => $e->getMessage()]);
+            $this->dispatch('toast', message: 'Error occurred while deleting item.', type: 'error');
         }
     }
 
@@ -124,18 +162,12 @@ class ItLeasingTable extends DataTableComponent
             $this->clearSelected();
             $this->setPage(1);
             $this->dispatch('$refresh');
+            $this->dispatch('toast', message: count($selected).' item(s) deleted successfully.', type: 'success');
 
-            $this->dispatch(
-                'toast',
-                message: count($selected) . ' item(s) deleted successfully.',
-                type: 'success'
-            );
-        } catch (QueryException $e) {
-            logger()->error('DB bulk delete error', ['error' => $e->getMessage()]);
-            $this->dispatch('toast', message: 'Database error occurred.', type: 'error');
-        } catch (Throwable $e) {
-            logger()->error('Unexpected bulk delete error', ['error' => $e->getMessage()]);
-            $this->dispatch('toast', message: 'Unexpected error occurred.', type: 'error');
+            $this->emitTotals();
+        } catch (QueryException|Throwable $e) {
+            logger()->error('Error bulk deleting items', ['error' => $e->getMessage()]);
+            $this->dispatch('toast', message: 'Error occurred during bulk delete.', type: 'error');
         }
     }
 
@@ -153,22 +185,68 @@ class ItLeasingTable extends DataTableComponent
             Column::make('Model', 'model')->sortable()->searchable(),
             Column::make('Purchase Cost', 'purchase_cost')
                 ->sortable()
-                ->format(fn($value) => '₱ ' . number_format($value, 2)),
+                ->format(fn ($value) => '₱ '.number_format($value, 2)),
             Column::make('Assigned Company', 'assigned_company')->sortable()->searchable(),
-            Column::make('Assigned Employee', 'assigned_employee')->sortable()->searchable()->format(fn($value) => $value ?: '—'),
-            Column::make('Status', 'status')->sortable()->searchable()
-                ->label(fn($row) => view('livewire.pages.it-leasing.partials.status-badge', ['status' => $row->status])->render())->html(),
+            Column::make('Assigned Employee', 'assigned_employee')
+                ->sortable()
+                ->searchable()
+                ->format(fn ($value) => $value ?: '—'),
+            Column::make('Status', 'status')
+                ->sortable()
+                ->searchable()
+                ->label(fn ($row) =>
+                    view('livewire.pages.it-leasing.partials.status-badge', ['status' => $row->status])->render()
+                )
+                ->html(),
             Column::make('Created At', 'created_at')
                 ->sortable()
-                ->format(fn($value) => $value->format('M d, Y')),
+                ->format(fn ($value) => $value->format('M d, Y')),
             Column::make('Actions')
-                ->label(
-                    fn($row) =>
-                    view('livewire.pages.it-leasing.partials.actions', [
-                        'item' => $row,
-                    ])->render()
+                ->label(fn ($row) =>
+                    view('livewire.pages.it-leasing.partials.actions', ['item' => $row])->render()
                 )
                 ->html(),
         ];
     }
+
+    /**
+     * Emit the current page and grand totals for purchase_cost.
+     *
+     * @return void
+     */
+    protected function emitTotals(): void
+    {
+        $pageRows = $this->getRows();
+
+        $pageTotal = $pageRows->sum('purchase_cost');
+
+        $grandTotal = $this
+            ->applyFilters(ItLeasing::query())
+            ->sum('purchase_cost');
+
+        $this->dispatch('totalsUpdated', [
+            'pageTotal'  => (float) $pageTotal,
+            'grandTotal' => (float) $grandTotal,
+        ]);
+    }
+
+
+    /**
+     * Emit totals once after the component has rendered to provide
+     * the parent component an initial page and grand total.
+     *
+     * This uses a static flag to ensure a single emission on first render.
+     *
+     * @return void
+     */
+    public function rendered(): void
+    {
+        static $emitted = false;
+
+        if (! $emitted) {
+            $this->emitTotals();
+            $emitted = true;
+        }
+    }
+
 }
