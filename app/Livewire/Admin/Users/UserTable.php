@@ -12,6 +12,7 @@ use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
 class UserTable extends DataTableComponent
 {
+    public string $tableName = 'user-table';
     protected $model = User::class;
 
     protected $listeners = ['confirmDeleteUser' => 'deleteUser'];

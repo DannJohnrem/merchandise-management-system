@@ -8,6 +8,7 @@ use Rappasoft\LaravelLivewireTables\Views\Column;
 
 class ActivityLogsTable extends DataTableComponent
 {
+    public string $tableName = 'activity-logs-table';
     protected $model = ActivityLog::class;
 
     public function configure(): void

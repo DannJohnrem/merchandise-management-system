@@ -11,6 +11,7 @@ use Illuminate\Database\QueryException;
 
 class RoleTable extends DataTableComponent
 {
+    public string $tableName = 'role-table';
     protected $model = Role::class;
 
     protected $listeners = ['confirmDeleteRole' => 'deleteRole'];

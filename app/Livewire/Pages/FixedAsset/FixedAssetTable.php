@@ -11,6 +11,7 @@ use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
 class FixedAssetTable extends DataTableComponent
 {
+    public string $tableName = 'fixed-asset-table';
     protected $model = FixedAsset::class;
 
     protected $listeners = ['confirmDeleteFixedAsset' => 'deleteItem'];

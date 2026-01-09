@@ -11,6 +11,8 @@ use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
 class ItLeasingTable extends DataTableComponent
 {
+    public string $tableName = 'it-leasing-table';
+    public bool $isItLeasingTable = true;
     protected $model = ItLeasing::class;
 
     protected $listeners = [
@@ -44,6 +46,7 @@ class ItLeasingTable extends DataTableComponent
      */
     public function updatedPage(): void
     {
+        // dd('Page updated to: ' . $this->getPage());
         $this->emitTotals();
     }
 
@@ -220,16 +223,21 @@ class ItLeasingTable extends DataTableComponent
 
         $pageTotal = $pageRows->sum('purchase_cost');
 
-        $grandTotal = $this
-            ->applyFilters(ItLeasing::query())
-            ->sum('purchase_cost');
+        // Only calculate grand total on page 1 for performance (it's only displayed there)
+        $grandTotal = 0;
+        if ($this->getPage() === 1) {
+            $grandTotal = $this
+                ->applyFilters(ItLeasing::query())
+                ->sum('purchase_cost');
+        }
 
+        // Dispatch event to parent component (Livewire v3 syntax)
         $this->dispatch('totalsUpdated', [
             'pageTotal'  => (float) $pageTotal,
             'grandTotal' => (float) $grandTotal,
+            'currentPage' => $this->getPage(),
         ]);
     }
-
 
     /**
      * Emit totals once after the component has rendered to provide
@@ -248,5 +256,4 @@ class ItLeasingTable extends DataTableComponent
             $emitted = true;
         }
     }
-
 }

@@ -18,19 +18,24 @@
         @endcan
     </div>
 
-    <div class="w-full border rounded-lg p-4 bg-white dark:bg-zinc-800 shadow-sm">
-        <livewire:pages.it-leasing.it-leasing-table />
+    <div class="relative w-full border rounded-lg p-4 bg-white dark:bg-zinc-800 shadow-sm">
+        <livewire:pages.it-leasing.it-leasing-table wire:key="it-leasing-table" />
 
-        <div class="mt-4 flex justify-end space-x-12 text-gray-700 dark:text-gray-200">
-            <div>
+        <div
+            class="absolute bottom-[70px] right-2 flex justify-end space-x-12 text-gray-700 dark:text-gray-200 bg-white dark:bg-zinc-800 p-2">
+            <!-- Page Total -->
+            <div class="flex items-center space-x-1">
                 <span class="font-semibold">Page Total:</span>
-                ₱ {{ number_format($pageTotal, 2) }}
+                <span>₱ {{ number_format($pageTotal, 2) }}</span>
             </div>
 
-            <div>
-                <span class="font-semibold">Grand Total:</span>
-                ₱ {{ number_format($grandTotal, 2) }}
-            </div>
+            <!-- Grand Total (show only on page 1) -->
+            @if ($currentPage === 1 && $grandTotal > 0)
+                <div class="flex items-center space-x-1">
+                    <span class="font-semibold">Grand Total:</span>
+                    <span>₱ {{ number_format($grandTotal, 2) }}</span>
+                </div>
+            @endif
         </div>
 
     </div>

@@ -6,6 +6,7 @@ use Livewire\Component;
 
 class ItLeasingIndex extends Component
 {
+    public int $currentPage = 1;
     public float $pageTotal = 0;
     public float $grandTotal = 0;
 
@@ -26,6 +27,7 @@ class ItLeasingIndex extends Component
     {
         $this->pageTotal  = (float) $totals['pageTotal'];
         $this->grandTotal = (float) $totals['grandTotal'];
+        $this->currentPage = (int) $totals['currentPage'];
     }
 
     /**
