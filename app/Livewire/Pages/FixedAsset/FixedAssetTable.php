@@ -2,19 +2,19 @@
 
 namespace App\Livewire\Pages\FixedAsset;
 
-use App\Models\FixedAsset;
 use Throwable;
+use App\Models\FixedAsset;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\QueryException;
-use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
+use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
 class FixedAssetTable extends DataTableComponent
 {
     public string $tableName = 'fixed-asset-table';
     protected $model = FixedAsset::class;
-
-    protected $listeners = ['confirmDeleteFixedAsset' => 'deleteItem'];
+    protected $listeners = ['confirmDeleteFixedAsset' => 'deleteItem', 'loadFixedAssets' => '$refresh'];
 
     public array $bulkActions = [
         'deleteSelected' => '🗑️ Delete Selected',
@@ -42,11 +42,19 @@ class FixedAssetTable extends DataTableComponent
         return [
             SelectFilter::make('Category')
                 ->options(
-                    FixedAsset::pluck('category', 'category')
-                        ->prepend('All', '')
-                        ->toArray()
+                    Cache::remember('fixed_asset_categories', 3600, function () {
+                        return FixedAsset::query()
+                            ->select('category')
+                            ->distinct()
+                            ->whereNotNull('category')
+                            ->pluck('category', 'category')
+                            ->prepend('All', '')
+                            ->toArray();
+                    })
                 )
-                ->filter(fn($query, $value) => $value ? $query->where('category', $value) : null),
+                ->filter(fn($query, $value) =>
+                    $value ? $query->where('category', $value) : null
+                ),
 
             SelectFilter::make('Status')
                 ->options([
@@ -77,8 +85,7 @@ class FixedAssetTable extends DataTableComponent
             $name = $item->asset_name ?? 'Asset';
             $item->delete();
 
-            $this->setPage(1);
-            $this->dispatch('$refresh');
+            $this->resetPage();
 
             $this->dispatch('toast', message: "{$name} deleted successfully!", type: 'success');
         } catch (QueryException $e) {
