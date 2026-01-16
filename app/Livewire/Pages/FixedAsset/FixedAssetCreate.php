@@ -2,12 +2,13 @@
 
 namespace App\Livewire\Pages\FixedAsset;
 
-use Livewire\Component;
-use App\Models\FixedAsset;
-use App\Models\ClassModel;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Database\QueryException;
 use Throwable;
+use Livewire\Component;
+use App\Models\ClassModel;
+use App\Models\FixedAsset;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\QueryException;
+use Illuminate\Validation\ValidationException;
 
 class FixedAssetCreate extends Component
 {
@@ -19,7 +20,9 @@ class FixedAssetCreate extends Component
         $this->items[] = $this->blankItem();
 
         // Load classes for dropdowns
-        $this->classes = ClassModel::orderBy('name')->get();
+        $this->classes = Cache::remember('fixed_asset_classes', 3600, function () {
+            return ClassModel::orderBy('name')->get();
+        });
     }
 
     protected function blankItem(): array
@@ -102,6 +105,8 @@ class FixedAssetCreate extends Component
 
                 FixedAsset::create($item);
             }
+
+            Cache::forget('fixed_asset_categories');
 
             session()->flash('toast', [
                 'message' => 'Fixed assets created successfully!',

@@ -6,6 +6,7 @@ use Throwable;
 use App\Models\FixedAsset;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
@@ -14,7 +15,11 @@ class FixedAssetTable extends DataTableComponent
 {
     public string $tableName = 'fixed-asset-table';
     protected $model = FixedAsset::class;
-    protected $listeners = ['confirmDeleteFixedAsset' => 'deleteItem', 'loadFixedAssets' => '$refresh'];
+
+    protected $listeners = [
+        'confirmDeleteFixedAsset' => 'deleteItem',
+        'loadFixedAssets' => '$refresh'
+    ];
 
     public array $bulkActions = [
         'deleteSelected' => '🗑️ Delete Selected',
@@ -30,8 +35,27 @@ class FixedAssetTable extends DataTableComponent
             ->setSearchDebounce(300)
             ->setBulkActionsEnabled()
             ->setEmptyMessage('No fixed assets found.')
-            ->setTheme('tailwind')
-            ->setAdditionalSelects(['fixed_assets.status']);
+            ->setTheme('tailwind');
+            // ->setAdditionalSelects(['fixed_assets.status']);
+    }
+
+    public function builder(): Builder
+    {
+        return FixedAsset::query()->select([
+            'id',
+            'asset_tag',
+            'category',
+            'asset_name',
+            'serial_number',
+            'brand',
+            'model',
+            'purchase_cost',
+            'supplier',
+            'assigned_employee',
+            'location',
+            'status',
+            'created_at',
+        ]);
     }
 
     /**
@@ -42,11 +66,12 @@ class FixedAssetTable extends DataTableComponent
         return [
             SelectFilter::make('Category')
                 ->options(
-                    Cache::remember('fixed_asset_categories', 3600, function () {
+                    Cache::remember('fixed_asset_categories', 600, function () {
                         return FixedAsset::query()
                             ->select('category')
-                            ->distinct()
                             ->whereNotNull('category')
+                            ->distinct()
+                            ->orderBy('category')
                             ->pluck('category', 'category')
                             ->prepend('All', '')
                             ->toArray();
@@ -72,7 +97,7 @@ class FixedAssetTable extends DataTableComponent
     /**
      * DELETE INDIVIDUAL
      */
-    public function deleteItem(int $id): void
+ public function deleteItem(int $id): void
     {
         try {
             $item = FixedAsset::find($id);
@@ -84,6 +109,9 @@ class FixedAssetTable extends DataTableComponent
 
             $name = $item->asset_name ?? 'Asset';
             $item->delete();
+
+            // keep category dropdown real-time
+            Cache::forget('fixed_asset_categories');
 
             $this->resetPage();
 
@@ -112,15 +140,14 @@ class FixedAssetTable extends DataTableComponent
 
             FixedAsset::whereIn('id', $selected)->delete();
 
+            // keep category dropdown real-time
+            Cache::forget('fixed_asset_categories');
+
             $this->clearSelected();
             $this->setPage(1);
             $this->dispatch('$refresh');
 
-            $this->dispatch(
-                'toast',
-                message: count($selected) . ' asset(s) deleted successfully!',
-                type: 'success'
-            );
+            $this->dispatch('toast', message: count($selected) . ' asset(s) deleted successfully!', type: 'success');
         } catch (QueryException $e) {
             logger()->error('DB bulk delete error', ['error' => $e->getMessage()]);
             $this->dispatch('toast', message: 'Database error occurred.', type: 'error');

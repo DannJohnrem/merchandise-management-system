@@ -2,11 +2,12 @@
 
 namespace App\Livewire\Pages\ItLeasing;
 
+use Throwable;
 use Livewire\Component;
 use App\Models\ItLeasing;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\QueryException;
-use Throwable;
+use Illuminate\Validation\ValidationException;
 
 class ItLeasingCreate extends Component
 {
@@ -70,17 +71,13 @@ class ItLeasingCreate extends Component
     public function updated($name, $value)
     {
         // Detect only brand updates
-        if (!str_ends_with($name, '.brand')) {
-            return;
-        }
+        if (!str_ends_with($name, '.brand')) return;
 
         $index = explode('.', $name)[1];
         $brand = strtoupper(trim($this->items[$index]['brand'] ?? ''));
 
         // Do NOT override manual input
-        if (!empty($this->items[$index]['rental_rate_per_month'])) {
-            return;
-        }
+        if (!empty($this->items[$index]['rental_rate_per_month'])) return;
 
         match ($brand) {
             'HP' => $this->items[$index]['rental_rate_per_month'] = 3000.00,
@@ -117,8 +114,13 @@ class ItLeasingCreate extends Component
             ]);
 
             foreach ($this->items as $item) {
+                // consistent storage (if inclusions column is JSON/text)
+                $item['inclusions'] = json_encode($item['inclusions'] ?? []);
                 ItLeasing::create($item);
             }
+
+            Cache::forget('it_leasing_categories');
+            Cache::forget('it_leasing_serial_numbers');
 
             session()->flash('toast', [
                 'message' => 'IT Leasing items created successfully!',

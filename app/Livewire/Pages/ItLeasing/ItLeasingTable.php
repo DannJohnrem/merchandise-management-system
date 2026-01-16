@@ -2,11 +2,13 @@
 
 namespace App\Livewire\Pages\ItLeasing;
 
-use App\Models\ItLeasing;
 use Throwable;
+use App\Models\ItLeasing;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\QueryException;
-use Rappasoft\LaravelLivewireTables\DataTableComponent;
+use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\Views\Column;
+use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
 class ItLeasingTable extends DataTableComponent
@@ -33,8 +35,28 @@ class ItLeasingTable extends DataTableComponent
             ->setSearchDebounce(300)
             ->setBulkActionsEnabled()
             ->setEmptyMessage('No IT leasing items found.')
-            ->setTheme('tailwind')
-            ->setAdditionalSelects(['it_leasings.status']);
+            ->setTheme('tailwind');
+            // ->setAdditionalSelects(['it_leasings.status']);
+    }
+
+    /**
+     * LIMIT COLUMNS (big win)
+     */
+    public function builder(): Builder
+    {
+        return ItLeasing::query()->select([
+            'id',
+            'category',
+            'item_name',
+            'serial_number',
+            'brand',
+            'model',
+            'purchase_cost',
+            'assigned_company',
+            'assigned_employee',
+            'status',
+            'created_at',
+        ]);
     }
 
     /**
@@ -68,10 +90,10 @@ class ItLeasingTable extends DataTableComponent
      * @param string|array|null $value The new search value
      * @return void
      */
-    public function updatedSearch(array|string|null $value): void
-    {
-        $this->emitTotals();
-    }
+    // public function updatedSearch(array|string|null $value): void
+    // {
+    //     $this->emitTotals();
+    // }
 
     /**
      * Recalculate totals when the items-per-page setting changes.
@@ -98,12 +120,34 @@ class ItLeasingTable extends DataTableComponent
     public function filters(): array
     {
         return [
-            SelectFilter::make('Category')
-                ->options(ItLeasing::pluck('category', 'category')->prepend('All', '')->toArray())
+             SelectFilter::make('Category')
+                ->options(
+                    Cache::remember('it_leasing_categories', 600, function () {
+                        return ItLeasing::query()
+                            ->select('category')
+                            ->whereNotNull('category')
+                            ->distinct()
+                            ->orderBy('category')
+                            ->pluck('category', 'category')
+                            ->prepend('All', '')
+                            ->toArray();
+                    })
+                )
                 ->filter(fn ($query, $value) => $value ? $query->where('category', $value) : null),
 
             SelectFilter::make('Serial Number')
-                ->options(ItLeasing::pluck('serial_number', 'serial_number')->prepend('All', '')->toArray())
+                ->options(
+                    Cache::remember('it_leasing_serial_numbers', 600, function () {
+                        return ItLeasing::query()
+                            ->select('serial_number')
+                            ->whereNotNull('serial_number')
+                            ->distinct()
+                            ->orderBy('serial_number')
+                            ->pluck('serial_number', 'serial_number')
+                            ->prepend('All', '')
+                            ->toArray();
+                    })
+                )
                 ->filter(fn ($query, $value) => $value ? $query->where('serial_number', $value) : null),
 
             SelectFilter::make('Status')
@@ -135,6 +179,9 @@ class ItLeasingTable extends DataTableComponent
             $name = $item->serial_number ?? 'Item';
             $item->delete();
 
+            Cache::forget('it_leasing_categories');
+            Cache::forget('it_leasing_serial_numbers');
+
             $this->setPage(1);
             $this->dispatch('$refresh');
 
@@ -161,6 +208,9 @@ class ItLeasingTable extends DataTableComponent
             }
 
             ItLeasing::whereIn('id', $selected)->delete();
+
+            Cache::forget('it_leasing_categories');
+            Cache::forget('it_leasing_serial_numbers');
 
             $this->clearSelected();
             $this->setPage(1);

@@ -2,11 +2,12 @@
 
 namespace App\Livewire\Pages\ItLeasing;
 
+use Throwable;
 use Livewire\Component;
 use App\Models\ItLeasing;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\QueryException;
-use Throwable;
+use Illuminate\Validation\ValidationException;
 
 class ItLeasingEdit extends Component
 {
@@ -47,9 +48,7 @@ class ItLeasingEdit extends Component
     public function updatedBrand($value)
     {
         // Do not override manual input
-        if (!empty($this->rental_rate_per_month)) {
-            return;
-        }
+        if (!empty($this->rental_rate_per_month)) return;
 
         match (strtoupper(trim($value))) {
             'HP' => $this->rental_rate_per_month = 3000.00,
@@ -80,8 +79,11 @@ class ItLeasingEdit extends Component
                 'status' => $this->status,
                 'condition' => $this->condition,
                 'remarks' => $this->remarks,
-                'inclusions' => $this->inclusions,
+                'inclusions' => json_encode($this->inclusions ?? []),
             ]);
+
+            Cache::forget('it_leasing_categories');
+            Cache::forget('it_leasing_serial_numbers');
 
             session()->flash('toast', [
                 'message' => 'IT Leasing item updated successfully!',
