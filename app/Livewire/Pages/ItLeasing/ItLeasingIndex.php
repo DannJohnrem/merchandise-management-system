@@ -6,6 +6,7 @@ use Livewire\Component;
 
 class ItLeasingIndex extends Component
 {
+    public bool $readyToLoad = false;
     public int $currentPage = 1;
     public float $pageTotal = 0;
     public float $grandTotal = 0;
@@ -13,6 +14,11 @@ class ItLeasingIndex extends Component
     protected $listeners = [
         'totalsUpdated' => 'updateTotals',
     ];
+
+    public function load(): void
+    {
+        $this->readyToLoad = true;
+    }
 
     /**
      * Receive updated totals from the child table component.

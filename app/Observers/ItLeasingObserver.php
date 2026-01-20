@@ -13,30 +13,36 @@ class ItLeasingObserver
     public function created(ItLeasing $leasing): void
     {
         ActivityLogger::log(
-            'ItLeasing',
-            $leasing->id,
-            'created',
-            null,
-            $leasing->toArray(),
-            'IT Leasing item created'
+            subjectType: ItLeasing::class,
+            subjectId: $leasing->id,
+            action: 'created',
+            old: null,
+            new: $leasing->getAttributes(),
+            description: 'IT Leasing item created'
         );
     }
 
     /**
-     * Auto log kapag UPDATE (status-aware)
+     * ✅ Use updated() not updating()
+     * - ensures DB update succeeded
+     * - getChanges() returns only modified fields
      */
-    public function updating(ItLeasing $leasing): void
+    public function updated(ItLeasing $leasing): void
     {
         $old = $leasing->getOriginal();
-        $dirty = $leasing->getDirty();
+        $changes = $leasing->getChanges();
+
+        if (empty($changes)) {
+            return;
+        }
 
         ActivityLogger::log(
-            'ItLeasing',
-            $leasing->id,
-            'updated',
-            $old,
-            $dirty,
-            'IT Leasing item updated'
+            subjectType: ItLeasing::class,
+            subjectId: $leasing->id,
+            action: 'updated',
+            old: $old,
+            new: $changes,
+            description: 'IT Leasing item updated'
         );
     }
 
@@ -46,12 +52,12 @@ class ItLeasingObserver
     public function deleted(ItLeasing $leasing): void
     {
         ActivityLogger::log(
-            'ItLeasing',
-            $leasing->id,
-            'deleted',
-            $leasing->toArray(),
-            null,
-            'IT Leasing item deleted'
+            subjectType: ItLeasing::class,
+            subjectId: $leasing->id,
+            action: 'deleted',
+            old: $leasing->getOriginal(),
+            new: null,
+            description: 'IT Leasing item deleted'
         );
     }
 }
