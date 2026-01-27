@@ -61,6 +61,24 @@ select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
 
+@layer components {
+  .js-accordion-panel {
+    overflow: hidden;
+    height: 0;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: height 260ms ease, opacity 180ms ease, transform 180ms ease;
+    will-change: height, opacity, transform;
+  }
+
+  .js-accordion-panel.is-open {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */

@@ -23,7 +23,18 @@
 
             {{-- 🦴 SKELETON --}}
             @unless ($readyToLoad)
-                <flux:skeleton.group animate="shimmer">
+                <flux:skeleton.group animate="shimmer" class="space-y-4">
+
+                    {{-- top controls skeleton (search / filters / per-page vibe) --}}
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-2 w-full">
+                            <div class="h-10 w-64"><flux:skeleton.line /></div>
+                            <div class="h-10 w-40 hidden sm:block"><flux:skeleton.line /></div>
+                            <div class="h-10 w-40 hidden md:block"><flux:skeleton.line /></div>
+                        </div>
+                        <div class="h-10 w-28"><flux:skeleton.line /></div>
+                    </div>
+
                     <div class="overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700">
 
                         {{-- header --}}
@@ -47,12 +58,22 @@
                         @endforeach
 
                     </div>
+
+                    {{-- pagination skeleton --}}
+                    <div class="flex items-center justify-between pt-2">
+                        <div class="h-4 w-44"><flux:skeleton.line /></div>
+                        <div class="flex items-center gap-2">
+                            @foreach (range(1, 4) as $i)
+                                <div class="h-9 w-9"><flux:skeleton.line class="rounded-md" /></div>
+                            @endforeach
+                        </div>
+                    </div>
                 </flux:skeleton.group>
             @endunless
 
             {{-- ✅ REAL TABLE --}}
             @if ($readyToLoad)
-                <livewire:pages.fixed-asset.fixed-asset-table />
+                <livewire:pages.fixed-asset.fixed-asset-table :readyToLoad="$readyToLoad" />
             @endif
 
         </div>

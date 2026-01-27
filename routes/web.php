@@ -16,12 +16,15 @@ use App\Livewire\Admin\Class\ClassIndex;
 use App\Livewire\Admin\Roles\RoleCreate;
 use App\Livewire\Admin\Users\UserCreate;
 use App\Livewire\Admin\Class\ClassCreate;
+use App\Livewire\Pages\Reports\InventoryList;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\ItLeasingQrController;
 use App\Livewire\Pages\ItLeasing\ItLeasingEdit;
 use App\Livewire\Pages\ItLeasing\ItLeasingShow;
+use App\Livewire\Pages\Reports\InventoryLedger;
 use App\Livewire\Pages\ItLeasing\ItLeasingIndex;
 use App\Livewire\Pages\FixedAsset\FixedAssetEdit;
+use App\Livewire\Pages\FixedAsset\FixedAssetShow;
 use App\Livewire\Pages\ItLeasing\ItLeasingCreate;
 use App\Livewire\Admin\Permissions\PermissionEdit;
 use App\Livewire\Pages\FixedAsset\FixedAssetIndex;
@@ -29,7 +32,6 @@ use App\Livewire\Admin\Permissions\PermissionIndex;
 use App\Livewire\Pages\FixedAsset\FixedAssetCreate;
 use App\Livewire\Admin\ActivityLog\ActivityLogIndex;
 use App\Livewire\Admin\Permissions\PermissionCreate;
-use App\Livewire\Pages\FixedAsset\FixedAssetShow;
 
 Route::get('/', function () {
     return Auth::check()
@@ -79,6 +81,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/create', FixedAssetCreate::class)->name('create');
         Route::get('/{asset}', FixedAssetShow::class)->name('show');
         Route::get('/{asset}/edit', FixedAssetEdit::class)->name('edit');
+    });
+
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/inventory-list', InventoryList::class)->name('inventory-list');
+        Route::get('/inventory-ledger', InventoryLedger::class)->name('inventory-ledger');
     });
 
     Route::prefix('admin')->name('admin.')->group(function () {

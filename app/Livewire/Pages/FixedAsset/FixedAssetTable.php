@@ -15,6 +15,7 @@ class FixedAssetTable extends DataTableComponent
 {
     public string $tableName = 'fixed-asset-table';
     protected $model = FixedAsset::class;
+    public bool $readyToLoad = false;
 
     protected $listeners = [
         'confirmDeleteFixedAsset' => 'deleteItem',
@@ -41,6 +42,10 @@ class FixedAssetTable extends DataTableComponent
 
     public function builder(): Builder
     {
+        if (! $this->readyToLoad) {
+            return FixedAsset::query()->whereRaw('0 = 1');
+        }
+
         return FixedAsset::query()->select([
             'id',
             'asset_tag',
