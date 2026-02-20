@@ -77,6 +77,14 @@ select:focus[data-flux-control] {
   }
 }
 
+/* Inventory reorder highlight row */
+.tr-reorder-highlight {
+    background-color: rgba(251, 191, 36, 0.18); /* amber-ish */
+}
+.dark .tr-reorder-highlight {
+    background-color: rgba(120, 53, 15, 0.30); /* darker amber for dark mode */
+}
+
 
 
 /* \[:where(&)\]:size-4 {

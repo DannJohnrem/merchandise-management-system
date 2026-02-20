@@ -14,8 +14,16 @@ class InventoryListTable extends DataTableComponent
         $this->setPrimaryKey('row_id');
         $this->setPerPage(25);
         $this->setPerPageAccepted([10, 25, 50, 100]);
+
+        // ✅ highlight based on for_reorder
+        $this->setTrAttributes(function ($row) {
+            return ((int) $row->for_reorder === 1)
+                ? ['class' => 'tr-reorder-highlight']
+                : [];
+        });
     }
 
+    // ✅ remove Builder return type
     public function builder(): Builder
     {
         return InventoryReportRow::queryUnion();
@@ -24,24 +32,30 @@ class InventoryListTable extends DataTableComponent
     public function columns(): array
     {
         return [
+            Column::make('For reorder', 'for_reorder')
+                ->format(fn($v) => (int)$v === 1 ? '<span title="For reorder">🚩</span>' : '')
+                ->html(),
             Column::make('Source', 'source')->sortable()->searchable(),
-            Column::make('Asset Tag', 'asset_tag')->sortable()->searchable(),
             Column::make('Category', 'category')->sortable()->searchable(),
-            Column::make('Item Name', 'item_name')->sortable()->searchable(),
-            Column::make('Serial', 'serial_number')->sortable()->searchable(),
+            Column::make('Name', 'name')->sortable()->searchable(),
             Column::make('Brand', 'brand')->sortable()->searchable(),
             Column::make('Model', 'model')->sortable()->searchable(),
 
-            Column::make('Cost', 'purchase_cost')
+            Column::make('Unit Price', 'unit_price')
                 ->sortable()
-                ->format(fn ($value) => is_null($value) ? '' : number_format((float) $value, 2)),
+                ->format(fn($v) => number_format((float)$v, 2)),
 
-            Column::make('Assigned Employee', 'assigned_employee')->sortable()->searchable(),
-            Column::make('Location', 'location')->sortable()->searchable(),
-            Column::make('Status', 'status')->sortable()->searchable(),
-            Column::make('Condition', 'item_condition')->sortable()->searchable(),
-            Column::make('Purchase Date', 'purchase_date')->sortable(),
-            Column::make('Warranty Exp.', 'warranty_expiration')->sortable(),
+            Column::make('Quantity in stock', 'quantity_in_stock')->sortable(),
+
+            Column::make('Inventory value', 'inventory_value')
+                ->sortable()
+                ->format(fn($v) => number_format((float)$v, 2)),
+
+            Column::make('Reorder level', 'reorder_level')->sortable(),
+            Column::make('Reorder time (days)', 'reorder_time_days')->sortable(),
+
+            Column::make('Discontinued?', 'discontinued')
+                ->format(fn($v) => (int)$v === 1 ? 'Yes' : 'No'),
         ];
     }
 }
