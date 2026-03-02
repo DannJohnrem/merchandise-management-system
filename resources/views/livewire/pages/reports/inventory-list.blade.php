@@ -12,5 +12,6 @@
 
     <div class="relative w-full border rounded-lg p-4 bg-white dark:bg-zinc-800 shadow-sm">
         <livewire:tables.inventory-list-table />
+        <livewire:modals.reorder-setting-modal :key="'reorder-setting-modal'" />
     </div>
 </div>

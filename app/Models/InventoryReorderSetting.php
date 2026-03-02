@@ -28,14 +28,4 @@ class InventoryReorderSetting extends Model
 
     public const SOURCE_FIXED_ASSET = 'fixed_asset';
     public const SOURCE_IT_LEASING  = 'it_leasing';
-
-    public static function makeItemKey(?string $category, ?string $name, ?string $brand, ?string $model): string
-    {
-        return strtolower(implode('|', [
-            trim((string) $category),
-            trim((string) $name),
-            trim((string) $brand),
-            trim((string) $model),
-        ]));
-    }
 }

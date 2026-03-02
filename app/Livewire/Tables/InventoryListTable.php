@@ -9,13 +9,14 @@ use Rappasoft\LaravelLivewireTables\Views\Column;
 
 class InventoryListTable extends DataTableComponent
 {
+    protected $listeners = ['refreshInventoryTable' => '$refresh'];
+
     public function configure(): void
     {
         $this->setPrimaryKey('row_id');
         $this->setPerPage(25);
         $this->setPerPageAccepted([10, 25, 50, 100]);
 
-        // ✅ highlight based on for_reorder
         $this->setTrAttributes(function ($row) {
             return ((int) $row->for_reorder === 1)
                 ? ['class' => 'tr-reorder-highlight']
@@ -23,7 +24,6 @@ class InventoryListTable extends DataTableComponent
         });
     }
 
-    // ✅ remove Builder return type
     public function builder(): Builder
     {
         return InventoryReportRow::queryUnion();
@@ -33,9 +33,11 @@ class InventoryListTable extends DataTableComponent
     {
         return [
             Column::make('For reorder', 'for_reorder')
-                ->format(fn($v) => (int)$v === 1 ? '<span title="For reorder">🚩</span>' : '')
+                ->format(fn ($v) => (int) $v === 1 ? '<span title="For reorder">🚩</span>' : '')
                 ->html(),
+
             Column::make('Source', 'source')->sortable()->searchable(),
+            Column::make('DEBUG KEY', 'item_key'),
             Column::make('Category', 'category')->sortable()->searchable(),
             Column::make('Name', 'name')->sortable()->searchable(),
             Column::make('Brand', 'brand')->sortable()->searchable(),
@@ -43,19 +45,22 @@ class InventoryListTable extends DataTableComponent
 
             Column::make('Unit Price', 'unit_price')
                 ->sortable()
-                ->format(fn($v) => number_format((float)$v, 2)),
+                ->format(fn ($v) => number_format((float) $v, 2)),
 
             Column::make('Quantity in stock', 'quantity_in_stock')->sortable(),
 
             Column::make('Inventory value', 'inventory_value')
                 ->sortable()
-                ->format(fn($v) => number_format((float)$v, 2)),
+                ->format(fn ($v) => number_format((float) $v, 2)),
 
             Column::make('Reorder level', 'reorder_level')->sortable(),
             Column::make('Reorder time (days)', 'reorder_time_days')->sortable(),
 
             Column::make('Discontinued?', 'discontinued')
-                ->format(fn($v) => (int)$v === 1 ? 'Yes' : 'No'),
+                ->format(fn ($v) => (int) $v === 1 ? 'Yes' : 'No'),
+
+            Column::make('Actions')
+                ->label(fn ($row) => view('livewire.tables.inventory-list-table-actions', ['row' => $row])),
         ];
     }
 }
