@@ -22,7 +22,8 @@ class ItLeasingTable extends DataTableComponent
     ];
 
     public array $bulkActions = [
-        'deleteSelected' => '🗑️ Delete Selected',
+        'deleteSelected' => 'Delete Selected',
+        'generateDeliveryReceipt' => 'Generate DR',
     ];
 
     public function configure(): void
@@ -222,6 +223,21 @@ class ItLeasingTable extends DataTableComponent
             logger()->error('Error bulk deleting items', ['error' => $e->getMessage()]);
             $this->dispatch('toast', message: 'Error occurred during bulk delete.', type: 'error');
         }
+    }
+
+    public function generateDeliveryReceipt(): void
+    {
+        $selected = $this->getSelected();
+
+        if (empty($selected)) {
+            $this->dispatch('toast', message: 'No items selected.', type: 'warning');
+            return;
+        }
+
+        $ids = implode(',', $selected);
+        $url = route('it-leasing.delivery-receipt', ['ids' => $ids]);
+
+        $this->dispatch('open-delivery-receipt', url: $url);
     }
 
     /**

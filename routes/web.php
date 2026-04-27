@@ -1,37 +1,38 @@
 <?php
 
-use Laravel\Fortify\Features;
-use App\Livewire\Settings\Profile;
-use App\Livewire\Settings\Password;
-use App\Livewire\Settings\TwoFactor;
-use Illuminate\Support\Facades\Auth;
-use App\Livewire\Settings\Appearance;
-use Illuminate\Support\Facades\Route;
-use App\Livewire\Admin\Roles\RoleEdit;
-use App\Livewire\Admin\Users\UserEdit;
-use App\Livewire\Admin\Class\ClassEdit;
-use App\Livewire\Admin\Roles\RoleIndex;
-use App\Livewire\Admin\Users\UserIndex;
-use App\Livewire\Admin\Class\ClassIndex;
-use App\Livewire\Admin\Roles\RoleCreate;
-use App\Livewire\Admin\Users\UserCreate;
-use App\Livewire\Admin\Class\ClassCreate;
-use App\Livewire\Pages\Reports\InventoryList;
+use App\Http\Controllers\DeliveryReceiptController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\ItLeasingQrController;
-use App\Livewire\Pages\ItLeasing\ItLeasingEdit;
-use App\Livewire\Pages\ItLeasing\ItLeasingShow;
-use App\Livewire\Pages\Reports\InventoryLedger;
-use App\Livewire\Pages\ItLeasing\ItLeasingIndex;
+use App\Livewire\Admin\ActivityLog\ActivityLogIndex;
+use App\Livewire\Admin\Class\ClassCreate;
+use App\Livewire\Admin\Class\ClassEdit;
+use App\Livewire\Admin\Class\ClassIndex;
+use App\Livewire\Admin\Permissions\PermissionCreate;
+use App\Livewire\Admin\Permissions\PermissionEdit;
+use App\Livewire\Admin\Permissions\PermissionIndex;
+use App\Livewire\Admin\Roles\RoleCreate;
+use App\Livewire\Admin\Roles\RoleEdit;
+use App\Livewire\Admin\Roles\RoleIndex;
+use App\Livewire\Admin\Users\UserCreate;
+use App\Livewire\Admin\Users\UserEdit;
+use App\Livewire\Admin\Users\UserIndex;
+use App\Livewire\Pages\FixedAsset\FixedAssetCreate;
 use App\Livewire\Pages\FixedAsset\FixedAssetEdit;
+use App\Livewire\Pages\FixedAsset\FixedAssetIndex;
 use App\Livewire\Pages\FixedAsset\FixedAssetShow;
 use App\Livewire\Pages\ItLeasing\ItLeasingCreate;
-use App\Livewire\Admin\Permissions\PermissionEdit;
-use App\Livewire\Pages\FixedAsset\FixedAssetIndex;
-use App\Livewire\Admin\Permissions\PermissionIndex;
-use App\Livewire\Pages\FixedAsset\FixedAssetCreate;
-use App\Livewire\Admin\ActivityLog\ActivityLogIndex;
-use App\Livewire\Admin\Permissions\PermissionCreate;
+use App\Livewire\Pages\ItLeasing\ItLeasingEdit;
+use App\Livewire\Pages\ItLeasing\ItLeasingIndex;
+use App\Livewire\Pages\ItLeasing\ItLeasingShow;
+use App\Livewire\Pages\Reports\InventoryLedger;
+use App\Livewire\Pages\Reports\InventoryList;
+use App\Livewire\Settings\Appearance;
+use App\Livewire\Settings\Password;
+use App\Livewire\Settings\Profile;
+use App\Livewire\Settings\TwoFactor;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use Laravel\Fortify\Features;
 
 Route::get('/', function () {
     return Auth::check()
@@ -72,6 +73,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('it-leasing')->name('it-leasing.')->group(function () {
         Route::get('/', ItLeasingIndex::class)->name('index');
         Route::get('/create', ItLeasingCreate::class)->name('create');
+        Route::get('/delivery-receipt', [DeliveryReceiptController::class, 'generate'])->name('delivery-receipt');
         Route::get('/{itLeasing}', ItLeasingShow::class)->name('show');
         Route::get('/{item}/edit', ItLeasingEdit::class)->name('edit');
     });

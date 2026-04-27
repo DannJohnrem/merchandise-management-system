@@ -141,4 +141,8 @@
     };
 
     document.addEventListener('confirm-delete-it-leasing', window.__confirmDeleteItLeasingHandler);
+
+    document.addEventListener('open-delivery-receipt', function (event) {
+        window.open(event.detail.url, '_blank');
+    });
 </script>
