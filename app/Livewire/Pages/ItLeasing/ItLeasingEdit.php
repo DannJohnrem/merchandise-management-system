@@ -60,7 +60,7 @@ class ItLeasingEdit extends Component
         $this->remarks = $item->remarks;
 
         // ✅ Decode inclusions JSON -> array (safe fallback)
-        $this->inclusions = $item->inclusions ? json_decode($item->inclusions, true) : [];
+        $this->inclusions = is_array($item->inclusions) ? $item->inclusions : [];
         if (!is_array($this->inclusions)) {
             $this->inclusions = [];
         }

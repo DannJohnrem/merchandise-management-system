@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DeliveryReceipt;
 use App\Models\ItLeasing;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DeliveryReceiptController extends Controller
 {
@@ -20,8 +22,25 @@ class DeliveryReceiptController extends Controller
 
         abort_if($items->isEmpty(), 404, 'No items found.');
 
-        // DR number: date-based muna
-        $drNumber = 'DR' . now()->format('Ymd') . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT);
+        // ✅ Generate DR number + save — both inside transaction
+        $drNumber = DB::transaction(function () use ($ids, $items) {
+            $lastDr = DeliveryReceipt::whereYear('created_at', now()->year)
+                ->lockForUpdate()
+                ->max('dr_number');
+
+            $lastSeq = $lastDr ? (int) substr($lastDr, -4) : 0;
+            $drNumber = 'DR' . now()->format('y') . str_pad($lastSeq + 1, 4, '0', STR_PAD_LEFT);
+
+            DeliveryReceipt::create([
+                'dr_number'         => $drNumber,
+                'it_leasing_ids'    => $ids,
+                'assigned_company'  => $items->first()->assigned_company,
+                'assigned_employee' => $items->first()->assigned_employee,
+                'generated_by'      => auth()->user()->name ?? 'system',
+            ]);
+
+            return $drNumber;
+        });
 
         // Build inclusions map
         $inclusionsMap = $items->mapWithKeys(function ($item) {

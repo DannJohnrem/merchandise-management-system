@@ -57,8 +57,8 @@
             vertical-align: top;
         }
         .shipped-header {
-            background-color: #00bcd4;
-            color: #fff;
+            background-color: #33CCCC;
+            color: #000;
             font-weight: bold;
             font-size: 10px;
             padding: 5px 8px;
@@ -92,8 +92,8 @@
             margin-bottom: 14px;
         }
         .items-table th {
-            background-color: #00bcd4;
-            color: #fff;
+            background-color: #33CCCC;
+            color: #000;
             font-weight: bold;
             padding: 6px 8px;
             font-size: 10px;
@@ -105,7 +105,7 @@
             font-size: 10px;
         }
         .items-table td.center { text-align: center; }
-        .items-table tr:nth-child(even) td { background-color: #e0f7fa; }
+        .items-table tr:nth-child(even) td { background-color: #d9d9d9; }
         .items-table tr:nth-child(odd) td  { background-color: #ffffff; }
 
         /* ── Totals ── */

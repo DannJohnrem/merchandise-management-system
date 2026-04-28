@@ -62,7 +62,7 @@ class FixedAssetEdit extends Component
         $this->remarks = $asset->remarks;
 
         // Decode inclusions from JSON, fallback to empty array
-        $this->inclusions = $asset->inclusions ? json_decode($asset->inclusions, true) : [];
+        $this->inclusions = is_array($asset->inclusions) ? $asset->inclusions : [];
 
         // Load available classes
         $this->classes =  Cache::remember('fixed_asset_classes', 3600, function () {
