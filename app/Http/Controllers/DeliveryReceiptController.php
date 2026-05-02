@@ -44,11 +44,21 @@ class DeliveryReceiptController extends Controller
 
         // Build inclusions map
         $inclusionsMap = $items->mapWithKeys(function ($item) {
-            $inc = collect((array) ($item->inclusions ?? []));
+            $raw = $item->inclusions;
+
+            // Safe decode kung hindi pa array
+            if (is_string($raw)) {
+                $raw = json_decode($raw, true) ?? [];
+            }
+
+            // Lowercase lahat para sa flexible matching
+            $inc = collect((array) $raw)
+                ->map(fn($v) => strtolower(trim((string) $v)));
+
             return [$item->id => [
-                'has_charger' => $inc->contains('charger'),
-                'has_bag'     => $inc->contains('bag'),
-                'has_mouse'   => $inc->contains('mouse'),
+                'has_charger' => $inc->contains(fn($v) => str_contains($v, 'charger')),
+                'has_bag'     => $inc->contains(fn($v) => str_contains($v, 'bag')),
+                'has_mouse'   => $inc->contains(fn($v) => str_contains($v, 'mouse')),
             ]];
         });
 

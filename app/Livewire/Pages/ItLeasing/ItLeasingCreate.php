@@ -66,56 +66,92 @@ class ItLeasingCreate extends Component
     }
 
     /**
-     * 🔥 AUTO-FILL RENTAL RATE BASED ON BRAND
+     * AUTO-FILL RENTAL RATE BASED ON BRAND
      */
     public function updated($name, $value)
     {
-        // Detect only brand updates
         if (!str_ends_with($name, '.brand')) return;
 
         $index = explode('.', $name)[1];
         $brand = strtoupper(trim($this->items[$index]['brand'] ?? ''));
 
-        // Do NOT override manual input
         if (!empty($this->items[$index]['rental_rate_per_month'])) return;
 
         match ($brand) {
-            'HP' => $this->items[$index]['rental_rate_per_month'] = 3000.00,
+            'HP'     => $this->items[$index]['rental_rate_per_month'] = 3000.00,
             'LENOVO' => $this->items[$index]['rental_rate_per_month'] = 3500.00,
-            default => null,
+            default  => null,
         };
     }
 
     public function save()
     {
         try {
+            // Step 1: Basic validation (WITHOUT unique rules)
             $this->validate([
-                'items' => 'required|array|min:1',
-                'items.*.category' => 'required|string|max:255',
-                'items.*.item_name' => 'required|string|max:255',
-                'items.*.serial_number' => 'required|string|unique:it_leasings,serial_number',
-                'items.*.charger_serial_number' => 'nullable|string|max:255|unique:it_leasings,charger_serial_number',
-                'items.*.brand' => 'nullable|string|max:255',
-                'items.*.model' => 'nullable|string|max:255',
-                'items.*.purchase_cost' => 'nullable|numeric',
-                'items.*.rental_rate_per_month' => 'nullable|numeric',
-                'items.*.supplier' => 'nullable|string|max:255',
-                'items.*.purchase_order_no' => 'nullable|string|max:255',
-                'items.*.purchase_date' => 'nullable|date',
-                'items.*.warranty_expiration' => 'nullable|date',
-                'items.*.assigned_company' => 'required|string|max:255',
-                'items.*.assigned_employee' => 'nullable|string|max:255',
-                'items.*.location' => 'nullable|string|max:255',
-                'items.*.status' => 'required|in:available,deployed,in_repair,returned,lost',
-                'items.*.condition' => 'nullable|in:new,good,fair,poor',
-                'items.*.remarks' => 'nullable|string',
-                'items.*.inclusions' => 'nullable|array',
-                'items.*.inclusions.*' => 'nullable|string|max:255',
+                'items'                          => 'required|array|min:1',
+                'items.*.category'               => 'required|string|max:255',
+                'items.*.item_name'              => 'required|string|max:255',
+                'items.*.serial_number'          => 'required|string|max:255',
+                'items.*.charger_serial_number'  => 'nullable|string|max:255',
+                'items.*.brand'                  => 'nullable|string|max:255',
+                'items.*.model'                  => 'nullable|string|max:255',
+                'items.*.purchase_cost'          => 'nullable|numeric',
+                'items.*.rental_rate_per_month'  => 'nullable|numeric',
+                'items.*.supplier'               => 'nullable|string|max:255',
+                'items.*.purchase_order_no'      => 'nullable|string|max:255',
+                'items.*.purchase_date'          => 'nullable|date',
+                'items.*.warranty_expiration'    => 'nullable|date',
+                'items.*.assigned_company'       => 'required|string|max:255',
+                'items.*.assigned_employee'      => 'nullable|string|max:255',
+                'items.*.location'               => 'nullable|string|max:255',
+                'items.*.status'                 => 'required|in:available,deployed,in_repair,returned,lost',
+                'items.*.condition'              => 'nullable|in:new,good,fair,poor',
+                'items.*.remarks'                => 'nullable|string',
+                'items.*.inclusions'             => 'nullable|array',
+                'items.*.inclusions.*'           => 'nullable|string|max:255',
             ]);
 
+            // Step 2: Collect serial numbers and charger serial numbers
+            $serialNumbers  = collect($this->items)->pluck('serial_number');
+            $chargerSerials = collect($this->items)
+                ->pluck('charger_serial_number')
+                ->filter()
+                ->values();
+
+            // Step 3: Check for duplicates within the batch
+            if ($serialNumbers->unique()->count() !== $serialNumbers->count()) {
+                $this->dispatch('toast', message: 'Duplicate serial numbers found within the batch.', type: 'error');
+                return;
+            }
+
+            if ($chargerSerials->unique()->count() !== $chargerSerials->count()) {
+                $this->dispatch('toast', message: 'Duplicate charger serial numbers found within the batch.', type: 'error');
+                return;
+            }
+
+            // Step 4: Check for duplicates against the database
+            $existingSerials = ItLeasing::whereIn('serial_number', $serialNumbers)
+                ->pluck('serial_number');
+
+            if ($existingSerials->isNotEmpty()) {
+                $this->dispatch('toast', message: 'Serial number(s) already exist in the database: ' . $existingSerials->join(', '), type: 'error');
+                return;
+            }
+
+            if ($chargerSerials->isNotEmpty()) {
+                $existingChargers = ItLeasing::whereIn('charger_serial_number', $chargerSerials)
+                    ->pluck('charger_serial_number');
+
+                if ($existingChargers->isNotEmpty()) {
+                    $this->dispatch('toast', message: 'Charger serial number(s) already exist in the database: ' . $existingChargers->join(', '), type: 'error');
+                    return;
+                }
+            }
+
+            // Step 5: Save all items
             foreach ($this->items as $item) {
-                // consistent storage (if inclusions column is JSON/text)
-                $item['inclusions'] = json_encode($item['inclusions'] ?? []);
+                $item['inclusions'] = $item['inclusions'] ?? [];
                 ItLeasing::create($item);
             }
 
@@ -124,7 +160,7 @@ class ItLeasingCreate extends Component
 
             session()->flash('toast', [
                 'message' => 'IT Leasing items created successfully!',
-                'type' => 'success',
+                'type'    => 'success',
             ]);
 
             $this->redirect(route('it-leasing.index'), navigate: true);

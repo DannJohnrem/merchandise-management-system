@@ -132,7 +132,7 @@ class ItLeasingEdit extends Component
             ]);
 
             // ✅ Store inclusions as JSON (same approach as FixedAssetEdit)
-            $validated['inclusions'] = json_encode($this->inclusions ?? []);
+            $validated['inclusions'] = $this->inclusions ?? [];
 
             $this->item->update($validated);
 
