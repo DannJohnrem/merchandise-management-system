@@ -84,6 +84,15 @@ class ItLeasingCreate extends Component
         };
     }
 
+    public function copyItem($index)
+    {
+        $itemToCopy = $this->items[$index];
+        $newItem = $itemToCopy;
+        $newItem['serial_number'] = null;
+        $newItem['charger_serial_number'] = null;
+        $this->items[] = $newItem;
+    }
+
     public function save()
     {
         try {

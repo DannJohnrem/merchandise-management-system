@@ -23,12 +23,19 @@
                             Item {{ $index + 1 }}
                         </h3>
 
-                        @if (count($items) > 1)
-                            <flux:button type="button" variant="danger" size="sm"
-                                wire:click="removeItem({{ $index }})">
-                                Remove
+                        <div class="flex gap-2">
+                            <flux:button type="button" variant="outline" size="sm"
+                                wire:click="copyItem({{ $index }})">
+                                Copy
                             </flux:button>
-                        @endif
+
+                            @if (count($items) > 1)
+                                <flux:button type="button" variant="danger" size="sm"
+                                    wire:click="removeItem({{ $index }})">
+                                    Remove
+                                </flux:button>
+                            @endif
+                        </div>
                     </div>
 
                     {{-- Fields --}}

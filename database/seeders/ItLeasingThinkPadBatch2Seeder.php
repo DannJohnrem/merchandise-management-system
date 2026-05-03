@@ -6,25 +6,21 @@ use Illuminate\Database\Seeder;
 use App\Models\ItLeasing;
 use Carbon\Carbon;
 
-class ItLeasingThinkPadSeeder extends Seeder
+class ItLeasingThinkPadBatch2Seeder extends Seeder
 {
     public function run(): void
     {
         $now = Carbon::now();
 
-        // ── 10 ThinkPad E14 Gen 4 ──
+        // ── 7 ThinkPad E14 Gen 4 (Batch 2) ──
         $e14Laptops = [
-            'PF66L81B', 'PF66M697', 'PF66M65W', 'PF66M647',
-            'PF66LBHW', 'PF66M67S', 'PF66M68B', 'PF676J0N',
-            'PF676RFG', 'PF676WSN',
+            'PF676J18', 'PF676WS3', 'PF676HKS',
+            'PF676HJT', 'PF6766TV', 'PF6766SZ', 'PF6766VH',
         ];
 
         $e14Chargers = [
-            '8SGX21J75549A1WH61N4317', '8SGX21J75549A1WH61N4857',
-            '8SGX21J75549A1WH61N4732', '8SGX21J75549A1WH61N4732',
-            '8SGX21J75549A1WH61N4322', '8SGX21J75549A1WH61N5055',
-            '8SGX21J75549A1WH61N4763', '8SGX21J75547L1CZ61K1ML6',
-            '8SGX21J75547L1CZ61K1ML2', '8SGX21J75547L1CZ5941JE5',
+            '8SGX21J75547L1CZ61K1ML3', '8SGX21J75547L1CZ5941JDE', '8SGX21J75547L1CZ61K18S7',
+            '8SGX21J75547L1CZ61K1MM4', '8SGX21J75547L1CZ61K1E27', '8SGX21J75547L1CZ61K1ML5', '8SGX21J75547L1CZ61K1JBS',
         ];
 
         foreach ($e14Laptops as $i => $sn) {
@@ -53,17 +49,15 @@ class ItLeasingThinkPadSeeder extends Seeder
             ]);
         }
 
-        // ── 7 ThinkPad E16 Gen 3 ──
+        // ── 8 ThinkPad E16 Gen 3 (Batch 2) ──
         $e16Laptops = [
-            'PF683JJX', 'PF683CQS', 'PF67B8RD', 'PF67BB1C',
-            'PF6835JE', 'PF683S81', 'PF67B45L',
+            'PF68446N', 'PF683JKT', 'PF6835DY', 'PF683YJR',
+            'PF67BL0A', 'PF6835G3', 'PF67BD6D', 'PF67BFFT',
         ];
 
         $e16Chargers = [
-            '8SGX21J75547L1CZ63G2M6G', '8SGX21J75547L1CZ63G2M05',
-            '8SGX21J75588AEWH5CCH0Z3', '8SGX21J75588AEWH5CCKEN9',
-            '8SGX21J75547L1CZ63G2M5R', '8SGX21J75547L1CZ63G2M6L',
-            '8SGX21J75588AEWH5CCKEMH',
+            '8SGX21J75547L1CZ63G2M5T', '8SGX21J75547L1CZ63G2M6K', '8SGX21J75547L1CZ63G094R', '8SGX21J75547L1CZ63G2M65',
+            '8SGX21J75588AEWH5CCKEN6', '8SGX21J75547L1CZ63G09SV', '8SGX21J75588AEWH5CCKENE', '8SGX21J75588AEWH5CCH0ZB',
         ];
 
         foreach ($e16Laptops as $i => $sn) {
@@ -92,6 +86,6 @@ class ItLeasingThinkPadSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('✅ Seeded 17 ThinkPad units (10 E14 + 7 E16) successfully.');
+        $this->command->info('✅ Seeded 15 ThinkPad units Batch 2 (7 E14 + 8 E16) successfully.');
     }
 }

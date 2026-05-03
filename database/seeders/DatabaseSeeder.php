@@ -26,6 +26,8 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             FiftyLaptopWithChargerSeeder::class,
             FixedAssetSeeder::class,
+            ItLeasingThinkPadSeeder::class,
+            ItLeasingThinkPadBatch2Seeder::class,
         ]);
     }
 }

@@ -22,7 +22,6 @@ class DeliveryReceiptController extends Controller
 
         abort_if($items->isEmpty(), 404, 'No items found.');
 
-        // ✅ Generate DR number + save — both inside transaction
         $drNumber = DB::transaction(function () use ($ids, $items) {
             $lastDr = DeliveryReceipt::whereYear('created_at', now()->year)
                 ->lockForUpdate()
@@ -44,19 +43,13 @@ class DeliveryReceiptController extends Controller
 
         // Build inclusions map
         $inclusionsMap = $items->mapWithKeys(function ($item) {
-            $raw = $item->inclusions;
+            $raw = $item->inclusions ?? [];
 
-            // Safe decode kung hindi pa array
-            if (is_string($raw)) {
-                $raw = json_decode($raw, true) ?? [];
-            }
-
-            // Lowercase lahat para sa flexible matching
             $inc = collect((array) $raw)
                 ->map(fn($v) => strtolower(trim((string) $v)));
 
             return [$item->id => [
-                'has_charger' => $inc->contains(fn($v) => str_contains($v, 'charger')),
+                'has_charger' => !empty($item->charger_serial_number),
                 'has_bag'     => $inc->contains(fn($v) => str_contains($v, 'bag')),
                 'has_mouse'   => $inc->contains(fn($v) => str_contains($v, 'mouse')),
             ]];
