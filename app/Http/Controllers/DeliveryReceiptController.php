@@ -16,7 +16,7 @@ class DeliveryReceiptController extends Controller
         abort_if(empty($ids), 400, 'No items selected.');
 
         $items = ItLeasing::whereIn('id', $ids)
-            ->select(['id', 'brand', 'model', 'serial_number', 'charger_serial_number', 'inclusions'])
+            ->select(['id', 'brand', 'model', 'serial_number', 'charger_serial_number', 'inclusions', 'category'])
             ->get();
 
         abort_if($items->isEmpty(), 404, 'No items found.');
@@ -46,13 +46,15 @@ class DeliveryReceiptController extends Controller
         });
 
         $inclusionsMap = $items->mapWithKeys(function ($item) {
+            $category = strtolower(trim($item->category ?? 'laptop'));
             $inc = collect((array) ($item->inclusions ?? []))
                 ->map(fn($v) => strtolower(trim((string) $v)));
 
             return [$item->id => [
-                'has_charger' => !empty($item->charger_serial_number),
-                'has_bag'     => $inc->contains(fn($v) => str_contains($v, 'bag')),
-                'has_mouse'   => $inc->contains(fn($v) => str_contains($v, 'mouse')),
+                'category'    => $category,
+                'has_charger' => $category === 'laptop' && !empty($item->charger_serial_number),
+                'has_bag'     => $category === 'laptop' && $inc->contains(fn($v) => str_contains($v, 'bag')),
+                'has_mouse'   => $category === 'laptop' && $inc->contains(fn($v) => str_contains($v, 'mouse')),
             ]];
         });
 
