@@ -234,10 +234,8 @@ class ItLeasingTable extends DataTableComponent
             return;
         }
 
-        $ids = implode(',', $selected);
-        $url = route('it-leasing.delivery-receipt', ['ids' => $ids]);
-
-        $this->dispatch('open-delivery-receipt', url: $url);
+        // Fire modal instead of going straight to controller
+        $this->dispatch('openDrModal', ids: array_values($selected));
     }
 
     /**

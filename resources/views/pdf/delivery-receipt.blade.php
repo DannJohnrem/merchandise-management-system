@@ -193,26 +193,18 @@
         <div class="shipped-col" style="padding-right: 6px;">
             <div class="shipped-header">
                 <span class="shipped-header-label">SHIPPED TO:</span>
-                <span class="shipped-header-value">BTSMC MANAGING SOLUTIONS, INC</span>
+                <span class="shipped-header-value">{{ strtoupper($shippedToCompany) }}</span>
             </div>
-            <div class="shipped-body">
-                Unit 330-3 &amp; 311-4 Spark Place Building<br>
-                P.Tuazon cor 10th Ave Brgy Socorro<br>
-                Cubao, QC
-            </div>
+            <div class="shipped-body">{{ $shippedToAddress }}</div>
         </div>
 
         {{-- BILLED TO --}}
         <div class="shipped-col" style="padding-left: 6px;">
             <div class="shipped-header">
                 <span class="shipped-header-label">BILLED TO:</span>
-                <span class="shipped-header-value">BTSMC MANAGING SOLUTIONS, INC</span>
+                <span class="shipped-header-value">{{ strtoupper($billedToCompany) }}</span>
             </div>
-            <div class="shipped-body">
-                Unit 330-3 &amp; 311-4 Spark Place Building<br>
-                P.Tuazon cor 10th Ave Brgy Socorro<br>
-                Cubao, QC
-            </div>
+            <div class="shipped-body">{{ $billedToAddress }}</div>
         </div>
     </div>
 
@@ -300,12 +292,12 @@
         <div class="sig-col">
             <div class="sig-label">RELEASED BY:</div>
             <div class="sig-line"></div>
-            <div class="sig-name">ACJ SUMMIT VENTURES CORP / DATE</div>
+            <div class="sig-name">{{ strtoupper($releasedBy) }} / DATE</div>
         </div>
         <div class="sig-col">
             <div class="sig-label">RECEIVED BY:</div>
             <div class="sig-line"></div>
-            <div class="sig-name">BTSMC MANAGING SOLUTIONS, INC / DATE</div>
+            <div class="sig-name">{{ strtoupper($receivedBy) }} / DATE</div>
         </div>
     </div>
 

@@ -127,6 +127,9 @@
 
     {{-- QR Code Modal --}}
     {{-- <livewire:pages.it-leasing.it-leasing-qr-modal /> --}}
+
+    {{-- DR Modal --}}
+    <livewire:pages.it-leasing.generate-dr-modal />
 </div>
 
 {{-- Delete Confirmation Listener --}}
