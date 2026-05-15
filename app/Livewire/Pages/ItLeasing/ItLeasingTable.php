@@ -18,7 +18,7 @@ class ItLeasingTable extends DataTableComponent
     protected $model = ItLeasing::class;
 
     protected $listeners = [
-        'confirmDeleteItem' => 'deleteItem',
+        'confirmDeleteItLeasing' => 'deleteItem',
     ];
 
     public array $bulkActions = [
@@ -150,6 +150,21 @@ class ItLeasingTable extends DataTableComponent
                     })
                 )
                 ->filter(fn ($query, $value) => $value ? $query->where('serial_number', $value) : null),
+
+            SelectFilter::make('Model')
+                ->options(
+                    Cache::remember('it_leasing_models', 600, function () {
+                        return ItLeasing::query()
+                            ->select('model')
+                            ->whereNotNull('model')
+                            ->distinct()
+                            ->orderBy('model')
+                            ->pluck('model', 'model')
+                            ->prepend('All', '')
+                            ->toArray();
+                    })
+                )
+                ->filter(fn ($query, $value) => $value ? $query->where('model', $value) : null),
 
             SelectFilter::make('Status')
                 ->options([

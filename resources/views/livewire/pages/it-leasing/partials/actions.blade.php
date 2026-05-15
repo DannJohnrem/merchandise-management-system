@@ -16,22 +16,14 @@
     </a>
 @endcan
 
-{{-- View QR (Flux Modal Trigger + Livewire Event) --}}
-{{-- <flux:modal.trigger name="it-leasing-qr">
-    <flux:button
-        variant="outline"
-        size="sm"
-        icon="qr-code"
-        wire:click="$dispatch('show-qr-modal', { itemId: {{ $item->id }} })"
-    >
-        View QR
-    </flux:button>
-</flux:modal.trigger> --}}
-
 {{-- Delete --}}
 @can('delete it-leasing')
-    <flux:button variant="danger" size="sm" icon="trash"
-        wire:click="$dispatch('confirm-delete-it-leasing', { id: {{ $item->id }} })">
+    <flux:button
+        variant="danger"
+        size="sm"
+        icon="trash"
+        onclick="window.dispatchEvent(new CustomEvent('open-delete-modal', { detail: { id: {{ $item->id }}, name: '{{ addslashes($item->serial_number ?? 'this item') }}' } }))"
+    >
         Delete
     </flux:button>
 @endcan
