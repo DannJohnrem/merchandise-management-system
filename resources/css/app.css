@@ -61,6 +61,32 @@ select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
 
+@layer components {
+  .js-accordion-panel {
+    overflow: hidden;
+    height: 0;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: height 260ms ease, opacity 180ms ease, transform 180ms ease;
+    will-change: height, opacity, transform;
+  }
+
+  .js-accordion-panel.is-open {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Inventory reorder highlight row */
+.tr-reorder-highlight {
+    background-color: rgba(251, 191, 36, 0.18); /* amber-ish */
+}
+.dark .tr-reorder-highlight {
+    background-color: rgba(120, 53, 15, 0.30); /* darker amber for dark mode */
+}
+
+
+
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */

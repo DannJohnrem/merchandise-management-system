@@ -8,6 +8,7 @@ use App\Models\ClassModel;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\QueryException;
 use Throwable;
+use Illuminate\Support\Facades\Cache;
 
 class FixedAssetEdit extends Component
 {
@@ -61,10 +62,12 @@ class FixedAssetEdit extends Component
         $this->remarks = $asset->remarks;
 
         // Decode inclusions from JSON, fallback to empty array
-        $this->inclusions = $asset->inclusions ? json_decode($asset->inclusions, true) : [];
+        $this->inclusions = is_array($asset->inclusions) ? $asset->inclusions : [];
 
         // Load available classes
-        $this->classes = ClassModel::orderBy('name')->get();
+        $this->classes =  Cache::remember('fixed_asset_classes', 3600, function () {
+            return ClassModel::orderBy('name')->get();
+        });
     }
 
     public function addInclusion()
@@ -108,6 +111,8 @@ class FixedAssetEdit extends Component
             $validated['inclusions'] = json_encode($this->inclusions);
 
             $this->asset->update($validated);
+
+            Cache::forget('fixed_asset_categories');
 
             session()->flash('toast', [
                 'message' => 'Fixed asset updated successfully!',

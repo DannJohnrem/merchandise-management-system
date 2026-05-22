@@ -6,6 +6,7 @@ use Livewire\Component;
 
 class UserIndex extends Component
 {
+    public bool $readyToLoad = false;
 
     public function mount()
     {
@@ -14,6 +15,11 @@ class UserIndex extends Component
             $toast = session('toast');
             $this->dispatch('toast', message: $toast['message'], type: $toast['type']);
         }
+    }
+
+    public function load():void
+    {
+        $this->readyToLoad = true;
     }
 
     public function render()

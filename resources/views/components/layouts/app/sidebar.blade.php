@@ -39,6 +39,19 @@
                 </flux:navlist.item>
             </flux:navlist.group>
 
+            {{-- Reports --}}
+            <flux:navlist.group expandable heading="Reports" class="grid">
+                <flux:navlist.item icon="document-text" :href="route('reports.inventory-list')"
+                    :current="request()->routeIs('reports.inventory-list')" wire:navigate>
+                    Inventory List
+                </flux:navlist.item>
+
+                <flux:navlist.item icon="clipboard-document-list" :href="route('reports.inventory-ledger')"
+                    :current="request()->routeIs('reports.inventory-ledger')" wire:navigate>
+                    Inventory Ledger
+                </flux:navlist.item>
+            </flux:navlist.group>
+
             {{-- Administration --}}
             <flux:navlist.group expandable heading="Administration" class="grid">
 
@@ -199,6 +212,66 @@
                 if (container) document.body.appendChild(container);
             });
         }
+
+        function initFluxAccordions() {
+            document.querySelectorAll('.js-accordion').forEach((host) => {
+                if (host.__accInit) return;
+                host.__accInit = true;
+
+                // Flux commonly renders details/summary for expandable groups
+                const details = host.closest('details') || host.querySelector('details') || host;
+                const summary = details.querySelector('summary');
+                const panel = details.querySelector(':scope > :not(summary)');
+
+                if (!summary || !panel) return;
+
+                panel.classList.add('js-accordion-panel');
+
+                // initial sync (if open)
+                if (details.hasAttribute('open')) {
+                    panel.classList.add('is-open');
+                    panel.style.height = panel.scrollHeight + 'px';
+                }
+
+                summary.addEventListener('click', (e) => {
+                    e.preventDefault();
+
+                    const isOpen = details.hasAttribute('open');
+
+                    if (!isOpen) {
+                        details.setAttribute('open', '');
+                        panel.classList.add('is-open');
+
+                        panel.style.height = '0px';
+                        requestAnimationFrame(() => {
+                            panel.style.height = panel.scrollHeight + 'px';
+                        });
+                    } else {
+                        panel.style.height = panel.scrollHeight + 'px';
+                        panel.classList.remove('is-open');
+
+                        requestAnimationFrame(() => {
+                            panel.style.height = '0px';
+                        });
+
+                        panel.addEventListener('transitionend', function onEnd(ev) {
+                            if (ev.propertyName !== 'height') return;
+                            panel.removeEventListener('transitionend', onEnd);
+                            details.removeAttribute('open');
+                        });
+                    }
+                });
+
+                window.addEventListener('resize', () => {
+                    if (details.hasAttribute('open')) {
+                        panel.style.height = panel.scrollHeight + 'px';
+                    }
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initFluxAccordions);
+        document.addEventListener('livewire:navigate', () => requestAnimationFrame(initFluxAccordions));
     </script>
 </body>
 

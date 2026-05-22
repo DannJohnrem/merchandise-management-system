@@ -56,6 +56,11 @@ class FixedAssetQrModal extends Component
         $this->isLoading = false;
     }
 
+    public function printQr()
+    {
+        $this->dispatch('print-qr');
+    }
+
     public function render()
     {
         return view('livewire.pages.fixed-asset.fixed-asset-qr-modal');

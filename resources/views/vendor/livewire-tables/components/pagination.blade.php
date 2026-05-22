@@ -1,15 +1,15 @@
 @aware(['isTailwind','isBootstrap','isBootstrap4', 'isBootstrap5', 'localisationPath'])
 @props(['currentRows'])
 @includeWhen(
-    $this->hasConfigurableAreaFor('before-pagination'), 
-    $this->getConfigurableAreaFor('before-pagination'), 
+    $this->hasConfigurableAreaFor('before-pagination'),
+    $this->getConfigurableAreaFor('before-pagination'),
     $this->getParametersForConfigurableArea('before-pagination')
 )
 
 <div {{ $this->getPaginationWrapperAttributesBag() }}>
     @if ($this->paginationVisibilityIsEnabled())
         @if ($isTailwind)
-            <div class="mt-4 px-4 md:p-0 sm:flex justify-between items-center space-y-4 sm:space-y-0">
+            <div class="{{ $this->isItLeasingTable ?? false ? 'mt-[70px]' : 'mt-4' }} px-4 md:p-0 sm:flex justify-between items-center space-y-4 sm:space-y-0">
                 <div>
                     @if ($this->paginationIsEnabled && $this->isPaginationMethod('standard') && $currentRows->lastPage() > 1 && $this->showPaginationDetails)
                         <p class="paged-pagination-results text-sm text-gray-700 leading-5 dark:text-white">
@@ -108,7 +108,7 @@
 </div>
 
 @includeWhen(
-    $this->hasConfigurableAreaFor('after-pagination'), 
-    $this->getConfigurableAreaFor('after-pagination'), 
+    $this->hasConfigurableAreaFor('after-pagination'),
+    $this->getConfigurableAreaFor('after-pagination'),
     $this->getParametersForConfigurableArea('after-pagination')
 )

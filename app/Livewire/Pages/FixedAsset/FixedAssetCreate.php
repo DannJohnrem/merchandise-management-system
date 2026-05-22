@@ -2,12 +2,14 @@
 
 namespace App\Livewire\Pages\FixedAsset;
 
-use Livewire\Component;
-use App\Models\FixedAsset;
-use App\Models\ClassModel;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Database\QueryException;
 use Throwable;
+use Livewire\Component;
+use App\Models\ClassModel;
+use App\Models\FixedAsset;
+use App\Services\AssetTagGenerator;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\QueryException;
+use Illuminate\Validation\ValidationException;
 
 class FixedAssetCreate extends Component
 {
@@ -19,7 +21,17 @@ class FixedAssetCreate extends Component
         $this->items[] = $this->blankItem();
 
         // Load classes for dropdowns
-        $this->classes = ClassModel::orderBy('name')->get();
+        $this->classes = Cache::remember('fixed_asset_classes', 3600, function () {
+            return ClassModel::orderBy('name')->get();
+        });
+    }
+
+    public function generatePreviewTag($index)
+    {
+        $category = $this->items[$index]['category'] ?? null;
+
+        // If empty OR if you want it to update when category changes:
+        $this->items[$index]['asset_tag'] = AssetTagGenerator::generate($category);
     }
 
     protected function blankItem(): array
@@ -77,8 +89,8 @@ class FixedAssetCreate extends Component
                 'items.*.asset_name' => 'required|string|max:255',
                 'items.*.category' => 'required|string|max:255',
                 'items.*.asset_tag' => 'nullable|string|max:255',
-                'items.*.serial_number' => 'nullable|string|max:255|unique:fixed_assets,serial_number',
-                'items.*.charger_serial_number' => 'nullable|string|max:255|unique:fixed_assets,charger_serial_number',
+                'items.*.serial_number' => 'required|string|max:255|unique:fixed_assets,serial_number',
+                'items.*.charger_serial_number' => 'required|string|max:255|unique:fixed_assets,charger_serial_number',
                 'items.*.brand' => 'nullable|string|max:255',
                 'items.*.model' => 'nullable|string|max:255',
                 'items.*.purchase_cost' => 'nullable|numeric',
@@ -102,6 +114,8 @@ class FixedAssetCreate extends Component
 
                 FixedAsset::create($item);
             }
+
+            Cache::forget('fixed_asset_categories');
 
             session()->flash('toast', [
                 'message' => 'Fixed assets created successfully!',

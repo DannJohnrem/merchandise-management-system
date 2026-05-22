@@ -77,7 +77,7 @@ class FiftyLaptopWithChargerSeeder extends Seeder
                 'charger_serial_number' => $chargerSerial,
                 'brand'                 => 'HP',
                 'model'                 => '15-fc0566AU',
-                'purchase_cost'         => 25000.00,
+                'purchase_cost'         => 38054.46,
                 'supplier'              => 'INFINITYTECH SOLUTION INC.',
                 'purchase_order_no'     => null,
                 'purchase_date'         => Carbon::create(2025, 12, 5),

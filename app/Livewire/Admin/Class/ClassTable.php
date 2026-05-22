@@ -11,6 +11,7 @@ use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
 class ClassTable extends DataTableComponent
 {
+    public string $tableName = 'class-table';
     protected $model = ClassModel::class;
 
     protected $listeners = ['confirmDeleteClass' => 'deleteClass'];

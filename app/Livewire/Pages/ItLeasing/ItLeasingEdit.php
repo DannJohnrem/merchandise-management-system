@@ -2,11 +2,12 @@
 
 namespace App\Livewire\Pages\ItLeasing;
 
+use Throwable;
 use Livewire\Component;
 use App\Models\ItLeasing;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\QueryException;
-use Throwable;
+use Illuminate\Validation\ValidationException;
 
 class ItLeasingEdit extends Component
 {
@@ -19,6 +20,7 @@ class ItLeasingEdit extends Component
     public $brand;
     public $model;
     public $purchase_cost;
+    public $rental_rate_per_month;
     public $supplier;
     public $purchase_order_no;
     public $purchase_date;
@@ -29,12 +31,15 @@ class ItLeasingEdit extends Component
     public $status;
     public $condition;
     public $remarks;
-    public $inclusions = [];
+
+    // ✅ must be array for blade foreach
+    public array $inclusions = [];
 
     public function mount(ItLeasing $item)
     {
         $this->item = $item;
 
+        // ✅ Manual assign (same style as FixedAssetEdit) to avoid JSON string issues
         $this->category = $item->category;
         $this->item_name = $item->item_name;
         $this->serial_number = $item->serial_number;
@@ -42,6 +47,7 @@ class ItLeasingEdit extends Component
         $this->brand = $item->brand;
         $this->model = $item->model;
         $this->purchase_cost = $item->purchase_cost;
+        $this->rental_rate_per_month = $item->rental_rate_per_month;
         $this->supplier = $item->supplier;
         $this->purchase_order_no = $item->purchase_order_no;
         $this->purchase_date = $item->purchase_date?->format('Y-m-d');
@@ -52,9 +58,32 @@ class ItLeasingEdit extends Component
         $this->status = $item->status ?: 'available';
         $this->condition = $item->condition ?: 'new';
         $this->remarks = $item->remarks;
-        $this->inclusions = $item->inclusions ?? [];
+
+        // ✅ Decode inclusions JSON -> array (safe fallback)
+        $this->inclusions = is_array($item->inclusions) ? $item->inclusions : [];
+        if (!is_array($this->inclusions)) {
+            $this->inclusions = [];
+        }
     }
 
+    /**
+     * 🔥 AUTO-FILL RENTAL RATE WHEN BRAND CHANGES
+     */
+    public function updatedBrand($value)
+    {
+        // Do not override manual input
+        if (!empty($this->rental_rate_per_month)) {
+            return;
+        }
+
+        match (strtoupper(trim((string) $value))) {
+            'HP' => $this->rental_rate_per_month = 3000.00,
+            'LENOVO' => $this->rental_rate_per_month = 3500.00,
+            default => null,
+        };
+    }
+
+    // ✅ Same helpers as FixedAssetEdit (optional but useful)
     public function addInclusion()
     {
         $this->inclusions[] = '';
@@ -72,35 +101,51 @@ class ItLeasingEdit extends Component
             $validated = $this->validate([
                 'category' => 'required|string|max:255',
                 'item_name' => 'required|string|max:255',
-                'serial_number' => "required|string|unique:it_leasings,serial_number,{$this->item->id}",
-                'charger_serial_number' => "nullable|string|unique:it_leasings,charger_serial_number,{$this->item->id}",
+
+                'serial_number' => "nullable|string|max:255|unique:it_leasings,serial_number,{$this->item->id}",
+                'charger_serial_number' => "nullable|string|max:255|unique:it_leasings,charger_serial_number,{$this->item->id}",
+
                 'brand' => 'nullable|string|max:255',
                 'model' => 'nullable|string|max:255',
+
                 'purchase_cost' => 'nullable|numeric',
+                'rental_rate_per_month' => 'nullable|numeric',
+
                 'supplier' => 'nullable|string|max:255',
                 'purchase_order_no' => 'nullable|string|max:255',
+
                 'purchase_date' => 'nullable|date',
                 'warranty_expiration' => 'nullable|date',
-                'assigned_company' => 'required|string|max:255',
+
+                'assigned_company' => 'nullable|string|max:255',
                 'assigned_employee' => 'nullable|string|max:255',
+
                 'location' => 'nullable|string|max:255',
-                'status' => 'required|in:available,deployed,in_repair,returned,lost',
+
+                'status' => 'nullable|in:available,deployed,in_repair,returned,lost',
                 'condition' => 'nullable|in:new,good,fair,poor',
+
                 'remarks' => 'nullable|string',
+
                 'inclusions' => 'nullable|array',
                 'inclusions.*' => 'nullable|string|max:255',
             ]);
 
-            $validated['inclusions'] = $this->inclusions;
+            // ✅ Store inclusions as JSON (same approach as FixedAssetEdit)
+            $validated['inclusions'] = $this->inclusions ?? [];
 
             $this->item->update($validated);
+
+            // ✅ clear cached filters (like your table filters)
+            Cache::forget('it_leasing_categories');
+            Cache::forget('it_leasing_serial_numbers');
 
             session()->flash('toast', [
                 'message' => 'IT Leasing item updated successfully!',
                 'type' => 'success',
             ]);
 
-            $this->redirect(route('it-leasing.index'), navigate: true);
+            return $this->redirect(route('it-leasing.index'), navigate: true);
 
         } catch (ValidationException $e) {
             $this->dispatch('toast', message: 'Please check required fields.', type: 'error');

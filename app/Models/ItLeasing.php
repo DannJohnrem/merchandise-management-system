@@ -18,6 +18,7 @@ class ItLeasing extends Model
         'brand',
         'model',
         'purchase_cost',
+        'rental_rate_per_month',
         'supplier',
         'purchase_order_no',
         'purchase_date',
