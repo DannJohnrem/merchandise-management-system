@@ -31,59 +31,80 @@ class ItLeasingEdit extends Component
     public $status;
     public $condition;
     public $remarks;
-
-    // ✅ must be array for blade foreach
     public array $inclusions = [];
+
+    /**
+     * Stores the page number the user came from.
+     * Captured from the ?page= query param passed by actions.blade.php.
+     * Stored as a Livewire property so it survives the full component lifecycle.
+     */
+    public int $returnPage = 1;
 
     public function mount(ItLeasing $item)
     {
         $this->item = $item;
 
-        // ✅ Manual assign (same style as FixedAssetEdit) to avoid JSON string issues
-        $this->category = $item->category;
-        $this->item_name = $item->item_name;
-        $this->serial_number = $item->serial_number;
-        $this->charger_serial_number = $item->charger_serial_number;
-        $this->brand = $item->brand;
-        $this->model = $item->model;
-        $this->purchase_cost = $item->purchase_cost;
-        $this->rental_rate_per_month = $item->rental_rate_per_month;
-        $this->supplier = $item->supplier;
-        $this->purchase_order_no = $item->purchase_order_no;
-        $this->purchase_date = $item->purchase_date?->format('Y-m-d');
-        $this->warranty_expiration = $item->warranty_expiration?->format('Y-m-d');
-        $this->assigned_company = $item->assigned_company;
-        $this->assigned_employee = $item->assigned_employee;
-        $this->location = $item->location;
-        $this->status = $item->status ?: 'available';
-        $this->condition = $item->condition ?: 'new';
-        $this->remarks = $item->remarks;
+        // actions.blade.php passes ?page=N (reads from ?it-leasing-table-page=N in the URL)
+        $this->returnPage = (int) request()->get('page', 1);
 
-        // ✅ Decode inclusions JSON -> array (safe fallback)
-        $this->inclusions = is_array($item->inclusions) ? $item->inclusions : [];
-        if (!is_array($this->inclusions)) {
-            $this->inclusions = [];
-        }
+        $this->category              = $item->category;
+        $this->item_name             = $item->item_name;
+        $this->serial_number         = $item->serial_number;
+        $this->charger_serial_number = $item->charger_serial_number;
+        $this->brand                 = $item->brand;
+        $this->model                 = $item->model;
+        $this->purchase_cost         = $item->purchase_cost;
+        $this->rental_rate_per_month = $item->rental_rate_per_month;
+        $this->supplier              = $item->supplier;
+        $this->purchase_order_no     = $item->purchase_order_no;
+        $this->purchase_date         = $item->purchase_date?->format('Y-m-d');
+        $this->warranty_expiration   = $item->warranty_expiration?->format('Y-m-d');
+        $this->assigned_company      = $item->assigned_company;
+        $this->assigned_employee     = $item->assigned_employee;
+        $this->location              = $item->location;
+        $this->status                = $item->status ?: 'available';
+        $this->condition             = $item->condition ?: 'new';
+        $this->remarks               = $item->remarks;
+        $this->inclusions            = is_array($item->inclusions) ? $item->inclusions : [];
     }
 
-    /**
-     * 🔥 AUTO-FILL RENTAL RATE WHEN BRAND CHANGES
-     */
+    protected function validationRules(): array
+    {
+        return [
+            'category'               => 'required|string|max:255',
+            'item_name'              => 'required|string|max:255',
+            'serial_number'          => "required|string|max:255|unique:it_leasings,serial_number,{$this->item->id}",
+            'charger_serial_number'  => "nullable|string|max:255|unique:it_leasings,charger_serial_number,{$this->item->id}",
+            'brand'                  => 'nullable|string|max:255',
+            'model'                  => 'nullable|string|max:255',
+            'purchase_cost'          => 'nullable|numeric',
+            'rental_rate_per_month'  => 'nullable|numeric',
+            'supplier'               => 'nullable|string|max:255',
+            'purchase_order_no'      => 'nullable|string|max:255',
+            'purchase_date'          => 'nullable|date',
+            'warranty_expiration'    => 'nullable|date',
+            'assigned_company'       => 'nullable|string|max:255',
+            'assigned_employee'      => 'nullable|string|max:255',
+            'location'               => 'nullable|string|max:255',
+            'status'                 => 'nullable|in:available,deployed,in_repair,returned,lost',
+            'condition'              => 'nullable|in:new,good,fair,poor',
+            'remarks'                => 'nullable|string',
+            'inclusions'             => 'nullable|array',
+            'inclusions.*'           => 'nullable|string|max:255',
+        ];
+    }
+
     public function updatedBrand($value)
     {
-        // Do not override manual input
-        if (!empty($this->rental_rate_per_month)) {
-            return;
-        }
+        if (!empty($this->rental_rate_per_month)) return;
 
         match (strtoupper(trim((string) $value))) {
-            'HP' => $this->rental_rate_per_month = 3000.00,
+            'HP'     => $this->rental_rate_per_month = 3000.00,
             'LENOVO' => $this->rental_rate_per_month = 3500.00,
-            default => null,
+            default  => null,
         };
     }
 
-    // ✅ Same helpers as FixedAssetEdit (optional but useful)
     public function addInclusion()
     {
         $this->inclusions[] = '';
@@ -98,54 +119,27 @@ class ItLeasingEdit extends Component
     public function update()
     {
         try {
-            $validated = $this->validate([
-                'category' => 'required|string|max:255',
-                'item_name' => 'required|string|max:255',
+            $validated = $this->validate($this->validationRules());
 
-                'serial_number' => "nullable|string|max:255|unique:it_leasings,serial_number,{$this->item->id}",
-                'charger_serial_number' => "nullable|string|max:255|unique:it_leasings,charger_serial_number,{$this->item->id}",
-
-                'brand' => 'nullable|string|max:255',
-                'model' => 'nullable|string|max:255',
-
-                'purchase_cost' => 'nullable|numeric',
-                'rental_rate_per_month' => 'nullable|numeric',
-
-                'supplier' => 'nullable|string|max:255',
-                'purchase_order_no' => 'nullable|string|max:255',
-
-                'purchase_date' => 'nullable|date',
-                'warranty_expiration' => 'nullable|date',
-
-                'assigned_company' => 'nullable|string|max:255',
-                'assigned_employee' => 'nullable|string|max:255',
-
-                'location' => 'nullable|string|max:255',
-
-                'status' => 'nullable|in:available,deployed,in_repair,returned,lost',
-                'condition' => 'nullable|in:new,good,fair,poor',
-
-                'remarks' => 'nullable|string',
-
-                'inclusions' => 'nullable|array',
-                'inclusions.*' => 'nullable|string|max:255',
-            ]);
-
-            // ✅ Store inclusions as JSON (same approach as FixedAssetEdit)
             $validated['inclusions'] = $this->inclusions ?? [];
 
             $this->item->update($validated);
 
-            // ✅ clear cached filters (like your table filters)
             Cache::forget('it_leasing_categories');
             Cache::forget('it_leasing_serial_numbers');
 
             session()->flash('toast', [
                 'message' => 'IT Leasing item updated successfully!',
-                'type' => 'success',
+                'type'    => 'success',
             ]);
 
-            return $this->redirect(route('it-leasing.index'), navigate: true);
+            // Redirect back to the exact page the user came from.
+            // Rappasoft reads pagination from ?it-leasing-table-page=N in the URL.
+            $redirectUrl = $this->returnPage > 1
+                ? route('it-leasing.index') . '?it-leasing-tablePage=' . $this->returnPage
+                : route('it-leasing.index');
+
+            return $this->redirect($redirectUrl, navigate: true);
 
         } catch (ValidationException $e) {
             $this->dispatch('toast', message: 'Please check required fields.', type: 'error');

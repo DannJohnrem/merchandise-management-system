@@ -37,11 +37,10 @@ class ItLeasingTable extends DataTableComponent
             ->setBulkActionsEnabled()
             ->setEmptyMessage('No IT leasing items found.')
             ->setTheme('tailwind');
-            // ->setAdditionalSelects(['it_leasings.status']);
     }
 
     /**
-     * LIMIT COLUMNS (big win)
+     * Limit selected columns for performance.
      */
     public function builder(): Builder
     {
@@ -61,67 +60,12 @@ class ItLeasingTable extends DataTableComponent
     }
 
     /**
-     * Recalculate totals when the current pagination page changes.
-     *
-     * Triggered by Livewire when the `page` property updates.
-     *
-     * @return void
-     */
-    public function updatedPage(): void
-    {
-        // dd('Page updated to: ' . $this->getPage());
-        $this->emitTotals();
-    }
-
-    /**
-     * Recalculate totals when table filters change.
-     *
-     * Called when Livewire updates the `filters` property.
-     *
-     * @return void
-     */
-    public function updatedFilters(): void
-    {
-        $this->emitTotals();
-    }
-
-    /**
-     * Recalculate totals when the search term changes.
-     *
-     * @param string|array|null $value The new search value
-     * @return void
-     */
-    // public function updatedSearch(array|string|null $value): void
-    // {
-    //     $this->emitTotals();
-    // }
-
-    /**
-     * Recalculate totals when the items-per-page setting changes.
-     *
-     * @param int|string $value The new per-page value
-     * @return void
-     */
-    public function updatedPerPage(string|int $value): void
-    {
-        $this->emitTotals();
-    }
-
-    /**
      * Define available filters for the data table.
-     *
-     * Each returned Filter (eg. `SelectFilter`) is used by the
-     * Livewire table to render filter UI and apply constraints to
-     * the query. Filters should reference valid database columns
-     * and return closures that modify the query when a value is
-     * selected.
-     *
-     * @return array<string, \Rappasoft\LaravelLivewireTables\Views\Filters\Filter>
      */
     public function filters(): array
     {
         return [
-             SelectFilter::make('Category')
+            SelectFilter::make('Category')
                 ->options(
                     Cache::remember('it_leasing_categories', 600, function () {
                         return ItLeasing::query()
@@ -168,7 +112,7 @@ class ItLeasingTable extends DataTableComponent
 
             SelectFilter::make('Status')
                 ->options([
-                    '' => 'All',
+                    ''          => 'All',
                     'available' => 'Available',
                     'deployed'  => 'Deployed',
                     'in_repair' => 'In Repair',
@@ -198,12 +142,9 @@ class ItLeasingTable extends DataTableComponent
             Cache::forget('it_leasing_categories');
             Cache::forget('it_leasing_serial_numbers');
 
-            $this->setPage(1);
-            $this->dispatch('$refresh');
-
             $this->dispatch('toast', message: "{$name} deleted successfully!", type: 'success');
-
             $this->emitTotals();
+
         } catch (QueryException|Throwable $e) {
             logger()->error('Error deleting item', ['error' => $e->getMessage()]);
             $this->dispatch('toast', message: 'Error occurred while deleting item.', type: 'error');
@@ -229,11 +170,10 @@ class ItLeasingTable extends DataTableComponent
             Cache::forget('it_leasing_serial_numbers');
 
             $this->clearSelected();
-            $this->setPage(1);
-            $this->dispatch('$refresh');
-            $this->dispatch('toast', message: count($selected).' item(s) deleted successfully.', type: 'success');
 
+            $this->dispatch('toast', message: count($selected).' item(s) deleted successfully.', type: 'success');
             $this->emitTotals();
+
         } catch (QueryException|Throwable $e) {
             logger()->error('Error bulk deleting items', ['error' => $e->getMessage()]);
             $this->dispatch('toast', message: 'Error occurred during bulk delete.', type: 'error');
@@ -249,12 +189,11 @@ class ItLeasingTable extends DataTableComponent
             return;
         }
 
-        // Fire modal instead of going straight to controller
         $this->dispatch('openDrModal', ids: array_values($selected));
     }
 
     /**
-     * Columns (placed at bottom for maintainability)
+     * Columns
      */
     public function columns(): array
     {
@@ -292,17 +231,17 @@ class ItLeasingTable extends DataTableComponent
     }
 
     /**
-     * Emit the current page and grand totals for purchase_cost.
+     * Emit page total and grand total (page 1 only) to parent.
      *
-     * @return void
+     * Called on every render so it catches all triggers:
+     * page change, filter change, per-page change, delete, etc.
      */
     protected function emitTotals(): void
     {
-        $pageRows = $this->getRows();
-
+        $pageRows  = $this->getRows();
         $pageTotal = $pageRows->sum('purchase_cost');
 
-        // Only calculate grand total on page 1 for performance (it's only displayed there)
+        // Grand total is expensive — only compute on page 1
         $grandTotal = 0;
         if ($this->getPage() === 1) {
             $grandTotal = $this
@@ -310,29 +249,20 @@ class ItLeasingTable extends DataTableComponent
                 ->sum('purchase_cost');
         }
 
-        // Dispatch event to parent component (Livewire v3 syntax)
         $this->dispatch('totalsUpdated', [
-            'pageTotal'  => (float) $pageTotal,
-            'grandTotal' => (float) $grandTotal,
+            'pageTotal'   => (float) $pageTotal,
+            'grandTotal'  => (float) $grandTotal,
             'currentPage' => $this->getPage(),
         ]);
     }
 
     /**
-     * Emit totals once after the component has rendered to provide
-     * the parent component an initial page and grand total.
-     *
-     * This uses a static flag to ensure a single emission on first render.
-     *
-     * @return void
+     * Called after every render.
+     * This is the single source of truth for emitting totals —
+     * covers initial load, pagination, filter changes, and deletes.
      */
     public function rendered(): void
     {
-        static $emitted = false;
-
-        if (! $emitted) {
-            $this->emitTotals();
-            $emitted = true;
-        }
+        $this->emitTotals();
     }
 }

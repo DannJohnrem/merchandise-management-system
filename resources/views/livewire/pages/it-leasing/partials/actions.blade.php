@@ -9,11 +9,18 @@
 
 {{-- Edit --}}
 @can('edit it-leasing')
-    <a href="{{ route('it-leasing.edit', $item->id) }}" wire:navigate>
-        <flux:button variant="primary" color="amber" size="sm" icon="pencil-square">
-            Edit
-        </flux:button>
-    </a>
+    <flux:button
+        variant="primary"
+        color="amber"
+        size="sm"
+        icon="pencil-square"
+        onclick="
+            var page = new URLSearchParams(window.location.search).get('it-leasing-tablePage') || 1;
+            Livewire.navigate('{{ route('it-leasing.edit', ['item' => $item->id]) }}?page=' + page);
+        "
+    >
+        Edit
+    </flux:button>
 @endcan
 
 {{-- Delete --}}

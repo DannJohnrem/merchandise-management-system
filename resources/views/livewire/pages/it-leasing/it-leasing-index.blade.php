@@ -83,12 +83,19 @@
                 <livewire:pages.it-leasing.it-leasing-table wire:key="it-leasing-table" />
 
                 {{-- TOTALS --}}
+                {{--
+                    Page Total  : always shown, updates on every page change.
+                    Grand Total : only shown on page 1 (computed by the table on page 1 only).
+                                  ItLeasingIndex preserves the last known grandTotal so it
+                                  doesn't get wiped when navigating to page 2+.
+                --}}
                 <div class="absolute bottom-[70px] right-2 flex justify-end space-x-12 text-gray-700 dark:text-gray-200 bg-white dark:bg-zinc-800 p-2">
                     <div class="flex items-center space-x-1">
                         <span class="font-semibold">Page Total:</span>
                         <span>₱ {{ number_format($pageTotal, 2) }}</span>
                     </div>
 
+                    {{-- Grand Total: visible only on page 1 and only once grandTotal has been computed --}}
                     @if ($currentPage === 1 && $grandTotal > 0)
                         <div class="flex items-center space-x-1">
                             <span class="font-semibold">Grand Total:</span>
@@ -146,7 +153,6 @@
 
 <script>
     window.addEventListener('open-delete-modal', function (event) {
-        // Small timeout para masiguro na nai-update ng Alpine ang state bago buksan ang modal
         setTimeout(function () {
             Flux.modal('confirm-delete-modal').show();
         }, 50);
