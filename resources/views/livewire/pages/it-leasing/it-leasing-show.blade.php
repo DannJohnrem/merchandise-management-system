@@ -89,7 +89,7 @@
                     <div class="flex items-center space-x-2">
                         <x-heroicon-o-calendar class="w-5 h-5 text-zinc-500" aria-label="Purchase Date" />
                         <dt class="font-medium text-zinc-700 dark:text-zinc-300">Purchase Date:</dt>
-                        <dd>{{ $itLeasing->formatted_purchase_date ?? 'N/A' }}</dd> {{-- Format in model/controller --}}
+                        <dd>{{ $itLeasing->purchase_date?->format('Y-m-d') ?? 'N/A' }}</dd>
                     </div>
                     <div class="flex items-center space-x-2">
                         <x-heroicon-o-shield-check class="w-5 h-5 text-zinc-500" aria-label="Warranty Expiration" />
