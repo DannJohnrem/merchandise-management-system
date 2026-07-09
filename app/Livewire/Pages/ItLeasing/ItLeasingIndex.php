@@ -3,6 +3,7 @@
 namespace App\Livewire\Pages\ItLeasing;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 
 class ItLeasingIndex extends Component
 {
@@ -10,10 +11,6 @@ class ItLeasingIndex extends Component
     public int $currentPage = 1;
     public float $pageTotal = 0;
     public float $grandTotal = 0;
-
-    protected $listeners = [
-        'totalsUpdated' => 'updateTotals',
-    ];
 
     public function load(): void
     {
@@ -23,24 +20,31 @@ class ItLeasingIndex extends Component
     /**
      * Receive updated totals from the child table component.
      *
-     * Updates the component's `pageTotal` and `grandTotal` properties
-     * with the values provided by the `ItLeasingTable` component.
+     * grandTotal is only sent on page 1. On other pages, the table sends 0
+     * to avoid an expensive query — so we preserve the last known grandTotal
+     * instead of overwriting it with 0.
      *
-     * @param array{pageTotal: float|int,grandTotal: float|int} $totals
+     * @param array{pageTotal: float, grandTotal: float, currentPage: int} $totals
      * @return void
      */
+    #[On('totalsUpdated')]
     public function updateTotals(array $totals): void
     {
-        $this->pageTotal  = (float) $totals['pageTotal'];
-        $this->grandTotal = (float) $totals['grandTotal'];
         $this->currentPage = (int) $totals['currentPage'];
+        $this->pageTotal   = (float) $totals['pageTotal'];
+
+        // Only update grandTotal when the table actually computed it (page 1).
+        // On page 2+, the table sends 0 — preserve the last known value instead.
+        if ($this->currentPage === 1) {
+            $this->grandTotal = (float) $totals['grandTotal'];
+        }
     }
 
     /**
      * Component mount hook.
      *
-     * If a session toast exists (from a previous action), dispatch it
-     * so the UI shows the message when the page loads.
+     * If a session toast exists (from a previous action like edit/create),
+     * dispatch it so the UI shows the message when the page loads.
      *
      * @return void
      */

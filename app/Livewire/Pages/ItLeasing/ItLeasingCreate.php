@@ -43,6 +43,33 @@ class ItLeasingCreate extends Component
         ];
     }
 
+    protected function validationRules(): array
+    {
+        return [
+            'items'                          => 'required|array|min:1',
+            'items.*.category'               => 'required|string|max:255',
+            'items.*.item_name'              => 'required|string|max:255',
+            'items.*.serial_number'          => 'required|string|max:255',
+            'items.*.charger_serial_number'  => 'nullable|string|max:255',
+            'items.*.brand'                  => 'nullable|string|max:255',
+            'items.*.model'                  => 'nullable|string|max:255',
+            'items.*.purchase_cost'          => 'nullable|numeric',
+            'items.*.rental_rate_per_month'  => 'nullable|numeric',
+            'items.*.supplier'               => 'nullable|string|max:255',
+            'items.*.purchase_order_no'      => 'nullable|string|max:255',
+            'items.*.purchase_date'          => 'nullable|date',
+            'items.*.warranty_expiration'    => 'nullable|date',
+            'items.*.assigned_company'       => 'required|string|max:255',
+            'items.*.assigned_employee'      => 'nullable|string|max:255',
+            'items.*.location'               => 'nullable|string|max:255',
+            'items.*.status'                 => 'required|in:available,deployed,in_repair,returned,lost',
+            'items.*.condition'              => 'nullable|in:new,good,fair,poor',
+            'items.*.remarks'                => 'nullable|string',
+            'items.*.inclusions'             => 'nullable|array',
+            'items.*.inclusions.*'           => 'nullable|string|max:255',
+        ];
+    }
+
     public function addItem()
     {
         $this->items[] = $this->blankItem();
@@ -65,9 +92,6 @@ class ItLeasingCreate extends Component
         $this->items[$itemIndex]['inclusions'] = array_values($this->items[$itemIndex]['inclusions']);
     }
 
-    /**
-     * AUTO-FILL RENTAL RATE BASED ON BRAND
-     */
     public function updated($name, $value)
     {
         if (!str_ends_with($name, '.brand')) return;
@@ -96,33 +120,11 @@ class ItLeasingCreate extends Component
     public function save()
     {
         try {
-            // Step 1: Basic validation (WITHOUT unique rules)
-            $this->validate([
-                'items'                          => 'required|array|min:1',
-                'items.*.category'               => 'required|string|max:255',
-                'items.*.item_name'              => 'required|string|max:255',
-                'items.*.serial_number'          => 'required|string|max:255',
-                'items.*.charger_serial_number'  => 'nullable|string|max:255',
-                'items.*.brand'                  => 'nullable|string|max:255',
-                'items.*.model'                  => 'nullable|string|max:255',
-                'items.*.purchase_cost'          => 'nullable|numeric',
-                'items.*.rental_rate_per_month'  => 'nullable|numeric',
-                'items.*.supplier'               => 'nullable|string|max:255',
-                'items.*.purchase_order_no'      => 'nullable|string|max:255',
-                'items.*.purchase_date'          => 'nullable|date',
-                'items.*.warranty_expiration'    => 'nullable|date',
-                'items.*.assigned_company'       => 'required|string|max:255',
-                'items.*.assigned_employee'      => 'nullable|string|max:255',
-                'items.*.location'               => 'nullable|string|max:255',
-                'items.*.status'                 => 'required|in:available,deployed,in_repair,returned,lost',
-                'items.*.condition'              => 'nullable|in:new,good,fair,poor',
-                'items.*.remarks'                => 'nullable|string',
-                'items.*.inclusions'             => 'nullable|array',
-                'items.*.inclusions.*'           => 'nullable|string|max:255',
-            ]);
+            // Step 1: Validate
+            $this->validate($this->validationRules());
 
             // Step 2: Collect serial numbers and charger serial numbers
-            $serialNumbers  = collect($this->items)->pluck('serial_number');
+            $serialNumbers = collect($this->items)->pluck('serial_number');
             $chargerSerials = collect($this->items)
                 ->pluck('charger_serial_number')
                 ->filter()
