@@ -276,9 +276,20 @@
         </thead>
         <tbody>
             @foreach ($items as $item)
-                @php $inc = $inclusionsMap[$item->id]; @endphp
+                @php
+                    $inc = $inclusionsMap[$item->id];
 
-                {{-- Laptop row --}}
+                    // Decode the dynamic "inclusions" JSON column (e.g. ["Lenovo Bag","Lenovo Bluetooth Headset (Teams)"])
+                    $extraInclusions = [];
+                    if (!empty($item->inclusions)) {
+                        $decoded = is_array($item->inclusions) ? $item->inclusions : json_decode($item->inclusions, true);
+                        if (is_array($decoded)) {
+                            $extraInclusions = $decoded;
+                        }
+                    }
+                @endphp
+
+                {{-- Laptop / Printer row --}}
                 @if ($inc['category'] === 'printer')
                     <tr>
                         <td class="center">{{ $lineItem++ }}</td>
@@ -308,27 +319,17 @@
                     @php $totalQty++; @endphp
                 @endif
 
-                {{-- Bag row --}}
-                @if ($inc['has_bag'])
+                {{-- Dynamic inclusions (from JSON "inclusions" column, e.g. Lenovo Bag, Lenovo Silent Mouse, Lenovo Bluetooth Headset) --}}
+                @foreach ($extraInclusions as $inclusionName)
+                    @continue(trim($inclusionName) === '')
                     <tr>
                         <td class="center">{{ $lineItem++ }}</td>
-                        <td>{{ $item->brand ?? 'Laptop' }} Laptop Bag</td>
+                        <td>{{ $inclusionName }}</td>
                         <td class="center">1</td>
                         <td>n/a</td>
                     </tr>
                     @php $totalQty++; @endphp
-                @endif
-
-                {{-- Mouse row --}}
-                @if ($inc['has_mouse'])
-                    <tr>
-                        <td class="center">{{ $lineItem++ }}</td>
-                        <td>{{ $item->brand ?? 'Laptop' }} Mouse</td>
-                        <td class="center">1</td>
-                        <td>n/a</td>
-                    </tr>
-                    @php $totalQty++; @endphp
-                @endif
+                @endforeach
             @endforeach
         </tbody>
     </table>

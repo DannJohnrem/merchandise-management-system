@@ -17,9 +17,10 @@ class InventoryListTable extends DataTableComponent
         $this->setPerPage(25);
         $this->setPerPageAccepted([10, 25, 50, 100]);
 
+        // Highlight inclusion rows so they're visually distinct from main items
         $this->setTrAttributes(function ($row) {
-            return ((int) $row->for_reorder === 1)
-                ? ['class' => 'tr-reorder-highlight']
+            return ($row->source === 'it_leasing_inclusion')
+                ? ['class' => 'tr-inclusion-row']
                 : [];
         });
     }
@@ -32,12 +33,17 @@ class InventoryListTable extends DataTableComponent
     public function columns(): array
     {
         return [
-            Column::make('For reorder', 'for_reorder')
-                ->format(fn ($v) => (int) $v === 1 ? '<span title="For reorder">🚩</span>' : '')
+            Column::make('Source', 'source')
+                ->sortable()
+                ->searchable()
+                ->format(fn ($v) => match ($v) {
+                    'it_leasing' => 'IT Leasing',
+                    'it_leasing_inclusion' => 'IT Leasing (Inclusion)',
+                    'fixed_asset' => 'Fixed Asset',
+                    default => $v,
+                })
                 ->html(),
 
-            Column::make('Source', 'source')->sortable()->searchable(),
-            Column::make('DEBUG KEY', 'item_key'),
             Column::make('Category', 'category')->sortable()->searchable(),
             Column::make('Name', 'name')->sortable()->searchable(),
             Column::make('Brand', 'brand')->sortable()->searchable(),
@@ -52,15 +58,6 @@ class InventoryListTable extends DataTableComponent
             Column::make('Inventory value', 'inventory_value')
                 ->sortable()
                 ->format(fn ($v) => number_format((float) $v, 2)),
-
-            Column::make('Reorder level', 'reorder_level')->sortable(),
-            Column::make('Reorder time (days)', 'reorder_time_days')->sortable(),
-
-            Column::make('Discontinued?', 'discontinued')
-                ->format(fn ($v) => (int) $v === 1 ? 'Yes' : 'No'),
-
-            Column::make('Actions')
-                ->label(fn ($row) => view('livewire.tables.inventory-list-table-actions', ['row' => $row])),
         ];
     }
 }
