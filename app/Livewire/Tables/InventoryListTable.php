@@ -31,27 +31,6 @@ class InventoryListTable extends DataTableComponent
         });
     }
 
-    public function showDetails(
-        string $rowId,
-        string $source,
-        string $itemKey,
-        string $category,
-        string $name,
-        string $brand,
-        string $model
-    ): void {
-        $this->dispatch(
-            'open-inventory-detail-modal',
-            rowId: $rowId,
-            source: $source,
-            itemKey: $itemKey,
-            category: $category,
-            name: $name,
-            brand: $brand,
-            model: $model,
-        );
-    }
-
     public function builder(): Builder
     {
         $query = InventoryReportRow::queryUnion();
@@ -107,18 +86,19 @@ class InventoryListTable extends DataTableComponent
     public function columns(): array
     {
         $click = function ($row) {
-            $args = collect([
-                $row->row_id,
-                $row->source,
-                $row->item_key,
-                $row->category,
-                $row->name,
-                $row->brand,
-                $row->model,
-            ])->map(fn ($v) => "'" . addslashes((string) ($v ?? '')) . "'")
-                ->implode(', ');
+            $payload = json_encode([
+                'rowId' => (string) $row->row_id,
+                'source' => (string) $row->source,
+                'itemKey' => (string) $row->item_key,
+                'category' => (string) ($row->category ?? ''),
+                'name' => (string) ($row->name ?? ''),
+                'brand' => (string) ($row->brand ?? ''),
+                'model' => (string) ($row->model ?? ''),
+            ]);
 
-            return "showDetails({$args})";
+            $jsCode = 'Livewire.dispatch("open-inventory-detail-modal", ' . $payload . ')';
+
+            return e($jsCode);
         };
 
         return [
@@ -137,7 +117,7 @@ class InventoryListTable extends DataTableComponent
 
             Column::make('Name', 'name')
                 ->sortable()->searchable()
-                ->format(fn ($v, $row) => '<span wire:click.stop="' . $click($row) . '" class="cursor-pointer block font-medium text-blue-600 dark:text-blue-400 hover:underline">' . e($v ?? '—') . '</span>')
+                ->format(fn ($v, $row) => '<span onclick="' . $click($row) . '" class="cursor-pointer block font-medium text-blue-600 dark:text-blue-400 hover:underline">' . e($v ?? '—') . '</span>')
                 ->html(),
 
             Column::make('Brand', 'brand')->sortable()->searchable(),
