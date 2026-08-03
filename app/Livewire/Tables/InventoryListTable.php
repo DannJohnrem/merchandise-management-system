@@ -18,21 +18,45 @@ class InventoryListTable extends DataTableComponent
         $this->setPrimaryKey('row_id');
         $this->setPerPage(25);
         $this->setPerPageAccepted([10, 25, 50, 100]);
+        $this->setAdditionalSelects(['row_id', 'item_key']);
 
         $this->setTrAttributes(function ($row) {
-            return ($row->source === 'it_leasing_inclusion')
-                ? ['class' => 'tr-inclusion-row']
-                : [];
+            $class = 'hover:bg-zinc-50 dark:hover:bg-zinc-700';
+
+            if ($row->source === 'it_leasing_inclusion') {
+                $class .= ' tr-inclusion-row';
+            }
+
+            return ['class' => $class];
         });
+    }
+
+    public function showDetails(
+        string $rowId,
+        string $source,
+        string $itemKey,
+        string $category,
+        string $name,
+        string $brand,
+        string $model
+    ): void {
+        $this->dispatch(
+            'open-inventory-detail-modal',
+            rowId: $rowId,
+            source: $source,
+            itemKey: $itemKey,
+            category: $category,
+            name: $name,
+            brand: $brand,
+            model: $model,
+        );
     }
 
     public function builder(): Builder
     {
         $query = InventoryReportRow::queryUnion();
 
-        // --- Date range filter (purchase_date) ---
         $dateFilter = $this->getAppliedFilterWithValue('purchase_date');
-         \Log::info('DateFilter raw value:', ['value' => $dateFilter]);
         if ($dateFilter) {
             $start = $dateFilter['minDate'] ?? null;
             $end = $dateFilter['maxDate'] ?? null;
@@ -45,7 +69,6 @@ class InventoryListTable extends DataTableComponent
             }
         }
 
-        // --- Model filter ---
         $modelFilter = $this->getAppliedFilterWithValue('model');
         if (! empty($modelFilter)) {
             $query->where('model', $modelFilter);
@@ -83,6 +106,21 @@ class InventoryListTable extends DataTableComponent
 
     public function columns(): array
     {
+        $click = function ($row) {
+            $args = collect([
+                $row->row_id,
+                $row->source,
+                $row->item_key,
+                $row->category,
+                $row->name,
+                $row->brand,
+                $row->model,
+            ])->map(fn ($v) => "'" . addslashes((string) ($v ?? '')) . "'")
+                ->implode(', ');
+
+            return "showDetails({$args})";
+        };
+
         return [
             Column::make('Source', 'source')
                 ->sortable()
@@ -96,7 +134,12 @@ class InventoryListTable extends DataTableComponent
                 ->html(),
 
             Column::make('Category', 'category')->sortable()->searchable(),
-            Column::make('Name', 'name')->sortable()->searchable(),
+
+            Column::make('Name', 'name')
+                ->sortable()->searchable()
+                ->format(fn ($v, $row) => '<span wire:click.stop="' . $click($row) . '" class="cursor-pointer block font-medium text-blue-600 dark:text-blue-400 hover:underline">' . e($v ?? '—') . '</span>')
+                ->html(),
+
             Column::make('Brand', 'brand')->sortable()->searchable(),
             Column::make('Model', 'model')->sortable()->searchable(),
 

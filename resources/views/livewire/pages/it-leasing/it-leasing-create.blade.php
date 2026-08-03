@@ -8,7 +8,7 @@
     </flux:breadcrumbs>
 
     <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-        Add New IT Leasing Items
+        Add transaction
     </h1>
 
     <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow rounded-lg p-6">
