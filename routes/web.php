@@ -16,6 +16,7 @@ use App\Livewire\Admin\Roles\RoleIndex;
 use App\Livewire\Admin\Users\UserCreate;
 use App\Livewire\Admin\Users\UserEdit;
 use App\Livewire\Admin\Users\UserIndex;
+use App\Livewire\Pages\Dashboard\Dashboard;
 use App\Livewire\Pages\FixedAsset\FixedAssetCreate;
 use App\Livewire\Pages\FixedAsset\FixedAssetEdit;
 use App\Livewire\Pages\FixedAsset\FixedAssetIndex;
@@ -40,7 +41,7 @@ Route::get('/', function () {
         : redirect()->route('login');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
+Route::get('dashboard', Dashboard::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 

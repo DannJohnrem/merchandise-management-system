@@ -90,3 +90,212 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
+
+
+/* ============================================
+   Flatpickr DateRangeFilter — custom teal theme (#37BAB5)
+   ============================================ */
+
+.flatpickr-calendar {
+    @apply rounded-xl! border! border-gray-200! shadow-xl! bg-white! p-4!;
+    font-family: inherit !important;
+    width: 300px !important;
+}
+
+.dark .flatpickr-calendar {
+    @apply border-gray-600! bg-gray-800!;
+}
+
+/* Month/year header */
+.flatpickr-months {
+    @apply mb-3! items-center!;
+}
+
+.flatpickr-current-month {
+    @apply text-sm! font-semibold! text-gray-800!;
+}
+
+.dark .flatpickr-current-month {
+    @apply text-white!;
+}
+
+.flatpickr-current-month input.cur-year,
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+    @apply text-gray-800! font-semibold!;
+}
+
+.dark .flatpickr-current-month input.cur-year,
+.dark .flatpickr-current-month .flatpickr-monthDropdown-months {
+    @apply text-white! bg-transparent!;
+}
+
+.flatpickr-prev-month,
+.flatpickr-next-month {
+    @apply text-gray-400! transition! rounded-md!;
+    fill: currentColor !important;
+}
+
+.flatpickr-prev-month:hover,
+.flatpickr-next-month:hover {
+    color: #37BAB5 !important;
+}
+
+/* Weekday labels */
+.flatpickr-weekday {
+    @apply text-xs! font-semibold! text-gray-400! uppercase!;
+}
+
+.dark .flatpickr-weekday {
+    @apply text-gray-500!;
+}
+
+/* Day cells - base */
+.flatpickr-day {
+    @apply text-sm! text-gray-700! transition! border-transparent!;
+    border-radius: 8px !important;
+    max-width: 34px !important;
+    height: 34px !important;
+    line-height: 34px !important;
+}
+
+.dark .flatpickr-day {
+    @apply text-gray-200!;
+}
+
+.flatpickr-day:hover {
+    background: rgba(55, 186, 181, 0.1) !important;
+    color: #37BAB5 !important;
+}
+
+.dark .flatpickr-day:hover {
+    @apply bg-gray-700!;
+    color: #37BAB5 !important;
+}
+
+.flatpickr-day.flatpickr-disabled,
+.flatpickr-day.prevMonthDay,
+.flatpickr-day.nextMonthDay {
+    @apply text-gray-300!;
+}
+
+.dark .flatpickr-day.flatpickr-disabled,
+.dark .flatpickr-day.prevMonthDay,
+.dark .flatpickr-day.nextMonthDay {
+    @apply text-gray-600!;
+}
+
+/* Selected / range endpoints - solid teal circle */
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+    background: #37BAB5 !important;
+    border-color: #37BAB5 !important;
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.flatpickr-day.selected:hover,
+.flatpickr-day.startRange:hover,
+.flatpickr-day.endRange:hover {
+    background: #2ea39e !important;
+    border-color: #2ea39e !important;
+}
+
+/* ============================================
+   Days within the range - mas visible na ngayon
+   ============================================ */
+
+.flatpickr-day.inRange {
+    background: rgba(55, 186, 181, 0.22) !important;
+    color: #0f6b67 !important;
+    font-weight: 500 !important;
+    border-radius: 0 !important;
+    box-shadow: -5px 0 0 rgba(55, 186, 181, 0.22), 5px 0 0 rgba(55, 186, 181, 0.22) !important;
+}
+
+.dark .flatpickr-day.inRange {
+    background: rgba(55, 186, 181, 0.32) !important;
+    color: #7fe3de !important;
+    box-shadow: -5px 0 0 rgba(55, 186, 181, 0.32), 5px 0 0 rgba(55, 186, 181, 0.32) !important;
+}
+
+/* Connect the range visually - startRange/endRange corners */
+.flatpickr-day.startRange {
+    border-radius: 8px 0 0 8px !important;
+    box-shadow: 5px 0 0 rgba(55, 186, 181, 0.22) !important;
+}
+
+.flatpickr-day.endRange {
+    border-radius: 0 8px 8px 0 !important;
+    box-shadow: -5px 0 0 rgba(55, 186, 181, 0.22) !important;
+}
+
+.flatpickr-day.startRange.endRange {
+    border-radius: 8px !important;
+    box-shadow: none !important;
+}
+
+/* ============================================
+   TODAY marker - fixed visibility on hover
+   ============================================ */
+
+.flatpickr-day.today {
+    border: 2px solid #37BAB5 !important;
+    color: #1f8b86 !important;
+    font-weight: 600 !important;
+    background: transparent !important;
+}
+
+.dark .flatpickr-day.today {
+    color: #5fd4cf !important;
+}
+
+/* Higher specificity para hindi ma-override ng generic hover rule */
+.flatpickr-day.today:hover {
+    background: #37BAB5 !important;
+    border-color: #37BAB5 !important;
+    color: white !important;
+}
+
+/* Kung today ay parte rin ng selected range/endpoint */
+.flatpickr-day.today.selected,
+.flatpickr-day.today.startRange,
+.flatpickr-day.today.endRange {
+    background: #37BAB5 !important;
+    border-color: #37BAB5 !important;
+    color: white !important;
+}
+
+/* Kung today ay nasa loob ng range pero hindi endpoint */
+.flatpickr-day.today.inRange {
+    border: 2px solid #37BAB5 !important;
+    background: rgba(55, 186, 181, 0.22) !important;
+    color: #0f6b67 !important;
+}
+
+/* ============================================
+   Date range input field
+   ============================================ */
+
+input[data-input].flatpickr-input,
+input[x-ref="dateRangeInput"] {
+    @apply w-full! rounded-lg! border! border-gray-300! shadow-sm! text-sm! text-gray-700! bg-white!;
+    padding: 0.5rem 0.75rem 0.5rem 2.25rem !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5' /%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: 0.65rem center !important;
+    background-size: 1rem !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.dark input[data-input].flatpickr-input,
+.dark input[x-ref="dateRangeInput"] {
+    @apply border-gray-600! bg-gray-800! text-gray-100!;
+}
+
+input[data-input].flatpickr-input:focus,
+input[x-ref="dateRangeInput"]:focus {
+    border-color: #37BAB5 !important;
+    box-shadow: 0 0 0 3px rgba(55, 186, 181, 0.15) !important;
+    outline: none !important;
+}

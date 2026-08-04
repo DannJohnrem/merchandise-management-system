@@ -12,9 +12,7 @@
 
     <div class="flex justify-end">
         @can('create it-leasing')
-            <flux:button icon="plus" variant="primary" href="{{ route('it-leasing.create') }}" wire:navigate>
-                Create IT Leasing
-            </flux:button>
+            <flux:button icon="plus" variant="primary" href="{{ route('it-leasing.create') }}" wire:navigate></flux:button>
         @endcan
     </div>
 

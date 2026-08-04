@@ -1,5 +1,7 @@
 // resources/js/app.js
 
+import Chart from 'chart.js/auto';
+window.Chart = Chart;
 
 // =====================
 // Custom toast function
@@ -76,3 +78,83 @@ window.toast = (message, type = 'success', duration = 4000) => {
 
     setTimeout(() => toastEl.remove(), duration);
 };
+
+document.addEventListener('alpine:init', () => {
+    Alpine.data('flatpickrFilter', (wire, filterKey, configs, elRefIgnored, locale) => ({
+        wireValues: wire.entangle('filterComponents.' + filterKey),
+        flatpickrInstance: null,
+
+        init() {
+            this.$nextTick(() => {
+                const el = this.$refs.dateRangeInput;
+                if (!el) return;
+
+                // Kung may existing flatpickr na naka-attach sa element (edge case),
+                // gamitin na lang iyon sa halip na gumawa ng duplicate.
+                if (el._flatpickr) {
+                    this.flatpickrInstance = el._flatpickr;
+                } else {
+                    this.flatpickrInstance = flatpickr(el, {
+                        mode: 'range',
+                        altFormat: configs.altFormat ?? 'F j, Y',
+                        altInput: configs.altInput ?? false,
+                        allowInput: configs.allowInput ?? false,
+                        allowInvalidPreload: configs.allowInvalidPreload ?? true,
+                        ariaDateFormat: configs.ariaDateFormat ?? 'F j, Y',
+                        clickOpens: true,
+                        dateFormat: configs.dateFormat ?? 'Y-m-d',
+                        defaultDate: configs.defaultDate ?? null,
+                        defaultHour: configs.defaultHour ?? 12,
+                        defaultMinute: configs.defaultMinute ?? 0,
+                        enableTime: configs.enableTime ?? false,
+                        enableSeconds: configs.enableSeconds ?? false,
+                        hourIncrement: configs.hourIncrement ?? 1,
+                        locale: configs.locale ?? locale ?? 'en',
+                        minDate: configs.earliestDate ?? null,
+                        maxDate: configs.latestDate ?? null,
+                        minuteIncrement: configs.minuteIncrement ?? 5,
+                        shorthandCurrentMonth: configs.shorthandCurrentMonth ?? false,
+                        time_24hr: configs.time_24hr ?? false,
+                        weekNumbers: configs.weekNumbers ?? false,
+                        onOpen: () => {
+                            window.childElementOpen = true;
+                        },
+                        onChange: (selectedDates, dateStr) => {
+                            if (selectedDates.length > 1) {
+                                const parts = dateStr.split(' ');
+                                window.childElementOpen = false;
+                                window.filterPopoverOpen = false;
+                                wire.set('filterComponents.' + filterKey, {
+                                    minDate: parts[0],
+                                    maxDate: parts[2] === undefined ? parts[0] : parts[2],
+                                });
+                            }
+                        },
+                    });
+                }
+
+                this.setupWire();
+                this.$watch('wireValues', () => this.setupWire());
+            });
+        },
+
+        changedValue(val) {
+            if (val.length < 5 && this.flatpickrInstance) {
+                this.flatpickrInstance.setDate([]);
+                wire.set('filterComponents.' + filterKey, {});
+            }
+        },
+
+        setupWire() {
+            if (!this.flatpickrInstance) return;
+
+            if (this.wireValues !== undefined
+                && this.wireValues.minDate !== undefined
+                && this.wireValues.maxDate !== undefined) {
+                this.flatpickrInstance.setDate([this.wireValues.minDate, this.wireValues.maxDate]);
+            } else {
+                this.flatpickrInstance.setDate([]);
+            }
+        },
+    }));
+});
