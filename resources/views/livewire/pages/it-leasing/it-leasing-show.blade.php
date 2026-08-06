@@ -17,6 +17,9 @@
             <flux:button variant="outline" href="{{ route('it-leasing.edit', $itLeasing) }}" wire:navigate>
                 Edit Item
             </flux:button>
+            <flux:button variant="outline" onclick="Flux.modal('pull-out-form').show()">
+                Pull Out / Replacement Form
+            </flux:button>
             <flux:spacer />
             <flux:button variant="danger" onclick="confirm('Are you sure?') && $wire.call('delete', {{ $itLeasing->id }})">
                 Delete Item
@@ -200,4 +203,6 @@
             @endif
         </div>
     </div>
+
+    <livewire:pages.it-leasing.generate-pull-out-modal :it-leasing="$itLeasing" />
 </div>

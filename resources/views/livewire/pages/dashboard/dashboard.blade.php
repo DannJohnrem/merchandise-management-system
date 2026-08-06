@@ -128,6 +128,7 @@
                     <tr class="border-b border-neutral-200 text-neutral-500 dark:border-neutral-700 dark:text-neutral-400">
                         <th class="py-2 pr-3 font-medium">Item</th>
                         <th class="py-2 pr-3 font-medium">Model</th>
+                        <th class="py-2 pr-3 forn-medium">Serial Number</th>
                         <th class="py-2 pr-3 font-medium">Status</th>
                         <th class="py-2 pr-3 font-medium">Purchased</th>
                     </tr>
@@ -137,6 +138,7 @@
                         <tr class="border-b border-neutral-100 last:border-0 dark:border-neutral-800">
                             <td class="py-2.5 pr-3 font-medium text-neutral-800 dark:text-neutral-100">{{ $item->item_name }}</td>
                             <td class="py-2.5 pr-3 text-neutral-600 dark:text-neutral-300">{{ $item->model ?? '—' }}</td>
+                            <td class="py-2.5 pr-3 text-neutral-600 dark:text-neutral-300">{{ $item->serial_number ?? '—' }}</td>
                             <td class="py-2.5 pr-3">
                                 <flux:badge size="sm" :color="match($item->status) {
                                     'available' => 'emerald',

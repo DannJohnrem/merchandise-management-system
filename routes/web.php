@@ -3,6 +3,7 @@
 use App\Http\Controllers\DeliveryReceiptController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\ItLeasingQrController;
+use App\Http\Controllers\PullOutFormController;
 use App\Livewire\Admin\ActivityLog\ActivityLogIndex;
 use App\Livewire\Admin\Class\ClassCreate;
 use App\Livewire\Admin\Class\ClassEdit;
@@ -75,6 +76,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', ItLeasingIndex::class)->name('index');
         Route::get('/create', ItLeasingCreate::class)->name('create');
         Route::get('/delivery-receipt', [DeliveryReceiptController::class, 'generate'])->name('delivery-receipt');
+        Route::get('/pull-out/{pullOutForm}', [PullOutFormController::class, 'generate'])->name('pull-out.generate');
         Route::get('/{itLeasing}', ItLeasingShow::class)->name('show');
         Route::get('/{item}/edit', ItLeasingEdit::class)->name('edit');
     });
