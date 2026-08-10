@@ -38,4 +38,9 @@ class ItLeasing extends Model
         'warranty_expiration' => 'date:Y-m-d',
         'inclusions' => 'array',
     ];
+
+    public function statusHistories()
+    {
+        return $this->hasMany(ItLeasingStatusHistory::class)->latest('changed_at');
+    }
 }

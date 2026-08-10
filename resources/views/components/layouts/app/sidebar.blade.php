@@ -39,6 +39,14 @@
                 </flux:navlist.item>
             </flux:navlist.group>
 
+            {{-- Billing --}}
+            {{-- <flux:navlist.group class="grid">
+                <flux:navlist.item icon="currency-dollar" :href="route('billing.index')"
+                    :current="request()->routeIs('billing.*')" wire:navigate>
+                    {{ __('Billing') }}
+                </flux:navlist.item>
+            </flux:navlist.group> --}}
+
             {{-- Reports --}}
             <flux:navlist.group expandable heading="Reports" class="grid">
                 <flux:navlist.item icon="document-text" :href="route('reports.inventory-list')"

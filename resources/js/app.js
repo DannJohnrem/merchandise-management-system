@@ -34,7 +34,6 @@ window.toast = (message, type = 'success', duration = 4000) => {
     const container = getToastContainer();
 
     const toastEl = document.createElement('div');
-    toastEl.textContent = message;
     toastEl.style.cssText = `
         position: relative;
         background: ${colors[type] || colors.success};
@@ -47,7 +46,113 @@ window.toast = (message, type = 'success', duration = 4000) => {
         transition: opacity 0.4s ease, transform 0.4s ease;
         overflow: hidden;
         min-width: 220px;
+        max-width: 380px;
     `;
+
+    if (Array.isArray(message)) {
+        // Close button — dahil hindi na auto-disappear ang mahabang toast
+        const closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.innerHTML = '&times;';
+        closeBtn.style.cssText = `
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            line-height: 1;
+            cursor: pointer;
+            opacity: 0.8;
+            padding: 0;
+        `;
+        closeBtn.addEventListener('click', () => {
+            toastEl.style.opacity = '0';
+            toastEl.style.transform = 'translateX(120%)';
+            setTimeout(() => toastEl.remove(), 400);
+        });
+        toastEl.appendChild(closeBtn);
+        toastEl.style.paddingRight = '2rem';
+
+        const [title, ...items] = message;
+        const collapsedLimit = 5;
+        const hasMore = items.length > collapsedLimit;
+
+        const titleEl = document.createElement('div');
+        titleEl.textContent = title;
+        titleEl.style.cssText = `
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        `;
+        toastEl.appendChild(titleEl);
+
+        const listEl = document.createElement('ul');
+        listEl.style.cssText = `
+            margin: 0;
+            padding-left: 1.1rem;
+            list-style-type: disc;
+            max-height: 120px;
+            overflow-y: auto;
+        `;
+
+        const renderItems = (list, limit) => {
+            listEl.innerHTML = '';
+            const shown = limit ? list.slice(0, limit) : list;
+            shown.forEach((itemText) => {
+                const li = document.createElement('li');
+                li.textContent = itemText;
+                li.style.cssText = `
+                    font-size: 0.8125rem;
+                    line-height: 1.5;
+                    margin-bottom: 0.15rem;
+                `;
+                listEl.appendChild(li);
+            });
+        };
+
+        renderItems(items, hasMore ? collapsedLimit : null);
+        toastEl.appendChild(listEl);
+
+        if (hasMore) {
+            const toggleEl = document.createElement('button');
+            toggleEl.type = 'button';
+            toggleEl.textContent = `Show ${items.length - collapsedLimit} more \u25BE`;
+            toggleEl.style.cssText = `
+                background: none;
+                border: none;
+                color: white;
+                text-decoration: underline;
+                font-size: 0.75rem;
+                font-weight: 600;
+                cursor: pointer;
+                padding: 0.375rem 0 0;
+                margin: 0;
+            `;
+
+            let expanded = false;
+            toggleEl.addEventListener('click', () => {
+                expanded = !expanded;
+                if (expanded) {
+                    renderItems(items, null);
+                    listEl.style.maxHeight = '200px';
+                    toggleEl.textContent = 'Show less \u25B4';
+                } else {
+                    renderItems(items, collapsedLimit);
+                    listEl.style.maxHeight = '120px';
+                    toggleEl.textContent = `Show ${items.length - collapsedLimit} more \u25BE`;
+                }
+            });
+
+            toastEl.appendChild(toggleEl);
+        }
+
+        // Toast will not auto-remove itself while it has an expandable list —
+        // it stays until the user closes it or a fresh toast pushes it out.
+        duration = hasMore ? 999999 : duration;
+    } else {
+        toastEl.textContent = message;
+    }
 
     const progress = document.createElement('div');
     progress.style.cssText = `

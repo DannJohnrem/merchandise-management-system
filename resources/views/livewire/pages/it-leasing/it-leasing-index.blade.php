@@ -12,7 +12,14 @@
 
     <div class="flex justify-end">
         @can('create it-leasing')
-            <flux:button icon="plus" variant="primary" href="{{ route('it-leasing.create') }}" wire:navigate></flux:button>
+            <flux:button
+                icon="plus"
+                variant="primary"
+                onclick="
+                    var qs = window.location.search;
+                    Livewire.navigate('{{ route('it-leasing.create') }}?redirect=' + encodeURIComponent(window.location.pathname + qs));
+                "
+            ></flux:button>
         @endcan
     </div>
 

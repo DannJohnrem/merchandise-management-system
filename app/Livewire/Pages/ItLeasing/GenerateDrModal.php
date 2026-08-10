@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Pages\ItLeasing;
 
+use App\Models\ItLeasing;
+use App\Models\ItLeasingStatusHistory;
 use Flux\Flux;
 use Livewire\Component;
 
@@ -60,6 +62,24 @@ class GenerateDrModal extends Component
     {
         $this->validate();
 
+        // I-update ang status ng bawat napiling item papuntang "deployed".
+        // Ginagamit ang individual saves (hindi bulk update) para ma-trigger
+        // ang ItLeasingObserver, na siyang lumilikha ng entry sa Status History.
+        $items = ItLeasing::whereIn('id', $this->selectedIds)->get();
+
+        foreach ($items as $item) {
+            if ($item->status !== 'deployed') {
+                $item->update(['status' => 'deployed']);
+
+                // I-patch ang bagong likhang history entry ng Observer
+                // para magkaroon ng malinaw na remark kung saan galing.
+                ItLeasingStatusHistory::where('it_leasing_id', $item->id)
+                    ->latest('changed_at')
+                    ->first()
+                    ?->update(['remarks' => 'Deployed via Delivery Receipt.']);
+            }
+        }
+
         $params = http_build_query([
             'ids'                => implode(',', $this->selectedIds),
             'shipped_to_company' => $this->shippedToCompany,
@@ -73,6 +93,11 @@ class GenerateDrModal extends Component
         $url = route('it-leasing.delivery-receipt') . '?' . $params;
 
         $this->dispatch('open-dr-window', url: $url);
+
+        // I-refresh ang datatable para makita agad ang bagong status,
+        // hindi na kailangan mag-reload ng buong page.
+        $this->dispatch('refreshDatatable');
+
         $this->close();
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pages\Dashboard;
 
+use App\Models\FixedAsset;
 use App\Models\ItLeasing;
 use App\Models\User;
 use Livewire\Component;
@@ -10,6 +11,34 @@ class Dashboard extends Component
 {
     // Adjust these if your actual status values are different
     protected array $statuses = ['available', 'deployed', 'in_repair', 'returned', 'lost'];
+
+    // Modal state
+    public bool $showUnitsModal = false;
+    public string $modalStatus = '';
+    public string $modalTitle = '';
+
+    public function showUnitsByStatus(string $status): void
+    {
+        $this->modalStatus = $status;
+        $this->modalTitle = match ($status) {
+            'available' => 'Available Units',
+            'deployed' => 'Deployed Units',
+            default => ucfirst(str_replace('_', ' ', $status)) . ' Units',
+        };
+        $this->showUnitsModal = true;
+    }
+
+    public function getModalUnitsProperty()
+    {
+        if (! $this->showUnitsModal || $this->modalStatus === '') {
+            return collect();
+        }
+
+        return ItLeasing::where('status', $this->modalStatus)
+            ->select(['id', 'item_name', 'model', 'serial_number', 'charger_serial_number'])
+            ->orderBy('item_name')
+            ->get();
+    }
 
     public function render()
     {
@@ -21,19 +50,26 @@ class Dashboard extends Component
         $itLeasingStatusCounts = collect($this->statuses)
             ->mapWithKeys(fn ($status) => [$status => (int) ($itLeasingRaw[$status] ?? 0)]);
 
+        // ---- Fixed Asset status counts ----
+        $fixedAssetRaw = FixedAsset::selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        $fixedAssetStatusCounts = collect($this->statuses)
+            ->mapWithKeys(fn ($status) => [$status => (int) ($fixedAssetRaw[$status] ?? 0)]);
+
+        // ---- Users count ----
+        $usersCount = User::count();
+
+        // ---- Recent items lists (last 10) ----
+        $itLeasingItems = ItLeasing::latest()->limit(10)->get();
+
         // ---- Top-level totals ----
         $totalAvailable = $itLeasingStatusCounts['available'] ?? 0;
         $totalDeployed = $itLeasingStatusCounts['deployed'] ?? 0;
 
         // ---- Total Amount to Bill this month (STATIC placeholder for now) ----
-        // TODO: replace with real computation once billing/rental logic is defined.
-        $totalBillThisMonth = null; // null = "not yet available" in the UI
-
-        // ---- Users count ----
-        $usersCount = User::count();
-
-        // ---- Recent items list (last 10) ----
-        $itLeasingItems = ItLeasing::latest()->limit(10)->get();
+        $totalBillThisMonth = null;
 
         // ---- Available units per model ----
         $availablePerModel = ItLeasing::where('status', 'available')
@@ -71,11 +107,12 @@ class Dashboard extends Component
 
         return view('livewire.pages.dashboard.dashboard', [
             'itLeasingStatusCounts' => $itLeasingStatusCounts,
+            'fixedAssetStatusCounts' => $fixedAssetStatusCounts,
+            'usersCount' => $usersCount,
+            'itLeasingItems' => $itLeasingItems,
             'totalAvailable' => $totalAvailable,
             'totalDeployed' => $totalDeployed,
             'totalBillThisMonth' => $totalBillThisMonth,
-            'usersCount' => $usersCount,
-            'itLeasingItems' => $itLeasingItems,
             'availablePerModel' => $availablePerModel,
             'laptopStatusCounts' => $laptopStatusCounts,
             'laptopsPerMonth' => $laptopsPerMonth,

@@ -8,9 +8,12 @@ use App\Models\ItLeasing;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
+use App\Concerns\HasRedirectUrl;
 
 class ItLeasingEdit extends Component
 {
+    use HasRedirectUrl;
+
     public ItLeasing $item;
 
     public $category;
@@ -33,19 +36,9 @@ class ItLeasingEdit extends Component
     public $remarks;
     public array $inclusions = [];
 
-    /**
-     * Stores the page number the user came from.
-     * Captured from the ?page= query param passed by actions.blade.php.
-     * Stored as a Livewire property so it survives the full component lifecycle.
-     */
-    public int $returnPage = 1;
-
     public function mount(ItLeasing $item)
     {
         $this->item = $item;
-
-        // actions.blade.php passes ?page=N (reads from ?it-leasing-table-page=N in the URL)
-        $this->returnPage = (int) request()->get('page', 1);
 
         $this->category              = $item->category;
         $this->item_name             = $item->item_name;
@@ -133,13 +126,7 @@ class ItLeasingEdit extends Component
                 'type'    => 'success',
             ]);
 
-            // Redirect back to the exact page the user came from.
-            // Rappasoft reads pagination from ?it-leasing-table-page=N in the URL.
-            $redirectUrl = $this->returnPage > 1
-                ? route('it-leasing.index') . '?it-leasing-tablePage=' . $this->returnPage
-                : route('it-leasing.index');
-
-            return $this->redirect($redirectUrl, navigate: true);
+            return $this->redirect($this->redirectUrl, navigate: true);
 
         } catch (ValidationException $e) {
             $this->dispatch('toast', message: 'Please check required fields.', type: 'error');

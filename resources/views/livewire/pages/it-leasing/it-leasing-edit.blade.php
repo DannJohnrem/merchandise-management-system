@@ -165,7 +165,7 @@
 
             {{-- Actions --}}
             <div class="flex justify-end space-x-2">
-                <flux:button variant="ghost" wire:navigate href="{{ route('it-leasing.index') }}">
+                <flux:button variant="ghost" wire:navigate href="{{ $redirectUrl }}">
                     Cancel
                 </flux:button>
                 <flux:button variant="primary" type="submit">

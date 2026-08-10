@@ -14,14 +14,19 @@
         <x-slot:title>{{ $itLeasing->item_name }}</x-slot:title>
         <x-slot:subtitle>View details of this IT leased item</x-slot:subtitle>
         <x-slot:actions>
-            <flux:button variant="outline" href="{{ route('it-leasing.edit', $itLeasing) }}" wire:navigate>
+            <flux:button variant="ghost" icon="arrow-left" href="{{ $redirectUrl }}" wire:navigate>
+                Back
+            </flux:button>
+            <flux:button variant="outline"
+                href="{{ route('it-leasing.edit', ['item' => $itLeasing, 'redirect' => $redirectUrl]) }}" wire:navigate>
                 Edit Item
             </flux:button>
             <flux:button variant="outline" onclick="Flux.modal('pull-out-form').show()">
                 Pull Out / Replacement Form
             </flux:button>
             <flux:spacer />
-            <flux:button variant="danger" onclick="confirm('Are you sure?') && $wire.call('delete', {{ $itLeasing->id }})">
+            <flux:button variant="danger"
+                onclick="confirm('Are you sure?') && $wire.call('delete', {{ $itLeasing->id }})">
                 Delete Item
             </flux:button>
         </x-slot:actions>
@@ -129,18 +134,18 @@
                                 $key = strtolower(trim($itLeasing->status ?? '')); // default to empty string if null
                                 $colors = [
                                     'available' => ['green', 'dark:bg-green-500 dark:text-white'],
-                                    'deployed'  => ['blue', 'dark:bg-blue-500 dark:text-white'],
+                                    'deployed' => ['blue', 'dark:bg-blue-500 dark:text-white'],
                                     'in_repair' => ['yellow', 'dark:bg-yellow-500 dark:text-black'],
-                                    'returned'  => ['purple', 'dark:bg-purple-500 dark:text-white'],
-                                    'lost'      => ['red', 'dark:bg-red-500 dark:text-white'],
+                                    'returned' => ['purple', 'dark:bg-purple-500 dark:text-white'],
+                                    'lost' => ['red', 'dark:bg-red-500 dark:text-white'],
                                 ];
 
                                 $labels = [
                                     'available' => 'Available',
-                                    'deployed'  => 'Deployed',
+                                    'deployed' => 'Deployed',
                                     'in_repair' => 'For Repair',
-                                    'returned'  => 'Returned',
-                                    'lost'      => 'Lost',
+                                    'returned' => 'Returned',
+                                    'lost' => 'Lost',
                                 ];
 
                                 [$color, $class] = $colors[$key] ?? ['slate', 'dark:bg-slate-500 dark:text-white'];
@@ -158,14 +163,14 @@
                             @php
                                 $key = strtolower(trim($itLeasing->condition ?? '')); // default to empty string if null
                                 $colors = [
-                                    'new'  => ['green', 'dark:bg-green-500 dark:text-white'],
+                                    'new' => ['green', 'dark:bg-green-500 dark:text-white'],
                                     'good' => ['blue', 'dark:bg-blue-500 dark:text-white'],
                                     'fair' => ['yellow', 'dark:bg-yellow-500 dark:text-black'],
                                     'poor' => ['red', 'dark:bg-red-500 dark:text-white'],
                                 ];
 
                                 $labels = [
-                                    'new'  => 'New',
+                                    'new' => 'New',
                                     'good' => 'Good',
                                     'fair' => 'Fair',
                                     'poor' => 'Poor',
@@ -200,6 +205,100 @@
                         @endif
                     </div>
                 </div>
+            @endif
+        </div>
+    </div>
+
+    {{-- Status History Card --}}
+    <div class="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-sm"
+        x-data="{ showAll: false }">
+        <div class="px-6 py-4 border-b border-zinc-200 dark:border-zinc-700 flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Status History</h2>
+                <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">Timeline of status changes for this item</p>
+            </div>
+            <flux:badge color="zinc" size="sm">{{ $itLeasing->statusHistories->count() }}
+                {{ Str::plural('entry', $itLeasing->statusHistories->count()) }}</flux:badge>
+        </div>
+
+        <div class="p-6 space-y-3">
+            @php
+                $statusMeta = [
+                    'available' => ['icon' => 'check-circle', 'bg' => 'bg-emerald-500', 'badge' => 'emerald'],
+                    'deployed' => ['icon' => 'arrow-up-tray', 'bg' => 'bg-blue-500', 'badge' => 'blue'],
+                    'in_repair' => ['icon' => 'wrench-screwdriver', 'bg' => 'bg-amber-500', 'badge' => 'amber'],
+                    'returned' => ['icon' => 'arrow-uturn-left', 'bg' => 'bg-zinc-400', 'badge' => 'zinc'],
+                    'lost' => ['icon' => 'x-circle', 'bg' => 'bg-red-500', 'badge' => 'red'],
+                ];
+                $defaultMeta = ['icon' => 'question-mark-circle', 'bg' => 'bg-zinc-400', 'badge' => 'zinc'];
+                $visibleLimit = 5;
+            @endphp
+
+            @forelse ($itLeasing->statusHistories as $index => $history)
+                @php
+                    $meta = $statusMeta[$history->to_status] ?? $defaultMeta;
+                    $fromMeta = $statusMeta[$history->from_status] ?? $defaultMeta;
+                @endphp
+
+                <div class="border border-zinc-200 dark:border-zinc-700 rounded-lg p-4"
+                    @if ($index >= $visibleLimit) x-show="showAll" x-cloak @endif>
+                    <div class="flex items-start gap-3">
+                        <div
+                            class="flex-shrink-0 flex items-center justify-center size-9 rounded-full {{ $meta['bg'] }}">
+                            <flux:icon :name="$meta['icon']" class="size-4.5 text-white" />
+                        </div>
+
+                        <div class="flex-1 min-w-0">
+                            <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    @if ($history->from_status)
+                                        <flux:badge size="sm" :color="$fromMeta['badge']" class="capitalize">
+                                            {{ str_replace('_', ' ', $history->from_status) }}
+                                        </flux:badge>
+                                        <x-heroicon-o-arrow-right class="w-4 h-4 text-zinc-400 flex-shrink-0" />
+                                    @endif
+                                    <flux:badge size="sm" :color="$meta['badge']" class="capitalize">
+                                        {{ str_replace('_', ' ', $history->to_status) }}
+                                    </flux:badge>
+                                </div>
+
+                                <span class="text-sm font-medium text-zinc-500 dark:text-zinc-400 whitespace-nowrap">
+                                    {{ $history->changed_at->format('M d, Y g:i A') }}
+                                </span>
+                            </div>
+
+                            <div class="flex items-center gap-1.5 mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+                                <x-heroicon-o-user class="w-4 h-4" />
+                                <span>{{ $history->changedBy?->name ?? 'System' }}</span>
+                                <span class="text-zinc-300 dark:text-zinc-600">•</span>
+                                <span>{{ $history->changed_at->diffForHumans() }}</span>
+                            </div>
+
+                            @if ($history->remarks)
+                                <p
+                                    class="mt-3 text-sm text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-700 rounded-md px-3 py-2">
+                                    {{ $history->remarks }}
+                                </p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="text-center py-10">
+                    <x-heroicon-o-clock class="w-8 h-8 text-zinc-300 dark:text-zinc-600 mx-auto mb-2" />
+                    <p class="text-sm text-zinc-400">No status changes recorded yet.</p>
+                </div>
+            @endforelse
+
+            @if ($itLeasing->statusHistories->count() > $visibleLimit)
+                <button type="button" @click="showAll = !showAll"
+                    class="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100 border border-dashed border-zinc-300 dark:border-zinc-600 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition">
+                    <span x-show="!showAll">Show {{ $itLeasing->statusHistories->count() - $visibleLimit }} more
+                        entries</span>
+                    <span x-show="showAll" x-cloak>Show less</span>
+                    <x-heroicon-o-chevron-down class="w-4 h-4 transition-transform"
+                        x-bind:class="showAll ? 'rotate-180' : ''" />
+                </button>
             @endif
         </div>
     </div>

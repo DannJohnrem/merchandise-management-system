@@ -1,10 +1,17 @@
 {{-- View --}}
 @can('view it-leasing')
-    <a href="{{ route('it-leasing.show', $item->id) }}" wire:navigate>
-        <flux:button variant="primary" color="sky" size="sm" icon="eye">
-            View
-        </flux:button>
-    </a>
+    <flux:button
+        variant="primary"
+        color="sky"
+        size="sm"
+        icon="eye"
+        onclick="
+            var qs = window.location.search;
+            Livewire.navigate('{{ route('it-leasing.show', ['itLeasing' => $item->id]) }}?redirect=' + encodeURIComponent(window.location.pathname + qs));
+        "
+    >
+        View
+    </flux:button>
 @endcan
 
 {{-- Edit --}}
@@ -15,8 +22,8 @@
         size="sm"
         icon="pencil-square"
         onclick="
-            var page = new URLSearchParams(window.location.search).get('it-leasing-tablePage') || 1;
-            Livewire.navigate('{{ route('it-leasing.edit', ['item' => $item->id]) }}?page=' + page);
+            var qs = window.location.search;
+            Livewire.navigate('{{ route('it-leasing.edit', ['item' => $item->id]) }}?redirect=' + encodeURIComponent(window.location.pathname + qs));
         "
     >
         Edit

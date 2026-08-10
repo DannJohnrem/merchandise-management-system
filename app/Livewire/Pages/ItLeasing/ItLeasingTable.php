@@ -180,17 +180,44 @@ class ItLeasingTable extends DataTableComponent
         }
     }
 
-    public function generateDeliveryReceipt(): void
-    {
-        $selected = $this->getSelected();
+   public function generateDeliveryReceipt(): void
+{
+    $selected = $this->getSelected();
 
-        if (empty($selected)) {
-            $this->dispatch('toast', message: 'No items selected.', type: 'warning');
-            return;
-        }
-
-        $this->dispatch('openDrModal', ids: array_values($selected));
+    if (empty($selected)) {
+        $this->dispatch('toast', message: 'No items selected.', type: 'warning');
+        return;
     }
+
+    $selectedItems = ItLeasing::whereIn('id', $selected)->get(['id', 'item_name', 'serial_number', 'status']);
+
+    $eligible = $selectedItems->where('status', 'available');
+    $ineligible = $selectedItems->where('status', '!=', 'available');
+
+    if ($eligible->isEmpty()) {
+        $message = array_merge(
+            ['None of the selected items are available for deployment because already deployed:'],
+            $ineligible->map(fn ($item) => "{$item->item_name} (SN: {$item->serial_number})")->values()->toArray()
+        );
+
+        $this->dispatch('toast', message: $message, type: 'error');
+        return;
+    }
+
+    if ($ineligible->isNotEmpty()) {
+        $message = array_merge(
+            ["Skipped {$ineligible->count()} item(s) already deployed:"],
+            $ineligible->map(fn ($item) => "{$item->item_name} (SN: {$item->serial_number})")->values()->toArray()
+        );
+
+        $this->dispatch('toast', message: $message, type: 'warning');
+    }
+
+    $this->clearSelected();
+    $this->setSelected($eligible->pluck('id')->values()->toArray());
+
+    $this->dispatch('openDrModal', ids: $eligible->pluck('id')->values()->toArray());
+}
 
     /**
      * Columns

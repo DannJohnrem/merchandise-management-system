@@ -3,7 +3,9 @@
 namespace App\Observers;
 
 use App\Models\ItLeasing;
+use App\Models\ItLeasingStatusHistory;
 use App\Services\ActivityLogger;
+use Illuminate\Support\Facades\Auth;
 
 class ItLeasingObserver
 {
@@ -20,6 +22,16 @@ class ItLeasingObserver
             new: $leasing->getAttributes(),
             description: 'IT Leasing item created'
         );
+
+        // Log the initial status into the dedicated status-history table
+        ItLeasingStatusHistory::create([
+            'it_leasing_id' => $leasing->id,
+            'changed_by' => Auth::id(),
+            'from_status' => null,
+            'to_status' => $leasing->status,
+            'remarks' => 'Item created.',
+            'changed_at' => now(),
+        ]);
     }
 
     /**
@@ -44,6 +56,19 @@ class ItLeasingObserver
             new: $changes,
             description: 'IT Leasing item updated'
         );
+
+        // If the status field specifically changed, also log it into the
+        // dedicated status-history table for the per-item timeline view.
+        if (array_key_exists('status', $changes)) {
+            ItLeasingStatusHistory::create([
+                'it_leasing_id' => $leasing->id,
+                'changed_by' => Auth::id(),
+                'from_status' => $old['status'] ?? null,
+                'to_status' => $changes['status'],
+                'remarks' => null,
+                'changed_at' => now(),
+            ]);
+        }
     }
 
     /**

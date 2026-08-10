@@ -3,6 +3,7 @@
 namespace App\Livewire\Pages\ItLeasing;
 
 use App\Models\ItLeasing;
+use App\Models\ItLeasingStatusHistory;
 use App\Models\PullOutForm;
 use Livewire\Component;
 
@@ -92,9 +93,24 @@ class GeneratePullOutModal extends Component
             $data['replacement_serial_no'] = 'N/A';
             $data['issued_by_name'] = null;
             $data['received_by_name'] = null;
+        } else {
+            $data['returned_by_name'] = null;
+            $data['return_received_by_name'] = null;
         }
 
         $pullOutForm = PullOutForm::create($data);
+
+        // I-update ang status ng item papuntang "returned" (auto-logged na ito ng Observer)
+        $this->itLeasing->update(['status' => 'returned']);
+
+        // I-link lang natin ang bagong history entry sa Pull Out Form na 'to
+        ItLeasingStatusHistory::where('it_leasing_id', $this->itLeasing->id)
+            ->latest('changed_at')
+            ->first()
+            ?->update([
+                'pull_out_form_id' => $pullOutForm->id,
+                'remarks' => 'Returned via Pull Out / Replacement Form.',
+            ]);
 
         $this->dispatch('pull-out-form-generated', url: route('it-leasing.pull-out.generate', $pullOutForm));
 

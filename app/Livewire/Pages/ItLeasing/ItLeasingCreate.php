@@ -8,9 +8,12 @@ use App\Models\ItLeasing;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
+use App\Concerns\HasRedirectUrl;
 
 class ItLeasingCreate extends Component
 {
+    use HasRedirectUrl;
+
     public array $items = [];
 
     public function mount()
@@ -120,17 +123,14 @@ class ItLeasingCreate extends Component
     public function save()
     {
         try {
-            // Step 1: Validate
             $this->validate($this->validationRules());
 
-            // Step 2: Collect serial numbers and charger serial numbers
             $serialNumbers = collect($this->items)->pluck('serial_number');
             $chargerSerials = collect($this->items)
                 ->pluck('charger_serial_number')
                 ->filter()
                 ->values();
 
-            // Step 3: Check for duplicates within the batch
             if ($serialNumbers->unique()->count() !== $serialNumbers->count()) {
                 $this->dispatch('toast', message: 'Duplicate serial numbers found within the batch.', type: 'error');
                 return;
@@ -141,7 +141,6 @@ class ItLeasingCreate extends Component
                 return;
             }
 
-            // Step 4: Check for duplicates against the database
             $existingSerials = ItLeasing::whereIn('serial_number', $serialNumbers)
                 ->pluck('serial_number');
 
@@ -160,7 +159,6 @@ class ItLeasingCreate extends Component
                 }
             }
 
-            // Step 5: Save all items
             foreach ($this->items as $item) {
                 $item['inclusions'] = $item['inclusions'] ?? [];
                 ItLeasing::create($item);
@@ -174,7 +172,7 @@ class ItLeasingCreate extends Component
                 'type'    => 'success',
             ]);
 
-            $this->redirect(route('it-leasing.index'), navigate: true);
+            $this->redirect($this->redirectUrl, navigate: true);
 
         } catch (ValidationException $e) {
             $this->dispatch('toast', message: 'Please check required fields.', type: 'error');
